@@ -27,7 +27,7 @@ if os.path.exists(_env_path):
         pass
 
 # Model identification (Official Google AI Studio Gemma-4 Model)
-GEMA4_MODEL_IDENTIFIER = "GEMA-4-26B-IT (gemma-4-26b-a4b-it via Google AI Studio)"
+GEMA4_MODEL_IDENTIFIER = "Gemma-4-26B-IT (gemma-4-26b-a4b-it / GEMA-4 via Google AI Studio)"
 GEMA4_STUDIO_MODEL = os.environ.get("GEMMA4_MODEL", "gemma-4-26b-a4b-it")
 GEMA4_MODEL_FAMILY = "Gemma-4 Open Architecture (Apache 2.0 Licensed, Google AI Studio)"
 GEMA4_QUANTIZATION = "Google AI Studio Cloud TPU / On-Premise Fallback"

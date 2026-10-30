@@ -955,22 +955,25 @@ def get_finance_overview():
 
 # --- GEMA-4 Open-Source AI Intelligence & Real-Time Operational Analytics ---
 
+@app.route('/api/gemma4/info', methods=['GET'])
 @app.route('/api/gema4/info', methods=['GET'])
 def get_gema4_info():
-    """Returns official specification of the GEMA-4 open-source engine powering MANN 2.0"""
+    """Returns official specification of the Gemma 4 open-source engine powering MANN 2.0"""
     return jsonify(gema4.get_model_specs())
 
+@app.route('/api/gemma4/triage', methods=['POST'])
 @app.route('/api/gema4/triage', methods=['POST'])
 def run_gema4_triage():
-    """Live GEMA-4 AI Triage for maintenance tickets and campus issues"""
+    """Live Gemma 4 AI Triage for maintenance tickets and campus issues"""
     data = request.get_json(silent=True) or {}
     title = data.get('title', '')
     desc = data.get('description', '')
     cat = data.get('category', 'General')
     urgency = data.get('urgency', 'Medium')
     analysis = gema4.triage_complaint(title, desc, cat, urgency)
-    return jsonify({'gema4_analysis': analysis})
+    return jsonify({'gema4_analysis': analysis, 'gemma4_analysis': analysis})
 
+@app.route('/api/gemma4/chat', methods=['POST'])
 @app.route('/api/gema4/chat', methods=['POST'])
 def gema4_chat_endpoint():
     """Interactive Gemma-4 conversational intelligence for mobile and desktop"""
@@ -984,6 +987,7 @@ def gema4_chat_endpoint():
     reply = gema4.chat(message, user_role=role, user_name=name)
     return jsonify(reply)
 
+@app.route('/api/gemma4/assist-complaint', methods=['POST'])
 @app.route('/api/gema4/assist-complaint', methods=['POST'])
 def gema4_assist_complaint():
     """Gemma-4 automated ticket polishing and categorization"""
