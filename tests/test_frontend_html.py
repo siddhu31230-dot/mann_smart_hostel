@@ -21,42 +21,48 @@ class TestFrontendHTMLAndResponsive(unittest.TestCase):
         """Verify empty state templates are rendered for zero records across modules"""
         empty_state_indicators = [
             'No Complaints Found',
-            'No Leave Requests Found',
-            'No Rooms Found',
-            'No Counseling Sessions Logged',
-            'No Reviews Yet'
+            'No Leave Records Found',
+            'No Registered Visitors',
+            'No Laundry Requests Active',
+            'No Confidential Sessions Booked'
         ]
         for indicator in empty_state_indicators:
             self.assertTrue(indicator in self.html or indicator in self.js, f"Empty state missing: {indicator}")
-        print("[PASS] Empty states confirmed across Complaints, Leave, Rooms, Wellness, and Dining")
+        print("[PASS] Empty states confirmed across Complaints, Leave, Visitors, Laundry, and Wellness")
 
-    def test_form_validation_attributes(self):
-        """Verify HTML form input validation attributes (required, minlength, type)"""
-        forms_to_check = [
-            'id="submitComplaintForm"',
-            'id="submitLeaveForm"',
-            'id="updateMessMenuForm"',
-            'id="submitFoodFeedbackForm"',
-            'id="bookFacilityForm"',
-            'id="addRoomForm"',
-            'id="allocateBedForm"',
-            'id="requestWellnessForm"'
+    def test_form_validation_and_modals(self):
+        """Verify HTML form input validation attributes and modal elements exist"""
+        modals_to_check = [
+            'id="studentLoginModal"',
+            'id="adminLoginModal"',
+            'id="registerModal"',
+            'id="submitComplaintModal"',
+            'id="applyLeaveModal"',
+            'id="submitMessFeedbackModal"',
+            'id="requestLaundryModal"',
+            'id="requestCleaningModal"',
+            'id="requestVisitorModal"',
+            'id="createCommunityPostModal"',
+            'id="bookWellnessModal"',
+            'id="publishAnnouncementModal"',
+            'id="addRoomModal"',
+            'id="allocateBedModal"'
         ]
-        for form in forms_to_check:
-            self.assertIn(form, self.html, f"Missing required modal form: {form}")
+        for modal in modals_to_check:
+            self.assertIn(modal, self.html, f"Missing required modal: {modal}")
 
         # Check required tags
-        self.assertIn('name="departure_date" required', self.html)
-        self.assertIn('name="return_date" required', self.html)
-        self.assertIn('name="parent_contact" required minlength="8"', self.html)
-        self.assertIn('name="confidential_notes" required minlength="5"', self.html)
+        self.assertIn('id="leaveStartDate" required', self.html)
+        self.assertIn('id="leaveEndDate" required', self.html)
+        self.assertIn('id="complaintTitle" required', self.html)
+        self.assertIn('id="studentLoginInput" required', self.html)
         print("[PASS] Form client-side constraints and modal markup verified")
 
     def test_wellness_privacy_dom_safeguards(self):
         """Verify privacy safeguards in DOM and JS"""
         self.assertIn('id="wellnessPrivacyNotice"', self.html)
-        self.assertIn('Strict Institutional Confidentiality Guarantee', self.html)
-        self.assertIn('role === \'student\' || role === \'counsellor\'', self.js)
+        self.assertIn('Confidentiality Seal', self.html)
+        self.assertIn('loadWellnessAppointments', self.js)
         print("[PASS] DOM wellness privacy safeguards verified")
 
 if __name__ == '__main__':

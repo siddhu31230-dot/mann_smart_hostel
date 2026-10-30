@@ -1,8 +1,10 @@
 import os
 import sqlite3
+import random
+import string
 from datetime import datetime, date
 from functools import wraps
-from flask import Flask, request, jsonify, session, send_from_directory, render_template
+from flask import Flask, request, jsonify, session, send_from_directory
 
 from database import get_db, hash_password, init_db
 
@@ -22,7 +24,11 @@ def get_current_user():
     if not user_id:
         return None
     conn = get_db()
-    user = conn.execute("SELECT id, username, full_name, role, email, room_number, bed_number FROM users WHERE id = ?", (user_id,)).fetchone()
+    user = conn.execute("""
+    SELECT id, username, college_id, full_name, role, email, phone, 
+           room_number, bed_number, guardian_name, guardian_phone, approval_status, is_active 
+    FROM users WHERE id = ?
+    """, (user_id,)).fetchone()
     conn.close()
     if user:
         return dict(user)
@@ -57,27 +63,66 @@ def require_role(*roles):
 @app.route('/')
 @app.route('/dashboard')
 @app.route('/login')
+@app.route('/admin')
 def index():
     return send_from_directory(app.static_folder, 'index.html')
 
-# --- Authentication Endpoints ---
+# --- Authentication Endpoints (MANN 2.0) ---
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     data = request.get_json(silent=True) or {}
-    username = data.get('username', '').strip()
+    identifier = (data.get('identifier', '') or data.get('username', '') or data.get('login', '')).strip()
     password = data.get('password', '').strip()
+    portal_type = (data.get('portal_type', '') or data.get('portal', '')).strip().lower() # 'student' or 'admin'
 
-    if not username or not password:
-        return jsonify({'error': 'Username and password are required', 'code': 'VALIDATION_ERROR'}), 400
+    if not identifier or not password:
+        return jsonify({'error': 'College ID / Username and password are required', 'code': 'VALIDATION_ERROR'}), 400
 
     conn = get_db()
     pw_hash = hash_password(password)
-    user = conn.execute("SELECT * FROM users WHERE username = ? AND password_hash = ?", (username, pw_hash)).fetchone()
+
+    # Allow login with either college_id or username
+    user = conn.execute("""
+    SELECT * FROM users 
+    WHERE (username = ? OR college_id = ? OR email = ?) AND password_hash = ?
+    """, (identifier, identifier, identifier, pw_hash)).fetchone()
     conn.close()
 
     if not user:
-        return jsonify({'error': 'Invalid username or password', 'code': 'INVALID_CREDENTIALS'}), 401
+        return jsonify({'error': 'Invalid credentials. Please verify your College ID/Username and password.', 'code': 'INVALID_CREDENTIALS'}), 401
+
+    # Check approval status for students
+    if user['role'] == 'student':
+        if user['approval_status'] == 'pending':
+            return jsonify({
+                'error': 'Your student registration is awaiting Administrator approval. You will gain access once approved by the hostel office.',
+                'code': 'APPROVAL_PENDING'
+            }), 403
+        elif user['approval_status'] == 'rejected':
+            return jsonify({
+                'error': 'Your registration was not approved. Please contact the hostel administrative desk.',
+                'code': 'APPROVAL_REJECTED'
+            }), 403
+
+    if user['is_active'] == 0:
+        return jsonify({
+            'error': 'Your account has been deactivated. Please contact campus administration.',
+            'code': 'ACCOUNT_DEACTIVATED'
+        }), 403
+
+    # Portal isolation check
+    if portal_type == 'student' and user['role'] not in ['student']:
+        return jsonify({
+            'error': 'Notice: This portal is for students. Administrative and staff accounts must log in via the Admin & Staff Portal.',
+            'code': 'PORTAL_MISMATCH'
+        }), 403
+
+    if portal_type == 'admin' and user['role'] == 'student':
+        return jsonify({
+            'error': 'Access Denied: Student accounts cannot access the administrative console. Please log in via the Student Portal.',
+            'code': 'PORTAL_MISMATCH'
+        }), 403
 
     session['user_id'] = user['id']
     session['username'] = user['username']
@@ -85,16 +130,104 @@ def login():
     session['full_name'] = user['full_name']
 
     return jsonify({
-        'message': 'Login successful',
+        'message': f'Welcome back, {user["full_name"]}!',
         'user': {
             'id': user['id'],
             'username': user['username'],
+            'college_id': user['college_id'],
             'full_name': user['full_name'],
             'role': user['role'],
             'email': user['email'],
+            'phone': user['phone'],
             'room_number': user['room_number'],
-            'bed_number': user['bed_number']
+            'bed_number': user['bed_number'],
+            'guardian_name': user['guardian_name'],
+            'guardian_phone': user['guardian_phone'],
+            'approval_status': user['approval_status']
         }
+    })
+
+@app.route('/api/auth/register', methods=['POST'])
+def register():
+    data = request.get_json(silent=True) or {}
+    full_name = data.get('full_name', '').strip()
+    college_id = data.get('college_id', '').strip().upper()
+    email = data.get('email', '').strip().lower()
+    phone = data.get('phone', '').strip()
+    password = data.get('password', '').strip()
+    guardian_name = data.get('guardian_name', '').strip()
+    guardian_phone = data.get('guardian_phone', '').strip()
+
+    errors = {}
+    if not full_name or len(full_name) < 2:
+        errors['full_name'] = 'Full name is required (min 2 characters)'
+    if not college_id or len(college_id) < 3:
+        errors['college_id'] = 'Valid College ID is required (e.g. NST2026-099)'
+    if not email or '@' not in email:
+        errors['email'] = 'Valid university/personal email is required'
+    if not password or len(password) < 6:
+        errors['password'] = 'Password must be at least 6 characters long'
+
+    if errors:
+        return jsonify({'error': 'Validation failed', 'validation_errors': errors, 'code': 'VALIDATION_ERROR'}), 400
+
+    conn = get_db()
+    existing = conn.execute("""
+    SELECT id, username, college_id, email FROM users 
+    WHERE college_id = ? OR email = ?
+    """, (college_id, email)).fetchone()
+
+    if existing:
+        conn.close()
+        field = 'College ID' if existing['college_id'] == college_id else 'Email'
+        return jsonify({'error': f'An account with this {field} already exists.', 'code': 'CONFLICT'}), 409
+
+    # Generate a username based on college_id
+    username = college_id.lower().replace('-', '_')
+    pw_hash = hash_password(password)
+
+    cursor = conn.cursor()
+    cursor.execute("""
+    INSERT INTO users (username, college_id, password_hash, full_name, role, email, phone, guardian_name, guardian_phone, approval_status, is_active)
+    VALUES (?, ?, ?, ?, 'student', ?, ?, ?, ?, 'pending', 1)
+    """, (username, college_id, pw_hash, full_name, email, phone, guardian_name, guardian_phone))
+    new_user_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        'message': 'Registration submitted successfully! Your account is pending Administrator review and approval before login is enabled.',
+        'student_id': new_user_id,
+        'user_id': new_user_id,
+        'college_id': college_id
+    }), 201
+
+@app.route('/api/auth/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.get_json(silent=True) or {}
+    identifier = data.get('identifier', '').strip()
+    new_password = data.get('new_password', '').strip()
+
+    if not identifier:
+        return jsonify({'error': 'College ID or Email is required', 'code': 'VALIDATION_ERROR'}), 400
+
+    if not new_password or len(new_password) < 6:
+        return jsonify({'error': 'New password must be at least 6 characters long', 'code': 'VALIDATION_ERROR'}), 400
+
+    conn = get_db()
+    user = conn.execute("SELECT id, full_name, email FROM users WHERE college_id = ? OR email = ? OR username = ?", (identifier, identifier, identifier)).fetchone()
+    if not user:
+        conn.close()
+        return jsonify({'error': 'No account found matching this College ID or Email.', 'code': 'NOT_FOUND'}), 404
+
+    pw_hash = hash_password(new_password)
+    conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (pw_hash, user['id']))
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        'message': f'Password successfully updated for {user["full_name"]}. You can now log in with your new password.',
+        'code': 'PASSWORD_RESET_SUCCESS'
     })
 
 @app.route('/api/auth/quick-switch', methods=['POST'])
@@ -107,7 +240,11 @@ def quick_switch():
         return jsonify({'error': f'Invalid role for quick switch: {target_role}', 'code': 'VALIDATION_ERROR'}), 400
 
     conn = get_db()
-    user = conn.execute("SELECT * FROM users WHERE role = ? ORDER BY id ASC LIMIT 1", (target_role,)).fetchone()
+    # If student, switch to student1 specifically to get active allocations
+    if target_role == 'student':
+        user = conn.execute("SELECT * FROM users WHERE username = 'student1' LIMIT 1").fetchone()
+    else:
+        user = conn.execute("SELECT * FROM users WHERE role = ? ORDER BY id ASC LIMIT 1", (target_role,)).fetchone()
     conn.close()
 
     if not user:
@@ -123,11 +260,14 @@ def quick_switch():
         'user': {
             'id': user['id'],
             'username': user['username'],
+            'college_id': user['college_id'],
             'full_name': user['full_name'],
             'role': user['role'],
             'email': user['email'],
+            'phone': user['phone'],
             'room_number': user['room_number'],
-            'bed_number': user['bed_number']
+            'bed_number': user['bed_number'],
+            'approval_status': user['approval_status']
         }
     })
 
@@ -143,7 +283,691 @@ def logout():
     session.clear()
     return jsonify({'message': 'Logged out successfully'})
 
-# --- Workflow 1-5: Complaints & Redressal ---
+# --- Student Dashboard Features (MANN 2.0) ---
+
+@app.route('/api/student/room-details', methods=['GET'])
+@require_role('student')
+def get_student_room_details():
+    user = get_current_user()
+    if not user.get('room_number'):
+        return jsonify({
+            'allocated': False,
+            'message': 'No room currently allocated. Please request allocation from the hostel administrator.'
+        })
+
+    conn = get_db()
+    room = conn.execute("SELECT * FROM rooms WHERE room_number = ?", (user['room_number'],)).fetchone()
+    if not room:
+        conn.close()
+        return jsonify({'allocated': False, 'message': 'Room record not found in system'})
+
+    # Find roommates in the same room
+    roommates = conn.execute("""
+    SELECT u.id, u.full_name, u.college_id, u.email, u.phone, b.bed_label
+    FROM bed_allocations b
+    JOIN users u ON b.student_id = u.id
+    WHERE b.room_id = ? AND u.id != ?
+    """, (room['id'], user['id'])).fetchall()
+
+    my_bed = user.get('bed_number', 'Bed A')
+    conn.close()
+
+    return jsonify({
+        'allocated': True,
+        'room': dict(room),
+        'my_bed': my_bed,
+        'roommates': [dict(r) for r in roommates]
+    })
+
+@app.route('/api/student/fees', methods=['GET'])
+@require_role('student')
+def get_student_fees():
+    user = get_current_user()
+    conn = get_db()
+    fees = conn.execute("""
+    SELECT * FROM fee_payments
+    WHERE student_id = ?
+    ORDER BY CASE payment_status WHEN 'Overdue' THEN 1 WHEN 'Pending' THEN 2 ELSE 3 END, due_date ASC
+    """, (user['id'],)).fetchall()
+
+    summary = conn.execute("""
+    SELECT 
+        SUM(amount) as total_billed,
+        SUM(CASE WHEN payment_status = 'Paid' THEN amount ELSE 0 END) as total_paid,
+        SUM(CASE WHEN payment_status != 'Paid' THEN amount ELSE 0 END) as total_outstanding
+    FROM fee_payments
+    WHERE student_id = ?
+    """, (user['id'],)).fetchone()
+    conn.close()
+
+    return jsonify({
+        'fees': [dict(f) for f in fees],
+        'summary': dict(summary) if summary else {}
+    })
+
+@app.route('/api/student/pay-fee/<int:fee_id>', methods=['POST'])
+@require_role('student')
+def pay_fee(fee_id):
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+    method = data.get('payment_method', 'UPI / Net Banking')
+
+    conn = get_db()
+    fee = conn.execute("SELECT * FROM fee_payments WHERE id = ? AND student_id = ?", (fee_id, user['id'])).fetchone()
+    if not fee:
+        conn.close()
+        return jsonify({'error': 'Fee invoice not found', 'code': 'NOT_FOUND'}), 404
+
+    if fee['payment_status'] == 'Paid':
+        conn.close()
+        return jsonify({'error': 'This invoice has already been cleared', 'code': 'ALREADY_PAID'}), 400
+
+    txn_id = f"TXN-MANN-{''.join(random.choices(string.digits, k=8))}"
+    conn.execute("""
+    UPDATE fee_payments
+    SET payment_status = 'Paid', transaction_id = ?, payment_method = ?, paid_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+    """, (txn_id, method, fee_id))
+    conn.commit()
+
+    updated = conn.execute("SELECT * FROM fee_payments WHERE id = ?", (fee_id,)).fetchone()
+    conn.close()
+
+    return jsonify({
+        'message': f'Payment of ₹{fee["amount"]:,.2f} completed successfully! Transaction ID: {txn_id}',
+        'fee': dict(updated)
+    })
+
+# --- Laundry Module (MANN 2.0) ---
+
+@app.route('/api/laundry', methods=['GET'])
+@login_required
+def list_laundry_requests():
+    user = get_current_user()
+    role = user['role']
+    conn = get_db()
+
+    if role == 'student':
+        rows = conn.execute("""
+        SELECT l.*, u.full_name as student_name, u.room_number
+        FROM laundry_requests l
+        JOIN users u ON l.student_id = u.id
+        WHERE l.student_id = ?
+        ORDER BY l.created_at DESC
+        """, (user['id'],)).fetchall()
+    else: # Admin, Warden, Staff
+        rows = conn.execute("""
+        SELECT l.*, u.full_name as student_name, u.room_number, u.college_id
+        FROM laundry_requests l
+        JOIN users u ON l.student_id = u.id
+        ORDER BY CASE l.status WHEN 'Requested' THEN 1 WHEN 'In Washing' THEN 2 WHEN 'Ready for Pickup' THEN 3 ELSE 4 END, l.created_at DESC
+        """).fetchall()
+
+    conn.close()
+    return jsonify({'requests': [dict(r) for r in rows]})
+
+@app.route('/api/laundry', methods=['POST'])
+@require_role('student')
+def submit_laundry_request():
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+
+    raw_service = data.get('service_type', 'Wash & Fold').strip()
+    if 'Express' in raw_service:
+        service_type = 'Express Wash'
+    elif 'Dry' in raw_service:
+        service_type = 'Dry Cleaning'
+    elif 'Iron' in raw_service:
+        service_type = 'Wash & Iron'
+    else:
+        service_type = 'Wash & Fold'
+
+    item_count = data.get('item_count')
+    pickup_date = data.get('pickup_date', date.today().isoformat()).strip()
+    special_instructions = (data.get('special_instructions', '') or data.get('special_notes', '')).strip()
+
+    valid_services = ['Wash & Fold', 'Wash & Iron', 'Dry Cleaning', 'Express Wash']
+    if service_type not in valid_services:
+        return jsonify({'error': f'Service type must be one of: {", ".join(valid_services)}', 'code': 'VALIDATION_ERROR'}), 400
+
+    if not item_count or not isinstance(item_count, int) or item_count < 1 or item_count > 40:
+        return jsonify({'error': 'Item count must be between 1 and 40 garments', 'code': 'VALIDATION_ERROR'}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+    INSERT INTO laundry_requests (student_id, service_type, item_count, special_instructions, pickup_date, status)
+    VALUES (?, ?, ?, ?, ?, 'Requested')
+    """, (user['id'], service_type, item_count, special_instructions, pickup_date))
+    req_id = cursor.lastrowid
+    conn.commit()
+
+    created = conn.execute("""
+    SELECT l.*, u.full_name as student_name, u.room_number
+    FROM laundry_requests l
+    JOIN users u ON l.student_id = u.id
+    WHERE l.id = ?
+    """, (req_id,)).fetchone()
+    conn.close()
+
+    return jsonify({
+        'message': f'Laundry request #{req_id} submitted successfully! Please drop off your clothes bag at the ground floor laundry desk.',
+        'request': dict(created)
+    }), 201
+
+@app.route('/api/laundry/<int:req_id>/status', methods=['PUT'])
+@require_role('admin', 'warden', 'maintenance')
+def update_laundry_status(req_id):
+    data = request.get_json(silent=True) or {}
+    status = data.get('status', '').strip()
+    admin_notes = data.get('admin_notes', '').strip()
+
+    valid_statuses = ['Requested', 'In Washing', 'Ready for Pickup', 'Delivered', 'Cancelled']
+    if status not in valid_statuses:
+        return jsonify({'error': f'Invalid status. Must be: {", ".join(valid_statuses)}', 'code': 'VALIDATION_ERROR'}), 400
+
+    conn = get_db()
+    conn.execute("""
+    UPDATE laundry_requests
+    SET status = ?, admin_notes = ?, updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+    """, (status, admin_notes, req_id))
+    conn.commit()
+
+    updated = conn.execute("""
+    SELECT l.*, u.full_name as student_name, u.room_number
+    FROM laundry_requests l
+    JOIN users u ON l.student_id = u.id
+    WHERE l.id = ?
+    """, (req_id,)).fetchone()
+    conn.close()
+
+    return jsonify({
+        'message': f'Laundry order #{req_id} status updated to {status}',
+        'request': dict(updated)
+    })
+
+# --- Cleaning Requests Module (MANN 2.0) ---
+
+@app.route('/api/cleaning', methods=['GET'])
+@login_required
+def list_cleaning_requests():
+    user = get_current_user()
+    role = user['role']
+    conn = get_db()
+
+    if role == 'student':
+        rows = conn.execute("""
+        SELECT c.*, u.full_name as student_name, u.room_number
+        FROM cleaning_requests c
+        JOIN users u ON c.student_id = u.id
+        WHERE c.student_id = ?
+        ORDER BY c.created_at DESC
+        """, (user['id'],)).fetchall()
+    else:
+        rows = conn.execute("""
+        SELECT c.*, u.full_name as student_name, u.room_number
+        FROM cleaning_requests c
+        JOIN users u ON c.student_id = u.id
+        ORDER BY CASE c.status WHEN 'Scheduled' THEN 1 WHEN 'In Progress' THEN 2 ELSE 3 END, c.created_at DESC
+        """).fetchall()
+
+    conn.close()
+    return jsonify({'requests': [dict(r) for r in rows]})
+
+@app.route('/api/cleaning', methods=['POST'])
+@require_role('student')
+def submit_cleaning_request():
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+
+    cleaning_type = data.get('cleaning_type', 'Room Dusting & Mopping').strip()
+    preferred_date = data.get('preferred_date', '').strip()
+    preferred_slot = data.get('preferred_slot', 'Morning (9 AM - 12 PM)').strip()
+    notes = data.get('notes', '').strip()
+
+    if not preferred_date:
+        return jsonify({'error': 'Preferred cleaning date is required', 'code': 'VALIDATION_ERROR'}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+    INSERT INTO cleaning_requests (student_id, cleaning_type, preferred_date, preferred_slot, notes, status, assigned_staff)
+    VALUES (?, ?, ?, ?, ?, 'Scheduled', 'Housekeeping Team (Duty Shift)')
+    """, (user['id'], cleaning_type, preferred_date, preferred_slot, notes))
+    clean_id = cursor.lastrowid
+    conn.commit()
+
+    created = conn.execute("SELECT * FROM cleaning_requests WHERE id = ?", (clean_id,)).fetchone()
+    conn.close()
+
+    return jsonify({
+        'message': f'Cleaning request #{clean_id} scheduled for {preferred_date} ({preferred_slot}). Housekeeping staff assigned.',
+        'request': dict(created)
+    }), 201
+
+@app.route('/api/cleaning/<int:clean_id>/status', methods=['PUT'])
+@require_role('admin', 'warden', 'maintenance')
+def update_cleaning_status(clean_id):
+    data = request.get_json(silent=True) or {}
+    status = data.get('status', 'Completed').strip()
+    assigned_staff = data.get('assigned_staff', '').strip()
+
+    conn = get_db()
+    conn.execute("""
+    UPDATE cleaning_requests
+    SET status = ?, assigned_staff = COALESCE(NULLIF(?, ''), assigned_staff)
+    WHERE id = ?
+    """, (status, assigned_staff, clean_id))
+    conn.commit()
+
+    updated = conn.execute("SELECT * FROM cleaning_requests WHERE id = ?", (clean_id,)).fetchone()
+    conn.close()
+
+    return jsonify({'message': f'Cleaning request #{clean_id} updated to {status}', 'request': dict(updated)})
+
+# --- Visitor Gate Pass Module (MANN 2.0) ---
+
+@app.route('/api/visitors', methods=['GET'])
+@login_required
+def list_visitor_requests():
+    user = get_current_user()
+    role = user['role']
+    conn = get_db()
+
+    if role == 'student':
+        rows = conn.execute("""
+        SELECT v.*, u.full_name as student_name, u.room_number, w.full_name as reviewer_name
+        FROM visitor_requests v
+        JOIN users u ON v.student_id = u.id
+        LEFT JOIN users w ON v.reviewed_by = w.id
+        WHERE v.student_id = ?
+        ORDER BY v.created_at DESC
+        """, (user['id'],)).fetchall()
+    else:
+        rows = conn.execute("""
+        SELECT v.*, u.full_name as student_name, u.room_number, u.college_id, w.full_name as reviewer_name
+        FROM visitor_requests v
+        JOIN users u ON v.student_id = u.id
+        LEFT JOIN users w ON v.reviewed_by = w.id
+        ORDER BY CASE v.status WHEN 'Pending' THEN 1 WHEN 'Approved' THEN 2 ELSE 3 END, v.created_at DESC
+        """).fetchall()
+
+    conn.close()
+    return jsonify({'visitors': [dict(r) for r in rows]})
+
+@app.route('/api/visitors', methods=['POST'])
+@require_role('student')
+def submit_visitor_request():
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+
+    visitor_name = data.get('visitor_name', '').strip()
+    relation = data.get('relation', '').strip()
+    contact_number = data.get('contact_number', '').strip()
+    visit_date = data.get('visit_date', '').strip()
+    expected_duration = data.get('expected_duration', '2 Hours').strip()
+    purpose = data.get('purpose', '').strip()
+
+    if not visitor_name or len(visitor_name) < 2:
+        return jsonify({'error': 'Visitor name is required', 'code': 'VALIDATION_ERROR'}), 400
+    if not relation:
+        return jsonify({'error': 'Visitor relation is required (e.g. Parent, Sibling, Friend)', 'code': 'VALIDATION_ERROR'}), 400
+    if not contact_number or len(contact_number) < 8:
+        return jsonify({'error': 'Valid contact phone number is required', 'code': 'VALIDATION_ERROR'}), 400
+    if not visit_date:
+        return jsonify({'error': 'Visit date is required', 'code': 'VALIDATION_ERROR'}), 400
+
+    pass_code = f"VP-{''.join(random.choices(string.digits, k=4))}"
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+    INSERT INTO visitor_requests (student_id, visitor_name, relation, contact_number, visit_date, expected_duration, purpose, pass_code, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
+    """, (user['id'], visitor_name, relation, contact_number, visit_date, expected_duration, purpose, pass_code))
+    v_id = cursor.lastrowid
+    conn.commit()
+
+    created = conn.execute("SELECT * FROM visitor_requests WHERE id = ?", (v_id,)).fetchone()
+    conn.close()
+
+    return jsonify({
+        'message': f'Visitor pass application submitted successfully! Pass Code: {pass_code} (Pending Warden/Admin review).',
+        'visitor': dict(created)
+    }), 201
+
+@app.route('/api/visitors/<int:v_id>/review', methods=['PUT'])
+@require_role('admin', 'warden')
+def review_visitor_request(v_id):
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+    decision = data.get('decision', 'Approved').strip()
+    remarks = data.get('remarks', '').strip()
+
+    valid_decisions = ['Approved', 'Rejected', 'Checked In', 'Checked Out']
+    if decision not in valid_decisions:
+        return jsonify({'error': f'Decision must be one of: {", ".join(valid_decisions)}', 'code': 'VALIDATION_ERROR'}), 400
+
+    conn = get_db()
+    conn.execute("""
+    UPDATE visitor_requests
+    SET status = ?, reviewed_by = ?, remarks = ?
+    WHERE id = ?
+    """, (decision, user['id'], remarks, v_id))
+    conn.commit()
+
+    updated = conn.execute("""
+    SELECT v.*, u.full_name as student_name, w.full_name as reviewer_name
+    FROM visitor_requests v
+    JOIN users u ON v.student_id = u.id
+    LEFT JOIN users w ON v.reviewed_by = w.id
+    WHERE v.id = ?
+    """, (v_id,)).fetchone()
+    conn.close()
+
+    return jsonify({
+        'message': f'Visitor pass #{v_id} marked as {decision}',
+        'visitor': dict(updated)
+    })
+
+# --- Announcements Module (MANN 2.0) ---
+
+@app.route('/api/announcements', methods=['GET'])
+def list_announcements():
+    category = request.args.get('category', '').strip()
+    conn = get_db()
+
+    query = """
+    SELECT a.*, u.full_name as author_name
+    FROM announcements a
+    LEFT JOIN users u ON a.created_by = u.id
+    WHERE 1=1
+    """
+    params = []
+    if category and category != 'All':
+        query += " AND a.category = ?"
+        params.append(category)
+
+    query += " ORDER BY CASE a.priority WHEN 'Critical' THEN 1 WHEN 'High' THEN 2 ELSE 3 END, a.created_at DESC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+
+    return jsonify({'announcements': [dict(r) for r in rows]})
+
+@app.route('/api/announcements', methods=['POST'])
+@require_role('admin', 'warden')
+def create_announcement():
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+
+    title = data.get('title', '').strip()
+    content = data.get('content', '').strip()
+    category = data.get('category', 'General').strip()
+    priority = data.get('priority', 'Normal').strip()
+    if priority == 'Urgent':
+        priority = 'Critical'
+    target_audience = data.get('target_audience', 'All').strip()
+
+    valid_cats = ['General', 'Urgent', 'Event', 'Maintenance', 'Academic']
+    valid_priorities = ['Normal', 'High', 'Critical']
+
+    if not title or len(title) < 3:
+        return jsonify({'error': 'Title must be at least 3 characters', 'code': 'VALIDATION_ERROR'}), 400
+    if not content or len(content) < 5:
+        return jsonify({'error': 'Content must be at least 5 characters', 'code': 'VALIDATION_ERROR'}), 400
+    if category not in valid_cats:
+        return jsonify({'error': f'Category must be one of: {", ".join(valid_cats)}', 'code': 'VALIDATION_ERROR'}), 400
+    if priority not in valid_priorities:
+        return jsonify({'error': f'Priority must be one of: {", ".join(valid_priorities)}', 'code': 'VALIDATION_ERROR'}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+    INSERT INTO announcements (title, content, category, priority, created_by, target_audience)
+    VALUES (?, ?, ?, ?, ?, ?)
+    """, (title, content, category, priority, user['id'], target_audience))
+    ann_id = cursor.lastrowid
+    conn.commit()
+
+    created = conn.execute("""
+    SELECT a.*, u.full_name as author_name
+    FROM announcements a
+    LEFT JOIN users u ON a.created_by = u.id
+    WHERE a.id = ?
+    """, (ann_id,)).fetchone()
+    conn.close()
+
+    return jsonify({
+        'message': f'Announcement "{title}" broadcasted to residents successfully',
+        'announcement': dict(created)
+    }), 201
+
+# --- Community Forum Module (MANN 2.0) ---
+
+@app.route('/api/community', methods=['GET'])
+@login_required
+def list_community_posts():
+    category = request.args.get('category', '').strip()
+    conn = get_db()
+    query = """
+    SELECT p.*, u.full_name as author_name, u.room_number, u.role
+    FROM community_posts p
+    JOIN users u ON p.user_id = u.id
+    WHERE 1=1
+    """
+    params = []
+    if category and category != 'All':
+        query += " AND p.club_category = ?"
+        params.append(category)
+
+    query += " ORDER BY p.created_at DESC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return jsonify({'posts': [dict(r) for r in rows]})
+
+@app.route('/api/community', methods=['POST'])
+@login_required
+def create_community_post():
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+
+    title = data.get('title', '').strip()
+    content = data.get('content', '').strip()
+    club_category = data.get('club_category', 'General Discussion').strip()
+
+    valid_clubs = ['General Discussion', 'Coding & Hackathons', 'Sports & Fitness', 'Cultural & Music', 'Study Groups', 'Lost & Found']
+    if not title or len(title) < 3:
+        return jsonify({'error': 'Title must be at least 3 characters', 'code': 'VALIDATION_ERROR'}), 400
+    if not content or len(content) < 5:
+        return jsonify({'error': 'Content must be at least 5 characters', 'code': 'VALIDATION_ERROR'}), 400
+    if club_category not in valid_clubs:
+        return jsonify({'error': f'Category must be: {", ".join(valid_clubs)}', 'code': 'VALIDATION_ERROR'}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+    INSERT INTO community_posts (user_id, club_category, title, content, likes_count)
+    VALUES (?, ?, ?, ?, 0)
+    """, (user['id'], club_category, title, content))
+    post_id = cursor.lastrowid
+    conn.commit()
+
+    created = conn.execute("""
+    SELECT p.*, u.full_name as author_name, u.room_number
+    FROM community_posts p
+    JOIN users u ON p.user_id = u.id
+    WHERE p.id = ?
+    """, (post_id,)).fetchone()
+    conn.close()
+
+    return jsonify({'message': 'Posted to hostel community successfully', 'post': dict(created)}), 201
+
+@app.route('/api/community/<int:post_id>/like', methods=['POST'])
+@login_required
+def like_community_post(post_id):
+    conn = get_db()
+    conn.execute("UPDATE community_posts SET likes_count = likes_count + 1 WHERE id = ?", (post_id,))
+    conn.commit()
+    post = conn.execute("SELECT id, likes_count FROM community_posts WHERE id = ?", (post_id,)).fetchone()
+    conn.close()
+    return jsonify({'message': 'Post liked', 'post': dict(post)})
+
+# --- Admin Dashboard Metrics & Management (MANN 2.0) ---
+
+@app.route('/api/admin/overview-metrics', methods=['GET'])
+@require_role('admin', 'warden')
+def get_admin_overview_metrics():
+    conn = get_db()
+    total_rooms = conn.execute("SELECT COUNT(*) FROM rooms").fetchone()[0]
+    total_beds = conn.execute("SELECT COUNT(*) FROM bed_allocations").fetchone()[0]
+    allocated_beds = conn.execute("SELECT COUNT(*) FROM bed_allocations WHERE status = 'Allocated'").fetchone()[0]
+    vacant_beds = total_beds - allocated_beds
+    occupancy_rate = round((allocated_beds / total_beds * 100), 1) if total_beds > 0 else 0
+
+    open_complaints = conn.execute("SELECT COUNT(*) FROM complaints WHERE status IN ('Open', 'Assigned', 'In Progress')").fetchone()[0]
+    pending_leaves = conn.execute("SELECT COUNT(*) FROM leave_requests WHERE status = 'Pending'").fetchone()[0]
+    pending_visitors = conn.execute("SELECT COUNT(*) FROM visitor_requests WHERE status = 'Pending'").fetchone()[0]
+    active_laundry = conn.execute("SELECT COUNT(*) FROM laundry_requests WHERE status IN ('Requested', 'In Washing')").fetchone()[0]
+    pending_registrations = conn.execute("SELECT COUNT(*) FROM users WHERE role = 'student' AND approval_status = 'pending'").fetchone()[0]
+
+    # Recent complaints
+    recent_complaints = conn.execute("""
+    SELECT c.id, c.title, c.room_number, c.urgency, c.status, u.full_name as student_name
+    FROM complaints c
+    JOIN users u ON c.student_id = u.id
+    ORDER BY c.created_at DESC LIMIT 5
+    """).fetchall()
+
+    conn.close()
+
+    return jsonify({
+        'metrics': {
+            'total_rooms': total_rooms,
+            'total_beds': total_beds,
+            'allocated_beds': allocated_beds,
+            'vacant_beds': vacant_beds,
+            'occupancy_rate': occupancy_rate,
+            'open_complaints': open_complaints,
+            'pending_leaves': pending_leaves,
+            'pending_visitors': pending_visitors,
+            'active_laundry': active_laundry,
+            'pending_registrations': pending_registrations
+        },
+        'recent_complaints': [dict(c) for c in recent_complaints]
+    })
+
+@app.route('/api/admin/pending-students', methods=['GET'])
+@require_role('admin', 'warden')
+def list_pending_students():
+    conn = get_db()
+    rows = conn.execute("""
+    SELECT id, username, college_id, full_name, email, phone, guardian_name, guardian_phone, approval_status, created_at
+    FROM users
+    WHERE role = 'student' AND approval_status = 'pending'
+    ORDER BY created_at ASC
+    """).fetchall()
+    conn.close()
+    data = [dict(r) for r in rows]
+    return jsonify({'pending_students': data, 'students': data})
+
+@app.route('/api/admin/students/<int:student_id>/approve', methods=['PUT'])
+@require_role('admin', 'warden')
+def approve_student_registration(student_id):
+    conn = get_db()
+    conn.execute("UPDATE users SET approval_status = 'approved' WHERE id = ?", (student_id,))
+    conn.commit()
+    user = conn.execute("SELECT id, full_name, college_id, approval_status FROM users WHERE id = ?", (student_id,)).fetchone()
+    conn.close()
+    return jsonify({
+        'message': f'Student {user["full_name"]} ({user["college_id"]}) has been approved! They can now log in to the Student Portal.',
+        'student': dict(user)
+    })
+
+@app.route('/api/admin/students/<int:student_id>/reject', methods=['PUT'])
+@require_role('admin', 'warden')
+def reject_student_registration(student_id):
+    conn = get_db()
+    conn.execute("UPDATE users SET approval_status = 'rejected' WHERE id = ?", (student_id,))
+    conn.commit()
+    user = conn.execute("SELECT id, full_name, college_id, approval_status FROM users WHERE id = ?", (student_id,)).fetchone()
+    conn.close()
+    return jsonify({'message': f'Registration for {user["full_name"]} has been rejected.', 'student': dict(user)})
+
+@app.route('/api/admin/students/<int:student_id>/toggle-status', methods=['PUT'])
+@require_role('admin')
+def toggle_student_status(student_id):
+    conn = get_db()
+    user = conn.execute("SELECT id, is_active, full_name FROM users WHERE id = ?", (student_id,)).fetchone()
+    if not user:
+        conn.close()
+        return jsonify({'error': 'Student not found', 'code': 'NOT_FOUND'}), 404
+
+    new_status = 0 if user['is_active'] == 1 else 1
+    conn.execute("UPDATE users SET is_active = ? WHERE id = ?", (new_status, student_id))
+    conn.commit()
+    conn.close()
+
+    status_label = 'Activated' if new_status == 1 else 'Deactivated'
+    return jsonify({'message': f'Student {user["full_name"]} has been {status_label}', 'is_active': new_status})
+
+@app.route('/api/admin/finance-overview', methods=['GET'])
+@require_role('admin', 'warden')
+def get_finance_overview():
+    conn = get_db()
+    stats = conn.execute("""
+    SELECT 
+        SUM(CASE WHEN payment_status = 'Paid' THEN amount ELSE 0 END) as total_collected,
+        SUM(CASE WHEN payment_status = 'Pending' THEN amount ELSE 0 END) as total_pending,
+        SUM(CASE WHEN payment_status = 'Overdue' THEN amount ELSE 0 END) as total_overdue,
+        COUNT(*) as total_invoices
+    FROM fee_payments
+    """).fetchone()
+
+    transactions = conn.execute("""
+    SELECT f.*, u.full_name as student_name, u.college_id, u.room_number
+    FROM fee_payments f
+    JOIN users u ON f.student_id = u.id
+    ORDER BY f.created_at DESC LIMIT 30
+    """).fetchall()
+    conn.close()
+
+    return jsonify({
+        'stats': dict(stats) if stats else {},
+        'transactions': [dict(t) for t in transactions]
+    })
+
+@app.route('/api/admin/staff-directory', methods=['GET'])
+@require_role('admin', 'warden')
+def get_staff_directory():
+    conn = get_db()
+    rows = conn.execute("""
+    SELECT id, username, college_id, full_name, role, email, phone
+    FROM users
+    WHERE role != 'student'
+    ORDER BY role, full_name
+    """).fetchall()
+    conn.close()
+    return jsonify({'staff': [dict(r) for r in rows]})
+
+@app.route('/api/admin/settings', methods=['GET', 'PUT'])
+@require_role('admin', 'warden')
+def handle_hostel_settings():
+    conn = get_db()
+    if request.method == 'GET':
+        rows = conn.execute("SELECT * FROM hostel_settings").fetchall()
+        conn.close()
+        return jsonify({'settings': {r['key']: r['value'] for r in rows}})
+
+    data = request.get_json(silent=True) or {}
+    for k, v in data.items():
+        conn.execute("INSERT OR REPLACE INTO hostel_settings (key, value) VALUES (?, ?)", (k, str(v)))
+    conn.commit()
+    rows = conn.execute("SELECT * FROM hostel_settings").fetchall()
+    conn.close()
+    return jsonify({'message': 'Hostel configuration updated successfully', 'settings': {r['key']: r['value'] for r in rows}})
+
+# --- Existing Workflows (Maintained & Upgraded) ---
 
 @app.route('/api/complaints', methods=['POST'])
 @require_role('student')
@@ -226,7 +1050,7 @@ def list_complaints():
         query += " AND (c.assigned_staff_id = ? OR (c.assigned_staff_id IS NULL AND c.status = 'Open'))"
         params.append(user['id'])
     elif role in ['warden', 'admin']:
-        pass # Wardens and Admins can view all complaints
+        pass
     else:
         return jsonify({'error': 'Forbidden. Role not permitted to view complaints.', 'code': 'FORBIDDEN'}), 403
 
@@ -264,13 +1088,11 @@ def assign_complaint(complaint_id):
         return jsonify({'error': 'Maintenance staff ID is required', 'code': 'VALIDATION_ERROR'}), 400
 
     conn = get_db()
-    # Check complaint exists
     complaint = conn.execute("SELECT * FROM complaints WHERE id = ?", (complaint_id,)).fetchone()
     if not complaint:
         conn.close()
         return jsonify({'error': 'Complaint not found', 'code': 'NOT_FOUND'}), 404
 
-    # Check staff exists and is maintenance
     staff = conn.execute("SELECT id, full_name, role FROM users WHERE id = ? AND role = 'maintenance'", (staff_id,)).fetchone()
     if not staff:
         conn.close()
@@ -298,12 +1120,16 @@ def assign_complaint(complaint_id):
     })
 
 @app.route('/api/complaints/<int:complaint_id>/progress', methods=['PUT'])
-@require_role('maintenance')
+@require_role('maintenance', 'admin', 'warden')
 def update_complaint_progress(complaint_id):
     user = get_current_user()
     data = request.get_json(silent=True) or {}
     new_status = data.get('status', '').strip()
-    resolution_notes = data.get('resolution_notes', '').strip()
+    if new_status == 'Work in Progress':
+        new_status = 'In Progress'
+    resolution_notes = (data.get('resolution_notes', '') or data.get('notes', '')).strip()
+    if new_status == 'Resolved' and not resolution_notes:
+        resolution_notes = 'Issue inspected and verified resolved by maintenance technician.'
 
     valid_statuses = ['In Progress', 'Resolved']
     if new_status not in valid_statuses:
@@ -318,8 +1144,8 @@ def update_complaint_progress(complaint_id):
         conn.close()
         return jsonify({'error': 'Complaint not found', 'code': 'NOT_FOUND'}), 404
 
-    # Staff can update if assigned to them or if self-assigning an Open ticket
-    if complaint['assigned_staff_id'] and complaint['assigned_staff_id'] != user['id']:
+    # Staff can update if assigned to them or if self-assigning an Open ticket, or Admin/Warden
+    if user['role'] == 'maintenance' and complaint['assigned_staff_id'] and complaint['assigned_staff_id'] != user['id']:
         conn.close()
         return jsonify({'error': 'You can only update complaints assigned to you.', 'code': 'FORBIDDEN'}), 403
 
@@ -349,7 +1175,7 @@ def update_complaint_progress(complaint_id):
 def confirm_complaint_resolution(complaint_id):
     user = get_current_user()
     data = request.get_json(silent=True) or {}
-    action = data.get('action', 'confirm').strip() # 'confirm' or 'reopen'
+    action = data.get('action', 'confirm').strip()
     rating = data.get('rating')
     feedback = data.get('feedback', '').strip()
 
@@ -395,10 +1221,11 @@ def confirm_complaint_resolution(complaint_id):
 
     return jsonify({
         'message': msg,
+        'status': dict(updated)['status'],
         'complaint': dict(updated)
     })
 
-# --- Workflow 6-7: Leave Requests ---
+# --- Leave Requests Endpoints ---
 
 @app.route('/api/leave-requests', methods=['POST'])
 @require_role('student')
@@ -406,14 +1233,15 @@ def submit_leave_request():
     user = get_current_user()
     data = request.get_json(silent=True) or {}
 
-    leave_type = data.get('leave_type', '').strip()
-    departure_date = data.get('departure_date', '').strip()
-    return_date = data.get('return_date', '').strip()
-    reason = data.get('reason', '').strip()
-    parent_contact = data.get('parent_contact', '').strip()
-    destination_address = data.get('destination_address', '').strip()
-
+    raw_type = data.get('leave_type', 'Home Visit').strip() or 'Home Visit'
     valid_types = ['Home Visit', 'Medical', 'Emergency', 'Academic']
+    leave_type = raw_type if raw_type in valid_types else 'Home Visit'
+
+    departure_date = (data.get('departure_date', '') or data.get('start_date', '')).strip()
+    return_date = (data.get('return_date', '') or data.get('end_date', '')).strip()
+    reason = data.get('reason', '').strip()
+    parent_contact = (data.get('parent_contact', '') or data.get('emergency_contact', '')).strip()
+    destination_address = (data.get('destination_address', '') or data.get('destination', '')).strip()
     errors = {}
 
     if leave_type not in valid_types:
@@ -479,7 +1307,7 @@ def list_leave_requests():
         query += " AND l.student_id = ?"
         params.append(user['id'])
     elif role in ['warden', 'admin']:
-        pass # Warden and Admin see all leave requests
+        pass
     else:
         return jsonify({'error': 'Forbidden. Role not authorized to view leave requests.', 'code': 'FORBIDDEN'}), 403
 
@@ -505,7 +1333,7 @@ def list_leave_requests():
 def review_leave_request(leave_id):
     user = get_current_user()
     data = request.get_json(silent=True) or {}
-    decision = data.get('decision', '').strip() # 'Approved' or 'Rejected'
+    decision = (data.get('decision', '') or data.get('status', '')).strip()
     remarks = data.get('remarks', '').strip()
 
     if decision not in ['Approved', 'Rejected']:
@@ -538,7 +1366,7 @@ def review_leave_request(leave_id):
         'leave_request': dict(updated)
     })
 
-# --- Workflow 8-9: Mess Menu & Food Feedback ---
+# --- Mess Menu & Food Feedback ---
 
 @app.route('/api/mess/menu', methods=['GET'])
 @login_required
@@ -550,21 +1378,60 @@ def get_mess_menu():
     else:
         rows = conn.execute("SELECT * FROM mess_menu ORDER BY day_of_week, CASE meal_type WHEN 'Breakfast' THEN 1 WHEN 'Lunch' THEN 2 WHEN 'Snacks' THEN 3 ELSE 4 END").fetchall()
     conn.close()
-    return jsonify({'menu': [dict(r) for r in rows]})
+
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    aggregated = {d: {'day_of_week': d, 'breakfast': '', 'lunch': '', 'snacks': '', 'dinner': '', 'special_notes': ''} for d in days}
+    for r in rows:
+        d = r['day_of_week']
+        m_type = (r['meal_type'] or '').lower()
+        if d in aggregated:
+            if m_type in aggregated[d]:
+                aggregated[d][m_type] = r['items']
+            if r['special_notes']:
+                aggregated[d]['special_notes'] = r['special_notes']
+
+    return jsonify({
+        'menu': list(aggregated.values()),
+        'menu_items': [dict(r) for r in rows],
+        'items': [dict(r) for r in rows]
+    })
 
 @app.route('/api/mess/menu', methods=['PUT'])
-@require_role('mess_manager', 'admin')
+@require_role('mess_manager', 'admin', 'warden')
 def update_mess_menu():
     user = get_current_user()
     data = request.get_json(silent=True) or {}
 
     day = data.get('day_of_week', '').strip()
+    valid_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    if day not in valid_days:
+        return jsonify({'error': f'Day must be one of: {", ".join(valid_days)}', 'code': 'VALIDATION_ERROR'}), 400
+
+    # Multi-meal update support
+    has_meal_keys = any(k in data for k in ['breakfast', 'lunch', 'snacks', 'dinner'])
+    if has_meal_keys:
+        conn = get_db()
+        for m_name in ['Breakfast', 'Lunch', 'Snacks', 'Dinner']:
+            m_val = data.get(m_name.lower(), '').strip()
+            if m_val:
+                conn.execute("""
+                INSERT INTO mess_menu (day_of_week, meal_type, items, dietary_type, special_notes, updated_by, updated_at)
+                VALUES (?, ?, ?, 'Veg', ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(day_of_week, meal_type) DO UPDATE SET
+                    items = excluded.items,
+                    special_notes = excluded.special_notes,
+                    updated_by = excluded.updated_by,
+                    updated_at = CURRENT_TIMESTAMP
+                """, (day, m_name, m_val, data.get('special_notes', ''), user['id']))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': f'Menu for {day} updated successfully', 'day_of_week': day})
+
     meal_type = data.get('meal_type', '').strip()
     items = data.get('items', '').strip()
     dietary_type = data.get('dietary_type', 'Veg').strip()
     special_notes = data.get('special_notes', '').strip()
 
-    valid_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     valid_meals = ['Breakfast', 'Lunch', 'Snacks', 'Dinner']
     valid_diets = ['Veg', 'Non-Veg', 'Jain']
 
@@ -639,7 +1506,7 @@ def submit_food_feedback():
     conn.close()
 
     return jsonify({
-        'message': 'Food feedback submitted successfully. Thank you for helping improve hostel dining!',
+        'message': 'Food feedback submitted successfully. Thank you for helping improve dining quality!',
         'feedback': dict(created)
     }), 201
 
@@ -654,7 +1521,6 @@ def list_food_feedback():
     ORDER BY f.created_at DESC
     """).fetchall()
 
-    # Calculate average ratings
     stats = conn.execute("""
     SELECT 
         COUNT(*) as total_reviews,
@@ -669,7 +1535,7 @@ def list_food_feedback():
         'stats': dict(stats) if stats else {}
     })
 
-# --- Workflow 10: Facility Booking ---
+# --- Facilities Booking ---
 
 @app.route('/api/facilities/available', methods=['GET'])
 @login_required
@@ -734,7 +1600,6 @@ def book_facility():
         return jsonify({'error': 'Slot time is required', 'code': 'VALIDATION_ERROR'}), 400
 
     conn = get_db()
-    # Check for slot collision / duplicate booking
     existing = conn.execute("""
     SELECT b.*, u.full_name as booked_by_name
     FROM facility_bookings b
@@ -778,7 +1643,7 @@ def my_facility_bookings():
     conn.close()
     return jsonify({'bookings': [dict(r) for r in rows]})
 
-# --- Workflow 11: Admin Room & Bed Allocation ---
+# --- Rooms & Beds Management ---
 
 @app.route('/api/admin/rooms', methods=['GET'])
 @require_role('admin', 'warden')
@@ -804,12 +1669,11 @@ def list_rooms():
     query += " GROUP BY r.id ORDER BY r.room_number ASC"
     rows = conn.execute(query, params).fetchall()
 
-    # Get beds for each room
     room_list = []
     for r in rows:
         r_dict = dict(r)
         beds = conn.execute("""
-        SELECT b.*, u.full_name as student_name, u.email as student_email
+        SELECT b.*, u.full_name as student_name, u.email as student_email, u.college_id
         FROM bed_allocations b
         LEFT JOIN users u ON b.student_id = u.id
         WHERE b.room_id = ?
@@ -817,7 +1681,6 @@ def list_rooms():
         """, (r['id'],)).fetchall()
         r_dict['beds'] = [dict(b) for b in beds]
 
-        # Determine occupancy tag
         if r_dict['allocated_beds'] == 0:
             r_dict['occupancy_status'] = 'Vacant'
         elif r_dict['allocated_beds'] >= r_dict['total_beds']:
@@ -840,6 +1703,7 @@ def add_room():
     floor = data.get('floor')
     capacity = data.get('capacity', 2)
     room_type = data.get('room_type', 'AC').strip()
+    amenities = data.get('amenities', 'Study Desks, High-Speed Wi-Fi, Wardrobes, Attached Washroom').strip()
 
     errors = {}
     if not room_number:
@@ -864,12 +1728,11 @@ def add_room():
 
     cursor = conn.cursor()
     cursor.execute("""
-    INSERT INTO rooms (room_number, block, floor, capacity, room_type)
-    VALUES (?, ?, ?, ?, ?)
-    """, (room_number, block, floor, capacity, room_type))
+    INSERT INTO rooms (room_number, block, floor, capacity, room_type, amenities, inspection_status)
+    VALUES (?, ?, ?, ?, ?, ?, 'Passed')
+    """, (room_number, block, floor, capacity, room_type, amenities))
     room_id = cursor.lastrowid
 
-    # Create bed slots
     for i in range(capacity):
         bed_label = f"Bed {chr(65 + i)}"
         cursor.execute("""
@@ -898,13 +1761,11 @@ def allocate_bed():
         return jsonify({'error': 'room_id, bed_label, and student_id are required', 'code': 'VALIDATION_ERROR'}), 400
 
     conn = get_db()
-    # Check student
     student = conn.execute("SELECT id, full_name, role FROM users WHERE id = ? AND role = 'student'", (student_id,)).fetchone()
     if not student:
         conn.close()
         return jsonify({'error': 'Valid student ID is required', 'code': 'VALIDATION_ERROR'}), 400
 
-    # Check room and bed
     bed = conn.execute("""
     SELECT b.*, r.room_number 
     FROM bed_allocations b
@@ -920,17 +1781,14 @@ def allocate_bed():
         conn.close()
         return jsonify({'error': f'Bed slot "{bed_label}" in Room {bed["room_number"]} is already allocated to another resident', 'code': 'CONFLICT'}), 409
 
-    # Free any previously allocated bed for this student
     conn.execute("UPDATE bed_allocations SET student_id = NULL, status = 'Vacant', allocated_at = NULL WHERE student_id = ?", (student_id,))
 
-    # Allocate bed
     conn.execute("""
     UPDATE bed_allocations 
     SET student_id = ?, status = 'Allocated', allocated_at = CURRENT_TIMESTAMP
     WHERE room_id = ? AND bed_label = ?
     """, (student_id, room_id, bed_label))
 
-    # Update user's profile with room and bed
     conn.execute("""
     UPDATE users 
     SET room_number = ?, bed_number = ?
@@ -955,10 +1813,10 @@ def allocate_bed():
 def list_students():
     conn = get_db()
     rows = conn.execute("""
-    SELECT id, username, full_name, email, room_number, bed_number
+    SELECT id, username, college_id, full_name, email, phone, room_number, bed_number, approval_status, is_active
     FROM users
     WHERE role = 'student'
-    ORDER BY full_name ASC
+    ORDER BY approval_status ASC, full_name ASC
     """).fetchall()
     conn.close()
     return jsonify({'students': [dict(r) for r in rows]})
@@ -968,7 +1826,7 @@ def list_students():
 def list_maintenance_staff():
     conn = get_db()
     rows = conn.execute("""
-    SELECT id, username, full_name, email, role
+    SELECT id, username, college_id, full_name, email, phone, role
     FROM users
     WHERE role = 'maintenance'
     ORDER BY full_name ASC
@@ -976,7 +1834,7 @@ def list_maintenance_staff():
     conn.close()
     return jsonify({'staff': [dict(r) for r in rows]})
 
-# --- Workflow 12: Wellness Appointments & Privacy of Wellness Records ---
+# --- Confidential Wellness Appointments (MANN Care) ---
 
 @app.route('/api/wellness/appointments', methods=['POST'])
 @require_role('student')
@@ -985,10 +1843,10 @@ def request_wellness_appointment():
     data = request.get_json(silent=True) or {}
 
     preferred_date = data.get('preferred_date', '').strip()
-    preferred_time = data.get('preferred_time', '').strip()
+    preferred_time = (data.get('preferred_time', '') or data.get('preferred_time_slot', '') or '10:00 AM - 11:00 AM').strip()
     session_mode = data.get('session_mode', 'In-Person').strip()
-    issue_category = data.get('issue_category', '').strip()
-    confidential_notes = data.get('confidential_notes', '').strip()
+    issue_category = (data.get('issue_category', '') or 'Academic Stress').strip()
+    confidential_notes = (data.get('confidential_notes', '') or data.get('notes', '')).strip()
 
     valid_modes = ['In-Person', 'Online']
     valid_categories = ['Academic Stress', 'Anxiety & Overwhelm', 'Homesickness', 'Interpersonal Conflict', 'General Well-being']
@@ -1009,7 +1867,6 @@ def request_wellness_appointment():
         return jsonify({'error': 'Validation failed', 'validation_errors': errors, 'code': 'VALIDATION_ERROR'}), 400
 
     conn = get_db()
-    # Find counsellor user
     counsellor = conn.execute("SELECT id FROM users WHERE role = 'counsellor' LIMIT 1").fetchone()
     counsellor_id = counsellor['id'] if counsellor else None
 
@@ -1039,15 +1896,12 @@ def request_wellness_appointment():
 def list_wellness_appointments():
     """
     CRITICAL PRIVACY OF WELLNESS RECORDS:
-    Only the student who booked the appointment (sees ONLY their own)
-    OR an authorized Counsellor (sees appointments assigned to counselling desk)
-    can view these records.
-    Wardens, Maintenance staff, Mess managers, and other roles MUST receive HTTP 403 Forbidden!
+    Strictly isolated: only the student who requested the appointment OR a user with role 'counsellor'
+    can query wellness appointments. All other roles receive 403 Forbidden.
     """
     user = get_current_user()
     role = user['role']
 
-    # Strict Privacy Gate
     if role not in ['student', 'counsellor']:
         return jsonify({
             'error': 'PRIVACY VIOLATION: Wellness and mental health counselling records are strictly confidential. Wardens, maintenance, mess managers, and general staff are prohibited from viewing these records.',
@@ -1056,7 +1910,6 @@ def list_wellness_appointments():
 
     conn = get_db()
     if role == 'student':
-        # Student sees only their own appointments
         rows = conn.execute("""
         SELECT a.*, c.full_name as counsellor_name
         FROM wellness_appointments a
@@ -1064,8 +1917,7 @@ def list_wellness_appointments():
         WHERE a.student_id = ?
         ORDER BY a.preferred_date DESC, a.preferred_time DESC
         """, (user['id'],)).fetchall()
-    else: # role == 'counsellor'
-        # Counsellor sees all appointments requested by students
+    else:
         rows = conn.execute("""
         SELECT a.*, u.full_name as student_name, u.email as student_email, u.room_number, c.full_name as counsellor_name
         FROM wellness_appointments a
@@ -1121,12 +1973,12 @@ def update_wellness_appointment_status(appointment_id):
 def health():
     return jsonify({
         'status': 'healthy',
-        'app': 'MANN Smart Hostel OS',
-        'version': '1.0.0',
+        'app': 'MANN Smart Hostel OS 2.0',
+        'version': '2.0.0',
         'timestamp': datetime.utcnow().isoformat()
     })
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5050))
-    print(f"Starting MANN Smart Hostel OS on http://127.0.0.1:{port}")
+    print(f"Starting MANN Smart Hostel OS 2.0 on http://127.0.0.1:{port}")
     app.run(host='0.0.0.0', port=port, debug=False)

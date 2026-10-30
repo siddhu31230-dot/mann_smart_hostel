@@ -1,55 +1,215 @@
 /**
- * MANN Smart Hostel OS - Client Application Controller
- * Handles SPA navigation, role switching, forms, modals, filters, and API interactions.
+ * MANN Smart Hostel OS 2.0 - Client Application Controller
+ * Handles Landing, Separate Student & Admin Portals, Responsive Navigation,
+ * 12 Student Modules, 13 Admin Modules, Modals, Toasts, Theme & API Endpoints.
  */
 
 const app = {
     currentUser: null,
-    activeTab: 'complaints',
+    activeRole: 'student',
+    activeSubTab: null,
     cachedRooms: [],
     cachedStaff: [],
     cachedStudents: [],
     currentMessDay: 'Monday',
 
     async init() {
-        // Setup today's date for inputs
-        const today = new Date().toISOString().split('T')[0];
-        const dateInput = document.getElementById('facilityBookingDateInput');
-        if (dateInput) dateInput.value = today;
-        const bookDate = document.getElementById('bookFacilityDate');
-        if (bookDate) bookDate.value = today;
-
-        // Check authentication
-        await this.checkAuth();
+        this.initTheme();
         this.setupEventListeners();
+        await this.checkAuth();
     },
 
-    setupEventListeners() {
-        // Search & filter listeners for complaints
-        const cSearch = document.getElementById('complaintSearchInput');
-        if (cSearch) cSearch.addEventListener('input', () => this.loadComplaints());
-
-        const cStatus = document.getElementById('complaintStatusFilter');
-        if (cStatus) cStatus.addEventListener('change', () => this.loadComplaints());
-
-        const cCat = document.getElementById('complaintCategoryFilter');
-        if (cCat) cCat.addEventListener('change', () => this.loadComplaints());
-
-        // Search & filter for leave
-        const lSearch = document.getElementById('leaveSearchInput');
-        if (lSearch) lSearch.addEventListener('input', () => this.loadLeaveRequests());
-
-        const lStatus = document.getElementById('leaveStatusFilter');
-        if (lStatus) lStatus.addEventListener('change', () => this.loadLeaveRequests());
-
-        // Filters for rooms
-        const rBlock = document.getElementById('roomBlockFilter');
-        if (rBlock) rBlock.addEventListener('change', () => this.loadRooms());
-
-        const rOcc = document.getElementById('roomOccupancyFilter');
-        if (rOcc) rOcc.addEventListener('change', () => this.loadRooms());
+    // ==========================================
+    // THEME MANAGEMENT (Light / Dark)
+    // ==========================================
+    initTheme() {
+        const savedTheme = localStorage.getItem('mann_theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+            const icon = document.getElementById('themeIcon');
+            if (icon) icon.className = 'fa-solid fa-sun text-amber-400 text-sm';
+        }
     },
 
+    toggleTheme() {
+        const isLight = document.body.classList.toggle('light-theme');
+        localStorage.setItem('mann_theme', isLight ? 'light' : 'dark');
+        const icon = document.getElementById('themeIcon');
+        if (icon) {
+            icon.className = isLight ? 'fa-solid fa-sun text-amber-400 text-sm' : 'fa-solid fa-moon text-sm';
+        }
+        this.showToast(isLight ? 'Switched to Ivory Light Theme' : 'Switched to Forest Dark Theme', 'info');
+    },
+
+    // ==========================================
+    // NAVIGATION & VIEW SWITCHING
+    // ==========================================
+    navigateTo(view) {
+        const landing = document.getElementById('view-landing');
+        const workspace = document.getElementById('view-workspace');
+
+        if (view === 'landing') {
+            if (landing) landing.classList.remove('hidden');
+            if (workspace) workspace.classList.add('hidden');
+        } else if (view === 'workspace') {
+            if (landing) landing.classList.add('hidden');
+            if (workspace) workspace.classList.remove('hidden');
+        }
+    },
+
+    renderSidebar() {
+        const navList = document.getElementById('navItemsList');
+        if (!navList || !this.currentUser) return;
+
+        const role = this.currentUser.role;
+        navList.innerHTML = '';
+
+        if (role === 'student') {
+            const studentItems = [
+                { id: 'my-room', icon: 'fa-door-open', label: 'My Room' },
+                { id: 'complaints', icon: 'fa-wrench', label: 'My Complaints' },
+                { id: 'mess', icon: 'fa-utensils', label: 'Mess Menu' },
+                { id: 'leaves', icon: 'fa-calendar-check', label: 'Leave Requests' },
+                { id: 'fees', icon: 'fa-credit-card', label: 'Fees & Payments' },
+                { id: 'laundry', icon: 'fa-shirt', label: 'Laundry' },
+                { id: 'cleaning', icon: 'fa-broom', label: 'Cleaning Requests' },
+                { id: 'visitors', icon: 'fa-id-badge', label: 'Visitor Requests' },
+                { id: 'community', icon: 'fa-users', label: 'Community Hub' },
+                { id: 'announcements', icon: 'fa-bullhorn', label: 'Announcements' },
+                { id: 'mann-care', icon: 'fa-shield-heart', label: 'MANN Care (Confidential)', special: 'text-purple-400' },
+                { id: 'profile', icon: 'fa-id-card', label: 'Resident Profile' }
+            ];
+
+            studentItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]`;
+                btn.dataset.tab = item.id;
+                btn.onclick = () => this.navigateToStudentSubTab(item.id);
+                btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center ${item.special || 'text-[#52b788]'}"></i> <span>${item.label}</span>`;
+                navList.appendChild(btn);
+            });
+
+            const privNotice = document.getElementById('wellnessPrivacyNotice');
+            if (privNotice) privNotice.classList.remove('hidden');
+
+        } else {
+            // Staff / Admin Roles
+            const adminItems = [
+                { id: 'admin-overview', icon: 'fa-chart-line', label: 'Command Overview' },
+                { id: 'admin-students', icon: 'fa-user-graduate', label: 'Student Management' },
+                { id: 'admin-rooms', icon: 'fa-hotel', label: 'Room Management' },
+                { id: 'admin-complaints', icon: 'fa-list-check', label: 'Complaint Queue' },
+                { id: 'admin-leaves', icon: 'fa-envelope-open-text', label: 'Leave Approvals' },
+                { id: 'admin-mess', icon: 'fa-utensils', label: 'Mess Operations' },
+                { id: 'admin-visitors', icon: 'fa-id-badge', label: 'Visitor Gate Log' },
+                { id: 'admin-staff', icon: 'fa-user-shield', label: 'Staff Directory' },
+                { id: 'admin-maintenance', icon: 'fa-screwdriver-wrench', label: 'Maintenance Hub' },
+                { id: 'admin-finance', icon: 'fa-coins', label: 'Finance & Ledger' },
+                { id: 'admin-announcements', icon: 'fa-bullhorn', label: 'Announcements' },
+                { id: 'admin-analytics', icon: 'fa-chart-pie', label: 'Hostel Analytics' },
+                { id: 'admin-settings', icon: 'fa-sliders', label: 'System Settings' }
+            ];
+
+            adminItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]`;
+                btn.dataset.tab = item.id;
+                btn.onclick = () => this.navigateToAdminSubTab(item.id);
+                btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center text-[#faedcd]"></i> <span>${item.label}</span>`;
+                navList.appendChild(btn);
+            });
+
+            const privNotice = document.getElementById('wellnessPrivacyNotice');
+            if (privNotice) {
+                if (role === 'counsellor') privNotice.classList.remove('hidden');
+                else privNotice.classList.add('hidden');
+            }
+        }
+    },
+
+    navigateToStudentSubTab(tabId) {
+        this.activeSubTab = tabId;
+        // Hide all subviews
+        document.querySelectorAll('.subview-panel').forEach(p => p.classList.add('hidden'));
+
+        // Target map
+        const viewIdMap = {
+            'my-room': 'view-student-my-room',
+            'complaints': 'view-student-complaints',
+            'mess': 'view-student-mess',
+            'leaves': 'view-student-leaves',
+            'fees': 'view-student-fees',
+            'laundry': 'view-student-laundry',
+            'cleaning': 'view-student-cleaning',
+            'visitors': 'view-student-visitors',
+            'community': 'view-student-community',
+            'announcements': 'view-student-announcements',
+            'mann-care': 'view-student-mann-care',
+            'profile': 'view-student-profile'
+        };
+
+        const targetView = document.getElementById(viewIdMap[tabId]);
+        if (targetView) targetView.classList.remove('hidden');
+
+        // Update active class on sidebar
+        document.querySelectorAll('#navItemsList button').forEach(btn => {
+            if (btn.dataset.tab === tabId) {
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#2d6a4f] text-[#fefae0] shadow-md border border-[#52b788]/30';
+            } else {
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]';
+            }
+        });
+
+        // Load data for the tab
+        if (tabId === 'my-room') this.loadStudentRoomDetails();
+        else if (tabId === 'complaints') this.loadComplaints();
+        else if (tabId === 'mess') { this.loadMessMenu(); this.loadMessFeedback(); }
+        else if (tabId === 'leaves') this.loadLeaveRequests();
+        else if (tabId === 'fees') this.loadStudentFees();
+        else if (tabId === 'laundry') this.loadLaundryRequests();
+        else if (tabId === 'cleaning') this.loadCleaningRequests();
+        else if (tabId === 'visitors') this.loadVisitorRequests();
+        else if (tabId === 'community') this.loadCommunityPosts();
+        else if (tabId === 'announcements') this.loadAnnouncements();
+        else if (tabId === 'mann-care') this.loadWellnessAppointments();
+        else if (tabId === 'profile') this.loadStudentProfile();
+    },
+
+    navigateToAdminSubTab(tabId) {
+        this.activeSubTab = tabId;
+        // Hide all subviews
+        document.querySelectorAll('.subview-panel').forEach(p => p.classList.add('hidden'));
+
+        const targetView = document.getElementById(`view-${tabId}`);
+        if (targetView) targetView.classList.remove('hidden');
+
+        // Update active class on sidebar
+        document.querySelectorAll('#navItemsList button').forEach(btn => {
+            if (btn.dataset.tab === tabId) {
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#2d6a4f] text-[#fefae0] shadow-md border border-[#52b788]/30';
+            } else {
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]';
+            }
+        });
+
+        // Load data
+        if (tabId === 'admin-overview') this.loadAdminOverview();
+        else if (tabId === 'admin-students') { this.loadPendingStudents(); this.loadAdminStudents(); }
+        else if (tabId === 'admin-rooms') this.loadRooms();
+        else if (tabId === 'admin-complaints') this.loadComplaints();
+        else if (tabId === 'admin-leaves') this.loadLeaveRequests();
+        else if (tabId === 'admin-mess') { this.loadAdminMessMenuDay(); this.loadMessFeedback(); }
+        else if (tabId === 'admin-visitors') this.loadVisitorRequests();
+        else if (tabId === 'admin-staff') this.loadAdminStaff();
+        else if (tabId === 'admin-maintenance') this.loadComplaints();
+        else if (tabId === 'admin-finance') this.loadAdminFinance();
+        else if (tabId === 'admin-announcements') this.loadAnnouncements();
+        else if (tabId === 'admin-settings') this.loadAdminSettings();
+    },
+
+    // ==========================================
+    // AUTHENTICATION & SESSIONS
+    // ==========================================
     async checkAuth() {
         try {
             const res = await fetch('/api/auth/me');
@@ -57,349 +217,460 @@ const app = {
                 const data = await res.json();
                 this.setUser(data.user);
             } else {
-                // Auto login as default student for demo / QA convenience
-                await this.quickSwitch('student');
+                this.setUser(null);
             }
-        } catch (err) {
-            console.error('Auth check error:', err);
-            await this.quickSwitch('student');
+        } catch (e) {
+            this.setUser(null);
         }
     },
 
     setUser(user) {
         this.currentUser = user;
-        document.getElementById('userFullName').textContent = user.full_name;
-        document.getElementById('userRoleBadge').textContent = user.role.replace('_', ' ');
+        const unauth = document.getElementById('unauthHeaderActions');
+        const auth = document.getElementById('authHeaderActions');
+        const nameEl = document.getElementById('userFullName');
+        const roleEl = document.getElementById('userRoleBadge');
+        const avatarEl = document.getElementById('userAvatarText');
+        const portalNameEl = document.getElementById('sidebarPortalName');
+        const subtextEl = document.getElementById('sidebarUserSubtext');
 
-        const roomSub = user.room_number ? `Room ${user.room_number} · ${user.bed_number || 'Bed'}` : `${user.role.toUpperCase()}`;
-        document.getElementById('sidebarUserSubtext').textContent = roomSub;
+        if (user) {
+            if (unauth) unauth.classList.add('hidden');
+            if (auth) auth.classList.remove('hidden');
 
-        // Update active role buttons
-        document.querySelectorAll('.role-btn').forEach(btn => {
-            if (btn.dataset.role === user.role) {
-                btn.classList.add('bg-blue-600', 'text-white');
-                btn.classList.remove('bg-transparent', 'text-slate-400');
-            } else {
-                btn.classList.remove('bg-blue-600', 'text-white');
-                btn.classList.add('bg-transparent', 'text-slate-400');
+            if (nameEl) nameEl.textContent = user.full_name || user.username;
+            if (roleEl) roleEl.textContent = (user.role || '').toUpperCase();
+            if (avatarEl) {
+                const initials = (user.full_name || user.username).substring(0, 2).toUpperCase();
+                avatarEl.textContent = initials;
             }
-        });
 
-        // Set complaint room input default
-        const roomInput = document.getElementById('complaintRoomInput');
-        if (roomInput && user.room_number) {
-            roomInput.value = user.room_number;
-        }
+            if (user.role === 'student') {
+                if (portalNameEl) portalNameEl.textContent = 'Student Resident Portal';
+                if (subtextEl) subtextEl.textContent = `${user.college_id || 'ID Pending'} • Room ${user.room_number || 'Unallocated'}`;
+            } else {
+                if (portalNameEl) portalNameEl.textContent = 'Staff Management Console';
+                if (subtextEl) subtextEl.textContent = `Staff Role: ${user.role.toUpperCase()}`;
+            }
 
-        // Render dynamic sidebar
-        this.renderSidebar();
+            // Highlight quick-role buttons in header
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                if (btn.dataset.role === user.role) {
+                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-bold bg-[#52b788] text-[#08140e] shadow-sm';
+                } else {
+                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f] text-[#8fb89e]';
+                }
+            });
 
-        // Switch to the first appropriate tab for this role
-        const defaultTab = this.getDefaultTabForRole(user.role);
-        this.switchTab(defaultTab);
-    },
+            this.navigateTo('workspace');
+            this.renderSidebar();
 
-    getDefaultTabForRole(role) {
-        switch(role) {
-            case 'maintenance': return 'complaints';
-            case 'mess_manager': return 'mess';
-            case 'counsellor': return 'wellness';
-            case 'admin': return 'rooms';
-            case 'warden': return 'complaints';
-            case 'student':
-            default:
-                return 'complaints';
-        }
-    },
-
-    renderSidebar() {
-        const role = this.currentUser.role;
-        const nav = document.getElementById('navItemsList');
-        const portalTitle = document.getElementById('sidebarPortalName');
-        const wellnessPrivacy = document.getElementById('wellnessPrivacyNotice');
-        nav.innerHTML = '';
-
-        const roleTitles = {
-            student: 'Student Portal',
-            warden: 'Warden Desk',
-            maintenance: 'Maintenance Desk',
-            mess_manager: 'Mess Admin Portal',
-            counsellor: 'Wellness Desk',
-            admin: 'Hostel Admin OS'
-        };
-        portalTitle.textContent = roleTitles[role] || 'Hostel Portal';
-
-        // Toggle wellness privacy notice for student and counsellor
-        if (role === 'student' || role === 'counsellor') {
-            wellnessPrivacy.classList.remove('hidden');
+            // Set initial tab
+            if (user.role === 'student') {
+                this.navigateToStudentSubTab(this.activeSubTab || 'my-room');
+            } else {
+                this.navigateToAdminSubTab(this.activeSubTab || 'admin-overview');
+            }
         } else {
-            wellnessPrivacy.classList.add('hidden');
-        }
-
-        const items = [];
-
-        if (role === 'student') {
-            items.push(
-                { id: 'complaints', label: 'My Complaints', icon: 'fa-wrench' },
-                { id: 'leave', label: 'Gate Outpass / Leave', icon: 'fa-plane-departure' },
-                { id: 'mess', label: 'Mess & Food Feedback', icon: 'fa-utensils' },
-                { id: 'facilities', label: 'Facility Booking', icon: 'fa-basketball' },
-                { id: 'wellness', label: 'Confidential Wellness', icon: 'fa-heart-pulse', badge: 'Private' }
-            );
-        } else if (role === 'warden') {
-            items.push(
-                { id: 'complaints', label: 'Complaints Board', icon: 'fa-wrench' },
-                { id: 'leave', label: 'Leave Approvals', icon: 'fa-plane-departure' },
-                { id: 'rooms', label: 'Room & Bed Overview', icon: 'fa-door-open' },
-                { id: 'mess', label: 'Mess Feedback', icon: 'fa-utensils' }
-            );
-        } else if (role === 'maintenance') {
-            items.push(
-                { id: 'complaints', label: 'Assigned Work Orders', icon: 'fa-screwdriver-wrench' }
-            );
-        } else if (role === 'mess_manager') {
-            items.push(
-                { id: 'mess', label: 'Weekly Mess Menu', icon: 'fa-bowl-food' }
-            );
-        } else if (role === 'counsellor') {
-            items.push(
-                { id: 'wellness', label: 'Wellness Appointments', icon: 'fa-user-doctor', badge: 'Strict Privacy' }
-            );
-        } else if (role === 'admin') {
-            items.push(
-                { id: 'rooms', label: 'Room & Bed Allocation', icon: 'fa-hotel' },
-                { id: 'complaints', label: 'All Complaints', icon: 'fa-wrench' },
-                { id: 'leave', label: 'All Leave Requests', icon: 'fa-plane-departure' },
-                { id: 'mess', label: 'Mess Overview', icon: 'fa-utensils' }
-            );
-        }
-
-        items.forEach(item => {
-            const btn = document.createElement('button');
-            btn.className = `w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition ${
-                this.activeTab === item.id 
-                ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' 
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-            }`;
-            btn.onclick = () => this.switchTab(item.id);
-            btn.innerHTML = `
-                <div class="flex items-center gap-2.5">
-                    <i class="fa-solid ${item.icon} w-4 text-center"></i>
-                    <span>${item.label}</span>
-                </div>
-                ${item.badge ? `<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">${item.badge}</span>` : ''}
-            `;
-            nav.appendChild(btn);
-        });
-
-        // Toggle action buttons in views based on role
-        this.updateViewControls();
-    },
-
-    updateViewControls() {
-        const role = this.currentUser.role;
-
-        // Complaint buttons
-        const cActions = document.getElementById('complaintActionButtons');
-        if (cActions) {
-            cActions.style.display = (role === 'student') ? 'block' : 'none';
-        }
-
-        // Leave buttons
-        const lActions = document.getElementById('leaveActionButtons');
-        if (lActions) {
-            lActions.style.display = (role === 'student') ? 'block' : 'none';
-        }
-
-        // Mess buttons
-        const fbBtn = document.getElementById('messFeedbackBtn');
-        const updateMenuBtn = document.getElementById('updateMessMenuBtn');
-        if (fbBtn) fbBtn.style.display = (role === 'student') ? 'flex' : 'none';
-        if (updateMenuBtn) updateMenuBtn.style.display = (role === 'mess_manager' || role === 'admin') ? 'flex' : 'none';
-
-        // Room buttons
-        const addRoomBtn = document.getElementById('addRoomBtn');
-        const allocBedBtn = document.getElementById('allocateBedBtn');
-        if (addRoomBtn) addRoomBtn.style.display = (role === 'admin') ? 'flex' : 'none';
-        if (allocBedBtn) allocBedBtn.style.display = (role === 'admin' || role === 'warden') ? 'flex' : 'none';
-
-        // Wellness button
-        const wActions = document.getElementById('wellnessActionButtons');
-        if (wActions) {
-            wActions.style.display = (role === 'student') ? 'block' : 'none';
+            if (unauth) unauth.classList.remove('hidden');
+            if (auth) auth.classList.add('hidden');
+            this.navigateTo('landing');
         }
     },
 
-    switchTab(tabId) {
-        this.activeTab = tabId;
-        document.querySelectorAll('.view-panel').forEach(panel => {
-            panel.classList.add('hidden');
-        });
+    async handleStudentLogin(e) {
+        e.preventDefault();
+        const login = document.getElementById('studentLoginInput').value.trim();
+        const password = document.getElementById('studentPasswordInput').value;
 
-        const activePanel = document.getElementById(`view-${tabId}`);
-        if (activePanel) {
-            activePanel.classList.remove('hidden');
-        }
-
-        // Re-render sidebar to highlight active tab
-        this.renderSidebar();
-
-        // Load data for the active tab
-        switch(tabId) {
-            case 'complaints': this.loadComplaints(); break;
-            case 'leave': this.loadLeaveRequests(); break;
-            case 'mess': this.loadMessMenu(); this.loadFoodFeedback(); break;
-            case 'facilities': this.loadFacilityAvailability(); this.loadMyFacilityBookings(); break;
-            case 'rooms': this.loadRooms(); break;
-            case 'wellness': this.loadWellnessAppointments(); break;
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login, password, portal: 'student' })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                this.closeModal('studentLoginModal');
+                this.setUser(data.user);
+                this.showToast(`Welcome back, ${data.user.full_name}!`, 'success');
+            } else {
+                this.showToast(data.error || 'Student login failed', 'error');
+            }
+        } catch (err) {
+            this.showToast('Network error during student login', 'error');
         }
     },
 
-    async quickSwitch(targetRole) {
+    async handleAdminLogin(e) {
+        e.preventDefault();
+        const login = document.getElementById('adminLoginInput').value.trim();
+        const password = document.getElementById('adminPasswordInput').value;
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login, password, portal: 'admin' })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                this.closeModal('adminLoginModal');
+                this.setUser(data.user);
+                this.showToast(`Staff console unlocked: ${data.user.full_name}`, 'success');
+            } else {
+                this.showToast(data.error || 'Staff authentication rejected', 'error');
+            }
+        } catch (err) {
+            this.showToast('Network error during staff login', 'error');
+        }
+    },
+
+    async quickSwitch(role) {
         try {
             const res = await fetch('/api/auth/quick-switch', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ role: targetRole })
+                body: JSON.stringify({ role })
             });
             const data = await res.json();
             if (res.ok) {
-                this.toast(`Switched role to ${data.user.full_name} (${data.user.role})`, 'success');
                 this.setUser(data.user);
+                this.showToast(`Switched active context to ${role.toUpperCase()}`, 'info');
             } else {
-                this.toast(data.error || 'Failed to switch role', 'error');
+                this.showToast(data.error || 'Failed to switch role', 'error');
             }
         } catch (err) {
-            this.toast('Error switching role: ' + err.message, 'error');
+            this.showToast('Quick switch failed', 'error');
         }
     },
 
     async logout() {
-        await fetch('/api/auth/logout', { method: 'POST' });
-        this.toast('Logged out successfully', 'info');
-        setTimeout(() => window.location.reload(), 400);
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (e) {}
+        this.setUser(null);
+        this.showToast('Logged out securely', 'info');
     },
 
-    // --- Workflow 1-5: Complaints Handling ---
-
-    async loadComplaints() {
-        const status = document.getElementById('complaintStatusFilter')?.value || 'All';
-        const category = document.getElementById('complaintCategoryFilter')?.value || 'All';
-        const search = document.getElementById('complaintSearchInput')?.value || '';
-
-        const params = new URLSearchParams({ status, category, search });
-        const container = document.getElementById('complaintsListContainer');
-        container.innerHTML = '<div class="text-xs text-slate-400 py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading complaints...</div>';
+    async handleStudentRegister(e) {
+        e.preventDefault();
+        const payload = {
+            full_name: document.getElementById('regFullName').value.trim(),
+            college_id: document.getElementById('regCollegeId').value.trim(),
+            username: document.getElementById('regUsername').value.trim(),
+            email: document.getElementById('regEmail').value.trim(),
+            phone: document.getElementById('regPhone').value.trim(),
+            guardian_name: document.getElementById('regGuardianName').value.trim(),
+            guardian_phone: document.getElementById('regGuardianPhone').value.trim(),
+            password: document.getElementById('regPassword').value
+        };
 
         try {
-            const res = await fetch(`/api/complaints?${params.toString()}`);
-            if (!res.ok) {
-                const err = await res.json();
-                container.innerHTML = `<div class="p-4 rounded-xl bg-red-950/20 border border-red-800/40 text-red-400 text-xs">${err.error}</div>`;
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                this.closeModal('registerModal');
+                this.showToast('Registration submitted! Status: Pending Administrator Approval.', 'success');
+            } else {
+                this.showToast(data.error || 'Registration failed', 'error');
+            }
+        } catch (err) {
+            this.showToast('Failed to submit registration', 'error');
+        }
+    },
+
+    async handleForgotPassword(e) {
+        e.preventDefault();
+        const identifier = document.getElementById('forgotPasswordInput').value.trim();
+        try {
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identifier })
+            });
+            const data = await res.json();
+            this.closeModal('forgotPasswordModal');
+            this.showToast(data.message || 'Recovery instructions dispatched.', 'info');
+        } catch (e) {
+            this.showToast('Error processing recovery', 'error');
+        }
+    },
+
+    // Demo Fill Helpers
+    fillStudentDemo() {
+        const inp = document.getElementById('studentLoginInput');
+        const pass = document.getElementById('studentPasswordInput');
+        if (inp) inp.value = 'NST2026-042';
+        if (pass) pass.value = 'Student@123';
+    },
+
+    fillAndLoginStudent(id, pw) {
+        this.openStudentLoginModal();
+        const inp = document.getElementById('studentLoginInput');
+        const pass = document.getElementById('studentPasswordInput');
+        if (inp) inp.value = id;
+        if (pass) pass.value = pw;
+        document.getElementById('studentLoginForm').requestSubmit();
+    },
+
+    fillAdminDemo(role) {
+        const roleMap = {
+            'admin': { id: 'ADMIN-001', pass: 'Admin@123' },
+            'warden': { id: 'WARDEN-001', pass: 'Warden@123' },
+            'mess_manager': { id: 'MESS-001', pass: 'Mess@123' },
+            'maintenance': { id: 'MAINT-001', pass: 'Maint@123' },
+            'counsellor': { id: 'COUNS-001', pass: 'Couns@123' }
+        };
+        const creds = roleMap[role] || roleMap['admin'];
+        const inp = document.getElementById('adminLoginInput');
+        const pass = document.getElementById('adminPasswordInput');
+        if (inp) inp.value = creds.id;
+        if (pass) pass.value = creds.pass;
+    },
+
+    fillAndLoginAdmin(id, pw) {
+        this.openAdminLoginModal();
+        const inp = document.getElementById('adminLoginInput');
+        const pass = document.getElementById('adminPasswordInput');
+        if (inp) inp.value = id;
+        if (pass) pass.value = pw;
+        document.getElementById('adminLoginForm').requestSubmit();
+    },
+
+    // Password Toggle
+    togglePasswordVisibility(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (!input) return;
+        if (input.type === 'password') {
+            input.type = 'text';
+            if (icon) icon.className = 'fa-solid fa-eye-slash';
+        } else {
+            input.type = 'password';
+            if (icon) icon.className = 'fa-solid fa-eye';
+        }
+    },
+
+    // ==========================================
+    // STUDENT MODULE: MY ROOM
+    // ==========================================
+    async loadStudentRoomDetails() {
+        const c = document.getElementById('studentRoomDetailsContainer');
+        if (!c) return;
+
+        try {
+            const res = await fetch('/api/student/room-details');
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            const room = data.room;
+
+            if (!room) {
+                c.innerHTML = `
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-3">
+                        <i class="fa-solid fa-bed text-4xl text-[#8fb89e]"></i>
+                        <h3 class="text-base font-bold text-[#fefae0]">No Room Allocated</h3>
+                        <p class="text-xs text-[#8fb89e]">Your room assignment is currently being processed by hostel administration.</p>
+                    </div>
+                `;
                 return;
             }
-            const data = await res.json();
-            this.renderComplaints(data.complaints);
-        } catch (err) {
-            container.innerHTML = `<div class="p-4 rounded-xl bg-red-950/20 border border-red-800/40 text-red-400 text-xs">Error loading complaints: ${err.message}</div>`;
+
+            const roommatesList = (data.roommates || []).map(r => `
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#0f281e]/80 border border-[#52b788]/20">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-[#1b4332] text-[#52b788] flex items-center justify-center font-bold text-[11px] border border-[#52b788]/40">
+                            ${r.bed_identifier.slice(-1)}
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-[#fefae0]">${r.full_name}</div>
+                            <div class="text-[10px] text-[#8fb89e]">${r.college_id}</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-[#143528] text-[#52b788] border border-[#52b788]/30">${r.bed_identifier}</span>
+                </div>
+            `).join('');
+
+            c.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 forest-card p-6 rounded-3xl border border-[#52b788]/30 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-[#52b788]/20">
+                            <div>
+                                <span class="text-[11px] font-bold text-[#52b788] uppercase tracking-wider">${room.room_type}</span>
+                                <h3 class="text-2xl font-extrabold text-[#fefae0] font-serif-title mt-0.5">Room ${room.room_number}</h3>
+                            </div>
+                            <span class="text-xs px-3 py-1 rounded-full bg-[#52b788]/20 text-[#52b788] border border-[#52b788]/40 font-bold">
+                                Assigned Bed: ${data.my_bed}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                                <span class="text-[#8fb89e] text-[10px]">Hostel Block</span>
+                                <div class="font-bold text-[#fefae0] text-sm mt-0.5">Block ${room.block}</div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                                <span class="text-[#8fb89e] text-[10px]">Floor</span>
+                                <div class="font-bold text-[#fefae0] text-sm mt-0.5">${room.floor}nd Floor</div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                                <span class="text-[#8fb89e] text-[10px]">Capacity</span>
+                                <div class="font-bold text-[#fefae0] text-sm mt-0.5">${room.capacity} Residents</div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                                <span class="text-[#8fb89e] text-[10px]">Occupancy</span>
+                                <div class="font-bold text-[#52b788] text-sm mt-0.5">${room.occupied} / ${room.capacity} Beds</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2">
+                            <h4 class="text-xs font-bold text-[#fefae0] uppercase tracking-wider">Roommates Directory</h4>
+                            <div class="space-y-2">
+                                ${roommatesList || '<p class="text-xs text-[#8fb89e]">No roommates assigned yet.</p>'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Digital Room Pass & Wi-Fi -->
+                    <div class="space-y-4">
+                        <div class="forest-card p-6 rounded-3xl border border-[#faedcd]/30 text-center space-y-3">
+                            <span class="text-[10px] font-bold text-[#faedcd] uppercase tracking-widest">NFC / QR Room Pass</span>
+                            <div class="w-32 h-32 mx-auto bg-white p-2 rounded-2xl flex items-center justify-center shadow-lg">
+                                <i class="fa-solid fa-qrcode text-7xl text-slate-900"></i>
+                            </div>
+                            <div class="text-xs font-mono text-[#fefae0] font-bold">KEYPASS-${room.room_number}-${data.my_bed.replace(' ', '')}</div>
+                            <p class="text-[10px] text-[#8fb89e]">Scan at your hostel corridor electronic reader</p>
+                        </div>
+
+                        <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 text-xs space-y-1.5">
+                            <div class="font-bold text-[#fefae0] flex items-center gap-2">
+                                <i class="fa-solid fa-wifi text-[#52b788]"></i> High-Speed Mesh Wi-Fi
+                            </div>
+                            <div class="text-[#8fb89e]">SSID: <span class="text-[#fefae0] font-mono">MANN-Hostel-Block${room.block}</span></div>
+                            <div class="text-[#8fb89e]">Passcode: <span class="text-[#fefae0] font-mono">Hostel@Secure2026</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } catch (e) {
+            c.innerHTML = `<div class="p-4 text-xs text-red-400">Failed to load room details.</div>`;
         }
     },
 
-    renderComplaints(complaints) {
-        const container = document.getElementById('complaintsListContainer');
-        if (!complaints || complaints.length === 0) {
-            container.innerHTML = `
-                <div class="glass-card p-8 text-center space-y-3">
-                    <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-400 text-xl">
-                        <i class="fa-solid fa-clipboard-check"></i>
+    downloadRoomKeyPass() {
+        this.showToast('Digital Key Pass loaded into device wallet.', 'success');
+    },
+
+    // ==========================================
+    // COMPLAINTS MODULE (Student & Admin)
+    // ==========================================
+    async loadComplaints() {
+        const studentContainer = document.getElementById('complaintsListContainer');
+        const adminContainer = document.getElementById('adminComplaintsListContainer');
+        const targetContainer = (this.currentUser && this.currentUser.role !== 'student') ? adminContainer : studentContainer;
+        if (!targetContainer) return;
+
+        try {
+            const search = (document.getElementById('complaintSearchInput') || {}).value || '';
+            const status = (document.getElementById('complaintStatusFilter') || {}).value || '';
+            const category = (document.getElementById('complaintCategoryFilter') || {}).value || '';
+
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (status) params.append('status', status);
+            if (category) params.append('category', category);
+
+            const res = await fetch(`/api/complaints?${params.toString()}`);
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            const complaints = data.complaints || [];
+
+            if (complaints.length === 0) {
+                targetContainer.innerHTML = `
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-circle-check text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Complaints Found</h4>
+                        <p class="text-xs text-[#8fb89e]">Everything is running smoothly or matches your filter criteria.</p>
                     </div>
-                    <h3 class="text-sm font-bold text-slate-200">No Complaints Found</h3>
-                    <p class="text-xs text-slate-400 max-w-sm mx-auto">There are no maintenance complaints matching your current view or filter criteria.</p>
-                </div>
-            `;
-            return;
-        }
-
-        const role = this.currentUser.role;
-        container.innerHTML = complaints.map(c => {
-            const statusClass = {
-                'Open': 'badge-open',
-                'Assigned': 'badge-assigned',
-                'In Progress': 'badge-in-progress',
-                'Resolved': 'badge-resolved',
-                'Closed': 'badge-closed'
-            }[c.status] || 'badge-open';
-
-            const urgencyClass = c.urgency === 'Emergency' ? 'badge-emergency font-extrabold' : 'bg-slate-800 text-slate-300 border border-slate-700';
-
-            // Action buttons according to workflow steps
-            let actionBtn = '';
-            if ((role === 'warden' || role === 'admin') && (c.status === 'Open' || c.status === 'Assigned')) {
-                actionBtn = `
-                    <button onclick="app.openAssignModal(${c.id}, '${c.title.replace(/'/g, "\\'")}', '${c.category}')" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition">
-                        <i class="fa-solid fa-user-plus mr-1"></i> Assign Staff
-                    </button>
                 `;
-            } else if (role === 'maintenance' && (c.status === 'Assigned' || c.status === 'In Progress')) {
-                actionBtn = `
-                    <button onclick="app.openProgressModal(${c.id}, '${c.title.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition">
-                        <i class="fa-solid fa-screwdriver-wrench mr-1"></i> Update Progress
-                    </button>
-                `;
-            } else if (role === 'student' && c.status === 'Resolved') {
-                actionBtn = `
-                    <button onclick="app.openConfirmResolutionModal(${c.id}, '${c.title.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold text-xs transition">
-                        <i class="fa-solid fa-circle-check mr-1"></i> Confirm & Close
-                    </button>
-                `;
+                return;
             }
 
-            return `
-                <div class="glass-card glass-card-hover p-4 space-y-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-xs font-mono font-bold text-slate-400">#${c.id}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${statusClass}">${c.status}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-medium ${urgencyClass}">${c.urgency}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">${c.category}</span>
-                            <span class="text-xs text-slate-400 font-medium"><i class="fa-solid fa-door-closed mr-1"></i>Room ${c.room_number}</span>
+            targetContainer.innerHTML = complaints.map(c => {
+                const urgencyBadge = c.urgency === 'High' || c.urgency === 'Emergency' 
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' 
+                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+
+                let statusBadge = 'bg-[#1b4332] text-[#8fb89e] border border-[#52b788]/20';
+                if (c.status === 'Resolved') statusBadge = 'bg-blue-500/20 text-blue-300 border border-blue-500/30';
+                if (c.status === 'Closed') statusBadge = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                if (c.status === 'Work in Progress') statusBadge = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
+
+                const isStaff = this.currentUser && this.currentUser.role !== 'student';
+
+                return `
+                    <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#52b788]/20">
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-mono text-xs font-bold text-[#52b788]">#${c.id}</span>
+                                <span class="text-xs px-2.5 py-0.5 rounded-full ${urgencyBadge} font-bold">${c.urgency}</span>
+                                <span class="text-xs px-2.5 py-0.5 rounded-full ${statusBadge} font-bold">${c.status}</span>
+                                <span class="text-xs text-[#8fb89e]">• ${c.category}</span>
+                            </div>
+                            <span class="text-[11px] text-[#8fb89e] font-mono">Location: Room ${c.room_number}</span>
                         </div>
-                        <div class="text-[11px] text-slate-500">
-                            ${new Date(c.created_at).toLocaleString()}
+
+                        <div>
+                            <h4 class="text-sm font-bold text-[#fefae0]">${c.title}</h4>
+                            <p class="text-xs text-[#8fb89e] mt-1">${c.description}</p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs text-[#8fb89e] border-t border-[#52b788]/10">
+                            <div>
+                                Assigned Tech: <span class="text-[#fefae0] font-semibold">${c.assigned_to_name || 'Unassigned'}</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                ${!isStaff && c.status === 'Resolved' ? `
+                                    <button onclick="app.confirmComplaintResolution(${c.id})" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">
+                                        Confirm Resolution & Close
+                                    </button>
+                                ` : ''}
+
+                                ${isStaff ? `
+                                    <button onclick="app.openAssignModal(${c.id})" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#1b4332] text-xs font-semibold text-[#fefae0] border border-[#52b788]/30">
+                                        Assign Staff
+                                    </button>
+                                    <button onclick="app.updateComplaintProgress(${c.id}, 'Work in Progress')" class="px-2.5 py-1 rounded-lg bg-[#2d6a4f] hover:bg-[#40916c] text-xs font-semibold text-[#fefae0]">
+                                        Mark In-Progress
+                                    </button>
+                                    <button onclick="app.updateComplaintProgress(${c.id}, 'Resolved')" class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white">
+                                        Mark Resolved
+                                    </button>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
-
-                    <div>
-                        <h3 class="text-sm font-bold text-white">${c.title}</h3>
-                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">${c.description}</p>
-                    </div>
-
-                    <!-- Assignment & Resolution Details -->
-                    ${(c.staff_name || c.warden_notes || c.resolution_notes || c.student_feedback) ? `
-                        <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800/80 text-xs space-y-1.5">
-                            ${c.staff_name ? `<div class="text-slate-300"><span class="text-slate-500 font-semibold">Assigned Technician:</span> <span class="text-blue-400 font-medium">${c.staff_name}</span></div>` : ''}
-                            ${c.warden_notes ? `<div class="text-slate-300"><span class="text-slate-500 font-semibold">Warden Instructions:</span> ${c.warden_notes}</div>` : ''}
-                            ${c.resolution_notes ? `<div class="text-slate-300"><span class="text-green-400 font-semibold">Resolution Notes:</span> ${c.resolution_notes}</div>` : ''}
-                            ${c.student_rating ? `<div class="text-slate-300"><span class="text-amber-400 font-semibold">Student Rating:</span> ${'⭐'.repeat(c.student_rating)} (${c.student_rating}/5) ${c.student_feedback ? `— "${c.student_feedback}"` : ''}</div>` : ''}
-                        </div>
-                    ` : ''}
-
-                    <div class="flex items-center justify-between pt-1 border-t border-slate-800/60">
-                        <div class="text-[11px] text-slate-400">
-                            Reported by: <span class="text-slate-300 font-medium">${c.student_name}</span>
-                        </div>
-                        <div>${actionBtn}</div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
+        } catch (e) {
+            targetContainer.innerHTML = `<div class="p-4 text-xs text-red-400">Failed to load complaints.</div>`;
+        }
     },
 
-    async handleComplaintSubmit(e) {
+    async handleCreateComplaint(e) {
         e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const payload = Object.fromEntries(formData.entries());
+        const payload = {
+            category: document.getElementById('complaintCategory').value,
+            urgency: document.getElementById('complaintUrgency').value,
+            room_number: document.getElementById('complaintRoomNumber').value.trim(),
+            title: document.getElementById('complaintTitle').value.trim(),
+            description: document.getElementById('complaintDescription').value.trim()
+        };
 
         try {
             const res = await fetch('/api/complaints', {
@@ -409,252 +680,185 @@ const app = {
             });
             const data = await res.json();
             if (res.ok) {
-                this.toast('Complaint submitted successfully (# ' + data.complaint.id + ')', 'success');
                 this.closeModal('submitComplaintModal');
-                form.reset();
+                this.showToast(`Complaint #${data.complaint.id} submitted!`, 'success');
                 this.loadComplaints();
             } else {
-                this.toast(data.error || 'Submission failed', 'error');
+                this.showToast(data.error || 'Failed to submit complaint', 'error');
             }
         } catch (err) {
-            this.toast('Error submitting complaint: ' + err.message, 'error');
+            this.showToast('Network error while lodging complaint', 'error');
         }
     },
 
-    async openAssignModal(complaintId, title, category) {
-        document.getElementById('assignComplaintId').value = complaintId;
-        document.getElementById('assignModalSubtitle').textContent = `Assign #${complaintId}: ${title}`;
+    async confirmComplaintResolution(id) {
+        try {
+            const res = await fetch(`/api/complaints/${id}/resolve-confirm`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rating: 5, remarks: 'Confirmed fixed by student resident' })
+            });
+            if (res.ok) {
+                this.showToast(`Ticket #${id} resolved & confirmed closed. Thank you!`, 'success');
+                this.loadComplaints();
+            }
+        } catch (e) {
+            this.showToast('Resolution confirmation failed', 'error');
+        }
+    },
 
-        // Load maintenance staff list
+    async openAssignModal(id) {
+        document.getElementById('assignComplaintId').value = id;
         const select = document.getElementById('assignStaffSelect');
         select.innerHTML = '<option value="">Loading technicians...</option>';
+        this.openModal('assignStaffModal');
 
         try {
             const res = await fetch('/api/admin/maintenance-staff');
             const data = await res.json();
-            this.cachedStaff = data.staff || [];
-            select.innerHTML = this.cachedStaff.map(s => `
-                <option value="${s.id}">${s.full_name} (${s.email})</option>
-            `).join('');
-            this.openModal('assignStaffModal');
-        } catch (err) {
-            this.toast('Failed to load maintenance staff: ' + err.message, 'error');
+            const staff = data.staff || [];
+            select.innerHTML = staff.map(s => `<option value="${s.id}">${s.full_name} (${s.role})</option>`).join('');
+        } catch (e) {
+            select.innerHTML = '<option value="">Failed to load staff</option>';
         }
     },
 
-    async handleAssignSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
-        const complaintId = document.getElementById('assignComplaintId').value;
-        const formData = new FormData(form);
-        const payload = {
-            staff_id: parseInt(formData.get('staff_id')),
-            warden_notes: formData.get('warden_notes')
-        };
+    async submitAssignStaff() {
+        const id = document.getElementById('assignComplaintId').value;
+        const staffId = document.getElementById('assignStaffSelect').value;
+        if (!staffId) return;
 
         try {
-            const res = await fetch(`/api/complaints/${complaintId}/assign`, {
+            const res = await fetch(`/api/complaints/${id}/assign`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ staff_id: parseInt(staffId), remarks: 'Assigned for immediate dispatch' })
             });
-            const data = await res.json();
             if (res.ok) {
-                this.toast(data.message, 'success');
                 this.closeModal('assignStaffModal');
+                this.showToast(`Ticket #${id} assigned to technician!`, 'success');
                 this.loadComplaints();
-            } else {
-                this.toast(data.error || 'Assignment failed', 'error');
             }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
+        } catch (e) {
+            this.showToast('Assignment failed', 'error');
         }
     },
 
-    openProgressModal(complaintId, title) {
-        document.getElementById('progressComplaintId').value = complaintId;
-        document.getElementById('progressModalSubtitle').textContent = `Ticket #${complaintId}: ${title}`;
-        this.openModal('updateProgressModal');
-    },
-
-    async handleProgressSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
-        const complaintId = document.getElementById('progressComplaintId').value;
-        const formData = new FormData(form);
-        const payload = Object.fromEntries(formData.entries());
-
+    async updateComplaintProgress(id, status) {
         try {
-            const res = await fetch(`/api/complaints/${complaintId}/progress`, {
+            const res = await fetch(`/api/complaints/${id}/progress`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ status: status, notes: `Status transitioned to ${status}` })
             });
-            const data = await res.json();
             if (res.ok) {
-                this.toast(data.message, 'success');
-                this.closeModal('updateProgressModal');
+                this.showToast(`Ticket #${id} updated to ${status}!`, 'success');
                 this.loadComplaints();
-            } else {
-                this.toast(data.error || 'Update failed', 'error');
             }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
+        } catch (e) {
+            this.showToast('Progress update failed', 'error');
         }
     },
 
-    openConfirmResolutionModal(complaintId, title) {
-        document.getElementById('confirmComplaintId').value = complaintId;
-        document.getElementById('confirmModalSubtitle').textContent = `Verify repair for #${complaintId}: ${title}`;
-        this.openModal('confirmResolutionModal');
-    },
-
-    async handleResolutionConfirmSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
-        const complaintId = document.getElementById('confirmComplaintId').value;
-        const formData = new FormData(form);
-        const payload = {
-            action: formData.get('action'),
-            rating: parseInt(formData.get('rating')),
-            feedback: formData.get('feedback')
-        };
-
-        try {
-            const res = await fetch(`/api/complaints/${complaintId}/resolve-confirm`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (res.ok) {
-                this.toast(data.message, 'success');
-                this.closeModal('confirmResolutionModal');
-                this.loadComplaints();
-            } else {
-                this.toast(data.error || 'Confirmation failed', 'error');
-            }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
-        }
-    },
-
-    // --- Workflow 6-7: Leave & Gate Outpass ---
-
+    // ==========================================
+    // LEAVE REQUESTS MODULE
+    // ==========================================
     async loadLeaveRequests() {
-        const status = document.getElementById('leaveStatusFilter')?.value || 'All';
-        const search = document.getElementById('leaveSearchInput')?.value || '';
-        const params = new URLSearchParams({ status, search });
-        const container = document.getElementById('leaveListContainer');
-        container.innerHTML = '<div class="text-xs text-slate-400 py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading leave records...</div>';
+        const studentContainer = document.getElementById('leaveRequestsContainer');
+        const adminContainer = document.getElementById('adminLeavesListContainer');
+        const targetContainer = (this.currentUser && this.currentUser.role !== 'student') ? adminContainer : studentContainer;
+        if (!targetContainer) return;
 
         try {
+            const search = (document.getElementById('leaveSearchInput') || {}).value || '';
+            const status = (document.getElementById('leaveStatusFilter') || {}).value || '';
+
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (status) params.append('status', status);
+
             const res = await fetch(`/api/leave-requests?${params.toString()}`);
-            if (!res.ok) {
-                const err = await res.json();
-                container.innerHTML = `<div class="p-4 rounded-xl bg-red-950/20 border border-red-800/40 text-red-400 text-xs">${err.error}</div>`;
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            const leaves = data.leave_requests || [];
+
+            if (leaves.length === 0) {
+                targetContainer.innerHTML = `
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-passport text-3xl text-[#faedcd]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Leave Records Found</h4>
+                        <p class="text-xs text-[#8fb89e]">No leave requests match your criteria.</p>
+                    </div>
+                `;
                 return;
             }
-            const data = await res.json();
-            this.renderLeaveRequests(data.leave_requests);
-        } catch (err) {
-            container.innerHTML = `<div class="p-4 rounded-xl bg-red-950/20 border border-red-800/40 text-red-400 text-xs">Error: ${err.message}</div>`;
-        }
-    },
 
-    renderLeaveRequests(requests) {
-        const container = document.getElementById('leaveListContainer');
-        if (!requests || requests.length === 0) {
-            container.innerHTML = `
-                <div class="glass-card p-8 text-center space-y-3">
-                    <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-400 text-xl">
-                        <i class="fa-solid fa-passport"></i>
+            const isStaff = this.currentUser && this.currentUser.role !== 'student';
+
+            targetContainer.innerHTML = leaves.map(l => {
+                let badgeClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                if (l.status === 'Approved') badgeClass = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                if (l.status === 'Rejected') badgeClass = 'bg-rose-500/20 text-rose-300 border border-rose-500/30';
+
+                return `
+                    <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#52b788]/20">
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-xs font-bold text-[#52b788]">PASS #${l.id}</span>
+                                <span class="text-xs px-2.5 py-0.5 rounded-full ${badgeClass} font-bold">${l.status}</span>
+                                ${isStaff ? `<span class="text-xs text-[#fefae0] font-bold">• ${l.student_name || 'Student'} (${l.college_id || 'ID'})</span>` : ''}
+                            </div>
+                            <span class="text-xs text-[#8fb89e] font-mono">${l.start_date} → ${l.end_date}</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <span class="text-[#8fb89e]">Reason:</span>
+                                <div class="font-semibold text-[#fefae0] mt-0.5">${l.reason}</div>
+                            </div>
+                            <div>
+                                <span class="text-[#8fb89e]">Destination:</span>
+                                <div class="font-semibold text-[#fefae0] mt-0.5">${l.destination}</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs border-t border-[#52b788]/10 text-[#8fb89e]">
+                            <div>Emergency Contact: <span class="text-[#fefae0] font-mono">${l.emergency_contact}</span></div>
+
+                            <div class="flex items-center gap-2">
+                                ${l.status === 'Approved' ? `
+                                    <span class="text-xs font-bold text-[#52b788] flex items-center gap-1">
+                                        <i class="fa-solid fa-qrcode"></i> Digital Gate Pass Active
+                                    </span>
+                                ` : ''}
+
+                                ${isStaff && l.status === 'Pending' ? `
+                                    <button onclick="app.reviewLeave(${l.id}, 'Approved')" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
+                                        Approve Out-Pass
+                                    </button>
+                                    <button onclick="app.reviewLeave(${l.id}, 'Rejected')" class="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs">
+                                        Reject
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-sm font-bold text-slate-200">No Leave Requests Found</h3>
-                    <p class="text-xs text-slate-400 max-w-sm mx-auto">There are no outpasses or leave applications filed currently.</p>
-                </div>
-            `;
-            return;
-        }
-
-        const role = this.currentUser.role;
-        container.innerHTML = requests.map(l => {
-            const statusClass = {
-                'Pending': 'bg-amber-500/10 text-amber-400 border border-amber-500/30',
-                'Approved': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30',
-                'Rejected': 'bg-red-500/10 text-red-400 border border-red-500/30'
-            }[l.status] || '';
-
-            let actionBtn = '';
-            if ((role === 'warden' || role === 'admin') && l.status === 'Pending') {
-                actionBtn = `
-                    <button onclick="app.openReviewLeaveModal(${l.id}, '${l.student_name.replace(/'/g, "\\'")}', '${l.leave_type}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition">
-                        <i class="fa-solid fa-stamp mr-1"></i> Review Outpass
-                    </button>
                 `;
-            }
-
-            return `
-                <div class="glass-card glass-card-hover p-4 space-y-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-xs font-mono font-bold text-slate-400">#LP-${l.id}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${statusClass}">${l.status}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">${l.leave_type}</span>
-                            <span class="text-xs text-slate-400 font-medium">Room ${l.room_number || 'N/A'}</span>
-                        </div>
-                        <div class="text-[11px] text-slate-500">
-                            Requested: ${new Date(l.created_at).toLocaleDateString()}
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-slate-900/60 p-3 rounded-lg border border-slate-800/80">
-                        <div>
-                            <span class="text-slate-500 font-semibold block">Schedule:</span>
-                            <span class="text-slate-200">Depart: ${l.departure_date}</span><br>
-                            <span class="text-slate-200">Return: ${l.return_date}</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-500 font-semibold block">Guardian & Destination:</span>
-                            <span class="text-slate-200">Contact: ${l.parent_contact}</span><br>
-                            <span class="text-slate-200 truncate block">Destination: ${l.destination_address}</span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <span class="text-xs text-slate-500 font-semibold">Reason:</span>
-                        <p class="text-xs text-slate-300 mt-0.5">${l.reason}</p>
-                    </div>
-
-                    ${l.warden_remarks ? `
-                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs">
-                            <span class="text-slate-400 font-semibold">Warden Remarks (${l.reviewer_name || 'Hostel Desk'}):</span>
-                            <span class="text-slate-200 ml-1">${l.warden_remarks}</span>
-                        </div>
-                    ` : ''}
-
-                    <div class="flex items-center justify-between pt-1 border-t border-slate-800/60">
-                        <div class="text-[11px] text-slate-400">
-                            Student: <span class="text-slate-200 font-medium">${l.student_name}</span>
-                        </div>
-                        <div>${actionBtn}</div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+            }).join('');
+        } catch (e) {
+            targetContainer.innerHTML = `<div class="p-4 text-xs text-red-400">Failed to load leave requests.</div>`;
+        }
     },
 
-    async handleLeaveSubmit(e) {
+    async handleApplyLeave(e) {
         e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const payload = Object.fromEntries(formData.entries());
-
-        // Client-side date check
-        if (payload.return_date < payload.departure_date) {
-            this.toast('Return date cannot be earlier than departure date', 'error');
-            return;
-        }
+        const payload = {
+            start_date: document.getElementById('leaveStartDate').value,
+            end_date: document.getElementById('leaveEndDate').value,
+            reason: document.getElementById('leaveReason').value.trim(),
+            destination: document.getElementById('leaveDestination').value.trim(),
+            emergency_contact: document.getElementById('leaveEmergencyContact').value.trim()
+        };
 
         try {
             const res = await fetch('/api/leave-requests', {
@@ -664,216 +868,135 @@ const app = {
             });
             const data = await res.json();
             if (res.ok) {
-                this.toast('Leave outpass submitted successfully', 'success');
-                this.closeModal('submitLeaveModal');
-                form.reset();
+                this.closeModal('applyLeaveModal');
+                this.showToast('Leave request submitted to Warden!', 'success');
                 this.loadLeaveRequests();
             } else {
-                this.toast(data.error || 'Submission failed', 'error');
+                this.showToast(data.error || 'Failed to submit leave', 'error');
             }
         } catch (err) {
-            this.toast('Error submitting leave: ' + err.message, 'error');
+            this.showToast('Network error while applying for leave', 'error');
         }
     },
 
-    openReviewLeaveModal(leaveId, studentName, leaveType) {
-        document.getElementById('reviewLeaveId').value = leaveId;
-        document.getElementById('reviewLeaveModalSubtitle').textContent = `Reviewing Outpass #${leaveId} for ${studentName} (${leaveType})`;
-        this.openModal('reviewLeaveModal');
-    },
-
-    async handleLeaveReviewSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
-        const leaveId = document.getElementById('reviewLeaveId').value;
-        const formData = new FormData(form);
-        const payload = {
-            decision: formData.get('decision'),
-            remarks: formData.get('remarks')
-        };
-
+    async reviewLeave(id, status) {
         try {
-            const res = await fetch(`/api/leave-requests/${leaveId}/review`, {
+            const res = await fetch(`/api/leave-requests/${id}/review`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ status: status, remarks: `Reviewed and marked ${status}` })
             });
-            const data = await res.json();
             if (res.ok) {
-                this.toast(data.message, 'success');
-                this.closeModal('reviewLeaveModal');
+                this.showToast(`Leave request #${id} marked as ${status}!`, 'success');
                 this.loadLeaveRequests();
-            } else {
-                this.toast(data.error || 'Review submission failed', 'error');
             }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
+        } catch (e) {
+            this.showToast('Failed to review leave', 'error');
         }
     },
 
-    // --- Workflow 8-9: Mess Menu & Feedback ---
+    // ==========================================
+    // MESS MENU & FEEDBACK
+    // ==========================================
+    async loadMessMenu() {
+        const c = document.getElementById('messMenuContainer');
+        const pillsContainer = document.getElementById('messDayPills');
+        if (!c) return;
 
-    selectMessDay(day) {
-        this.currentMessDay = day;
-        document.querySelectorAll('.mess-day-btn').forEach(btn => {
-            if (btn.dataset.day === day) {
-                btn.classList.add('bg-blue-600', 'text-white');
-                btn.classList.remove('bg-slate-800', 'text-slate-400');
-            } else {
-                btn.classList.remove('bg-blue-600', 'text-white');
-                btn.classList.add('bg-slate-800', 'text-slate-400');
-            }
-        });
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        if (pillsContainer) {
+            pillsContainer.innerHTML = days.map(d => `
+                <button onclick="app.setMessDay('${d}')" class="px-3.5 py-1 rounded-xl text-xs font-semibold whitespace-nowrap transition ${d === this.currentMessDay ? 'bg-[#52b788] text-[#08140e] font-bold' : 'bg-[#143528] text-[#8fb89e] hover:text-[#fefae0]'}">
+                    ${d}
+                </button>
+            `).join('');
+        }
+
+        try {
+            const res = await fetch('/api/mess/menu');
+            const data = await res.json();
+            const menus = data.menu || [];
+            const dayMenu = menus.find(m => m.day_of_week === this.currentMessDay) || {};
+
+            c.innerHTML = `
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                        <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5"><i class="fa-solid fa-mug-hot"></i> Breakfast</span>
+                        <span class="text-[10px] text-[#8fb89e]">07:30 - 09:30</span>
+                    </div>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${dayMenu.breakfast || 'Menu unavailable'}</p>
+                </div>
+
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                        <span class="text-xs font-bold text-[#faedcd] flex items-center gap-1.5"><i class="fa-solid fa-bowl-rice"></i> Lunch</span>
+                        <span class="text-[10px] text-[#8fb89e]">12:30 - 14:30</span>
+                    </div>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${dayMenu.lunch || 'Menu unavailable'}</p>
+                </div>
+
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                        <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5"><i class="fa-solid fa-cookie-bite"></i> Snacks</span>
+                        <span class="text-[10px] text-[#8fb89e]">17:00 - 18:00</span>
+                    </div>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${dayMenu.snacks || 'Menu unavailable'}</p>
+                </div>
+
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                        <span class="text-xs font-bold text-[#faedcd] flex items-center gap-1.5"><i class="fa-solid fa-plate-wheat"></i> Dinner</span>
+                        <span class="text-[10px] text-[#8fb89e]">19:30 - 21:30</span>
+                    </div>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${dayMenu.dinner || 'Menu unavailable'}</p>
+                </div>
+            `;
+        } catch (e) {
+            c.innerHTML = `<div class="p-4 text-xs text-red-400">Failed to load mess menu.</div>`;
+        }
+    },
+
+    setMessDay(d) {
+        this.currentMessDay = d;
         this.loadMessMenu();
     },
 
-    async loadMessMenu() {
-        const grid = document.getElementById('messMenuGrid');
-        grid.innerHTML = '<div class="text-xs text-slate-400 py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading menu...</div>';
-
-        try {
-            const res = await fetch(`/api/mess/menu?day=${this.currentMessDay}`);
-            const data = await res.json();
-            const meals = data.menu || [];
-
-            const mealIcons = {
-                'Breakfast': 'fa-mug-saucer',
-                'Lunch': 'fa-bowl-rice',
-                'Snacks': 'fa-cookie-bite',
-                'Dinner': 'fa-plate-wheat'
-            };
-
-            const mealColors = {
-                'Breakfast': 'from-amber-500/10 to-orange-500/10 border-amber-500/20',
-                'Lunch': 'from-emerald-500/10 to-teal-500/10 border-emerald-500/20',
-                'Snacks': 'from-blue-500/10 to-cyan-500/10 border-blue-500/20',
-                'Dinner': 'from-purple-500/10 to-indigo-500/10 border-purple-500/20'
-            };
-
-            const allMeals = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
-            grid.innerHTML = allMeals.map(mealType => {
-                const item = meals.find(m => m.meal_type === mealType) || {
-                    day_of_week: this.currentMessDay,
-                    meal_type: mealType,
-                    items: 'Menu to be published by mess manager',
-                    dietary_type: 'Veg',
-                    special_notes: ''
-                };
-
-                const dietBadge = item.dietary_type === 'Non-Veg' 
-                    ? 'bg-red-500/15 text-red-400 border-red-500/30' 
-                    : (item.dietary_type === 'Jain' ? 'bg-amber-500/15 text-amber-400 border-amber-500/30' : 'bg-green-500/15 text-green-400 border-green-500/30');
-
-                return `
-                    <div class="glass-card glass-card-hover p-4 flex flex-col justify-between border bg-gradient-to-b ${mealColors[mealType]}">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid ${mealIcons[mealType]} text-slate-300"></i>
-                                    <h3 class="text-sm font-bold text-white">${mealType}</h3>
-                                </div>
-                                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold border ${dietBadge}">${item.dietary_type}</span>
-                            </div>
-                            <p class="text-xs text-slate-200 mt-2 font-medium leading-relaxed">${item.items}</p>
-                            ${item.special_notes ? `<div class="mt-2 text-[11px] text-slate-400 italic"><i class="fa-solid fa-circle-info mr-1"></i>${item.special_notes}</div>` : ''}
-                        </div>
-                        <div class="mt-4 pt-2 border-t border-slate-800/60 text-[10px] text-slate-500 flex justify-between">
-                            <span>${this.currentMessDay}</span>
-                            <span>MANN Campus Dining</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        } catch (err) {
-            grid.innerHTML = `<div class="text-xs text-red-400">Failed to load menu: ${err.message}</div>`;
-        }
-    },
-
-    async handleMessMenuSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const payload = Object.fromEntries(formData.entries());
-
-        try {
-            const res = await fetch('/api/mess/menu', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (res.ok) {
-                this.toast(data.message, 'success');
-                this.closeModal('updateMessMenuModal');
-                this.currentMessDay = payload.day_of_week;
-                this.selectMessDay(payload.day_of_week);
-            } else {
-                this.toast(data.error || 'Menu update failed', 'error');
-            }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
-        }
-    },
-
-    async loadFoodFeedback() {
-        const list = document.getElementById('messFeedbackList');
-        const badge = document.getElementById('feedbackStatsBadge');
+    async loadMessFeedback() {
+        const c = document.getElementById('messFeedbackContainer');
+        if (!c) return;
 
         try {
             const res = await fetch('/api/mess/feedback');
-            if (!res.ok) {
-                // If student role, they don't see the full audit list unless enabled, but let's see response
-                list.innerHTML = `<div class="text-xs text-slate-500 italic p-3">Submit your ratings above to help the hostel catering committee improve food quality.</div>`;
-                return;
-            }
             const data = await res.json();
-            const reviews = data.feedback || [];
-            const stats = data.stats || {};
+            const feedbacks = data.feedback || [];
 
-            if (stats.avg_food_rating) {
-                badge.textContent = `Avg Food: ⭐ ${stats.avg_food_rating}/5 · Hygiene: ⭐ ${stats.avg_hygiene_rating}/5 (${stats.total_reviews} reviews)`;
-            } else {
-                badge.textContent = 'No Reviews Yet';
-            }
-
-            if (reviews.length === 0) {
-                list.innerHTML = `
-                    <div class="glass-card p-6 text-center text-xs text-slate-400">
-                        No food feedback submitted yet for recent meals.
-                    </div>
-                `;
+            if (feedbacks.length === 0) {
+                c.innerHTML = `<p class="text-xs text-[#8fb89e] col-span-2">No student reviews recorded yet.</p>`;
                 return;
             }
 
-            list.innerHTML = reviews.slice(0, 5).map(r => `
-                <div class="glass-card p-3.5 text-xs space-y-1">
+            c.innerHTML = feedbacks.slice(0, 6).map(f => `
+                <div class="p-3 rounded-xl bg-[#0f281e]/80 border border-[#52b788]/20 space-y-1 text-xs">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-200">${r.student_name}</span>
-                            <span class="text-slate-400">· ${r.meal_type}</span>
-                        </div>
-                        <div class="text-amber-400 font-semibold">
-                            Taste: ${'⭐'.repeat(r.rating)} · Hygiene: ${'⭐'.repeat(r.hygiene_rating)}
-                        </div>
+                        <span class="font-bold text-[#52b788]">${f.meal_type}</span>
+                        <span class="text-amber-400 font-bold">${'★'.repeat(f.rating)}</span>
                     </div>
-                    ${r.comments ? `<p class="text-slate-300 italic">"${r.comments}"</p>` : ''}
-                    <div class="text-[10px] text-slate-500">${new Date(r.created_at).toLocaleString()}</div>
+                    <p class="text-[#fefae0]">${f.comment || 'No written remarks'}</p>
+                    <div class="text-[10px] text-[#8fb89e] flex justify-between pt-1">
+                        <span>${f.student_name || 'Resident'}</span>
+                        <span>${f.created_at ? f.created_at.split('T')[0] : ''}</span>
+                    </div>
                 </div>
             `).join('');
-        } catch (err) {
-            list.innerHTML = `<div class="text-xs text-slate-500">Feedback list unavailable for current role.</div>`;
-        }
+        } catch (e) {}
     },
 
-    async handleFoodFeedbackSubmit(e) {
+    async handleMessFeedback(e) {
         e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
         const payload = {
-            meal_type: formData.get('meal_type'),
-            rating: parseInt(formData.get('rating')),
-            hygiene_rating: parseInt(formData.get('hygiene_rating')),
-            comments: formData.get('comments')
+            meal_type: document.getElementById('feedbackMealType').value,
+            rating: parseInt(document.getElementById('feedbackRating').value),
+            comment: document.getElementById('feedbackComment').value.trim()
         };
 
         try {
@@ -882,229 +1005,866 @@ const app = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+            if (res.ok) {
+                this.closeModal('submitMessFeedbackModal');
+                this.showToast('Thank you for rating today’s food!', 'success');
+                this.loadMessFeedback();
+            }
+        } catch (e) {
+            this.showToast('Failed to submit feedback', 'error');
+        }
+    },
+
+    async loadAdminMessMenuDay() {
+        const day = document.getElementById('adminMessDaySelect').value;
+        try {
+            const res = await fetch('/api/mess/menu');
+            const data = await res.json();
+            const menu = (data.menu || []).find(m => m.day_of_week === day) || {};
+
+            document.getElementById('editBreakfast').value = menu.breakfast || '';
+            document.getElementById('editLunch').value = menu.lunch || '';
+            document.getElementById('editSnacks').value = menu.snacks || '';
+            document.getElementById('editDinner').value = menu.dinner || '';
+            document.getElementById('editSpecialNotes').value = menu.special_notes || '';
+        } catch (e) {}
+    },
+
+    async handleUpdateMessMenu(e) {
+        e.preventDefault();
+        const day = document.getElementById('adminMessDaySelect').value;
+        const payload = {
+            day_of_week: day,
+            breakfast: document.getElementById('editBreakfast').value.trim(),
+            lunch: document.getElementById('editLunch').value.trim(),
+            snacks: document.getElementById('editSnacks').value.trim(),
+            dinner: document.getElementById('editDinner').value.trim(),
+            special_notes: document.getElementById('editSpecialNotes').value.trim()
+        };
+
+        try {
+            const res = await fetch('/api/mess/menu', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                this.showToast(`Updated menu for ${day}!`, 'success');
+            }
+        } catch (e) {
+            this.showToast('Failed to update menu', 'error');
+        }
+    },
+
+    // ==========================================
+    // FEES AND PAYMENTS MODULE
+    // ==========================================
+    async loadStudentFees() {
+        const sumC = document.getElementById('studentFeesSummaryContainer');
+        const invC = document.getElementById('studentFeesInvoicesContainer');
+        if (!sumC || !invC) return;
+
+        try {
+            const res = await fetch('/api/student/fees');
+            const data = await res.json();
+            const fees = data.fees || [];
+
+            const totalDue = fees.reduce((acc, f) => acc + (f.status === 'Pending' ? f.amount : 0), 0);
+            const totalPaid = fees.reduce((acc, f) => acc + (f.status === 'Paid' ? f.amount : 0), 0);
+
+            sumC.innerHTML = `
+                <div class="forest-card p-5 rounded-2xl border border-rose-500/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Outstanding Dues</span>
+                    <div class="text-2xl font-extrabold text-rose-400 mt-1">₹${totalDue.toLocaleString()}</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-0.5">Pay before term deadline</div>
+                </div>
+                <div class="forest-card p-5 rounded-2xl border border-emerald-500/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Total Paid</span>
+                    <div class="text-2xl font-extrabold text-emerald-400 mt-1">₹${totalPaid.toLocaleString()}</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-0.5">Verified digital payments</div>
+                </div>
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Security Deposit</span>
+                    <div class="text-2xl font-extrabold text-[#faedcd] mt-1">₹10,000</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-0.5">Refundable upon graduation</div>
+                </div>
+            `;
+
+            invC.innerHTML = fees.map(f => `
+                <div class="p-4 rounded-xl bg-[#0f281e]/80 border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-[#fefae0] text-sm">${f.fee_type}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${f.status === 'Paid' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${f.status}</span>
+                        </div>
+                        <div class="text-[11px] text-[#8fb89e] mt-0.5">Term: ${f.term} • Due Date: ${f.due_date}</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-base text-[#fefae0]">₹${f.amount.toLocaleString()}</span>
+                        ${f.status === 'Pending' ? `
+                            <button onclick="app.payFee(${f.id})" class="px-4 py-2 rounded-xl btn-forest-primary text-xs font-bold shadow-md">
+                                Pay Online
+                            </button>
+                        ` : `
+                            <span class="text-xs text-[#52b788] font-bold"><i class="fa-solid fa-check"></i> Receipt Downloaded</span>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {}
+    },
+
+    async payFee(feeId) {
+        try {
+            const res = await fetch(`/api/student/pay-fee/${feeId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ payment_method: 'UPI / NetBanking', transaction_ref: 'TXN-' + Math.random().toString(36).substring(2, 9).toUpperCase() })
+            });
             const data = await res.json();
             if (res.ok) {
-                this.toast(data.message, 'success');
-                this.closeModal('submitFoodFeedbackModal');
-                form.reset();
-                this.loadFoodFeedback();
-            } else {
-                this.toast(data.error || 'Submission failed', 'error');
+                this.showToast(`Payment successful! Receipt: ${data.receipt_number}`, 'success');
+                this.loadStudentFees();
             }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
+        } catch (e) {
+            this.showToast('Payment gateway error', 'error');
         }
     },
 
-    // --- Workflow 10: Facility Booking ---
-
-    async loadFacilityAvailability() {
-        const date = document.getElementById('facilityBookingDateInput')?.value || new Date().toISOString().split('T')[0];
-        const grid = document.getElementById('facilityGridContainer');
-        grid.innerHTML = '<div class="text-xs text-slate-400 py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Checking facility slots...</div>';
+    // ==========================================
+    // LAUNDRY MODULE
+    // ==========================================
+    async loadLaundryRequests() {
+        const c = document.getElementById('laundryRequestsContainer');
+        if (!c) return;
 
         try {
-            const res = await fetch(`/api/facilities/available?date=${date}`);
+            const res = await fetch('/api/laundry');
             const data = await res.json();
-            const facilities = data.facilities || [];
+            const requests = data.requests || [];
 
-            const facIcons = {
-                'Study Room': 'fa-book-open-reader',
-                'Table Tennis': 'fa-table-tennis-paddle-ball',
-                'Badminton Court': 'fa-volleyball',
-                'Gym Slot': 'fa-dumbbell',
-                'Music Room': 'fa-guitar',
-                'Laundry Slot': 'fa-shirt'
-            };
-
-            grid.innerHTML = facilities.map(f => {
-                const availableCount = f.slots.filter(s => s.available).length;
-                return `
-                    <div class="glass-card p-4 space-y-3 border border-slate-800">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid ${facIcons[f.facility_name] || 'fa-building'} text-indigo-400"></i>
-                                <h3 class="text-sm font-bold text-white">${f.facility_name}</h3>
-                            </div>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${availableCount > 0 ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'}">
-                                ${availableCount} Slots Open
-                            </span>
-                        </div>
-
-                        <div class="space-y-1 max-h-48 overflow-y-auto pr-1">
-                            ${f.slots.map(s => `
-                                <div class="flex items-center justify-between text-xs p-1.5 rounded-lg ${s.available ? 'bg-slate-900/60 hover:bg-slate-800/80' : 'bg-slate-950/60 opacity-60'}">
-                                    <span class="text-slate-300 font-mono text-[11px]">${s.slot_time}</span>
-                                    ${s.available ? `
-                                        <button onclick="app.quickBookSlot('${f.facility_name}', '${date}', '${s.slot_time}')" class="px-2 py-0.5 rounded bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white text-[10px] font-semibold transition">
-                                            Book Slot
-                                        </button>
-                                    ` : `
-                                        <span class="text-[10px] text-red-400 font-medium">Booked (${s.booked_by || 'Reserved'})</span>
-                                    `}
-                                </div>
-                            `).join('')}
-                        </div>
+            if (requests.length === 0) {
+                c.innerHTML = `
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-shirt text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Laundry Requests Active</h4>
+                        <p class="text-xs text-[#8fb89e]">Schedule your express laundry pickup anytime.</p>
                     </div>
                 `;
-            }).join('');
-        } catch (err) {
-            grid.innerHTML = `<div class="text-xs text-red-400">Failed to load facilities: ${err.message}</div>`;
-        }
+                return;
+            }
+
+            const isStaff = this.currentUser && this.currentUser.role !== 'student';
+
+            c.innerHTML = requests.map(r => `
+                <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-[#fefae0]">Bag #${r.id} (${r.item_count} items)</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#143528] text-[#52b788] border border-[#52b788]/30">${r.service_type}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">${r.status}</span>
+                        </div>
+                        <div class="text-[11px] text-[#8fb89e] mt-1">${r.special_notes || 'Standard wash'} • Scheduled: ${r.pickup_date || 'Today'}</div>
+                    </div>
+                    ${isStaff ? `
+                        <div class="flex items-center gap-2">
+                            <button onclick="app.updateLaundryStatus(${r.id}, 'In Washing')" class="px-2.5 py-1 rounded bg-[#2d6a4f] text-xs font-semibold text-white">In Wash</button>
+                            <button onclick="app.updateLaundryStatus(${r.id}, 'Ready for Pickup')" class="px-2.5 py-1 rounded bg-blue-600 text-xs font-semibold text-white">Ready</button>
+                            <button onclick="app.updateLaundryStatus(${r.id}, 'Completed')" class="px-2.5 py-1 rounded bg-emerald-600 text-xs font-semibold text-white">Done</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        } catch (e) {}
     },
 
-    quickBookSlot(facilityName, date, slotTime) {
-        document.getElementById('bookFacilitySelect').value = facilityName;
-        document.getElementById('bookFacilityDate').value = date;
-        const slotSelect = document.querySelector('#bookFacilityForm select[name="slot_time"]');
-        if (slotSelect) slotSelect.value = slotTime;
-        this.openModal('bookFacilityModal');
-    },
-
-    async handleFacilityBookSubmit(e) {
+    async handleRequestLaundry(e) {
         e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const payload = Object.fromEntries(formData.entries());
+        const payload = {
+            item_count: parseInt(document.getElementById('laundryItemCount').value),
+            service_type: document.getElementById('laundryServiceType').value,
+            special_notes: document.getElementById('laundrySpecialNotes').value.trim()
+        };
 
         try {
-            const res = await fetch('/api/facilities/book', {
+            const res = await fetch('/api/laundry', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const data = await res.json();
             if (res.ok) {
-                this.toast(data.message, 'success');
-                this.closeModal('bookFacilityModal');
-                this.loadFacilityAvailability();
-                this.loadMyFacilityBookings();
-            } else {
-                this.toast(data.error || 'Facility booking failed', 'error');
+                this.closeModal('requestLaundryModal');
+                this.showToast('Laundry pickup scheduled successfully!', 'success');
+                this.loadLaundryRequests();
             }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
+        } catch (e) {
+            this.showToast('Failed to schedule laundry', 'error');
         }
     },
 
-    async loadMyFacilityBookings() {
-        const list = document.getElementById('myFacilityBookingsList');
-        if (!list) return;
+    async updateLaundryStatus(id, status) {
+        try {
+            const res = await fetch(`/api/laundry/${id}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            if (res.ok) {
+                this.showToast(`Laundry #${id} marked as ${status}`, 'success');
+                this.loadLaundryRequests();
+            }
+        } catch (e) {}
+    },
+
+    // ==========================================
+    // CLEANING MODULE
+    // ==========================================
+    async loadCleaningRequests() {
+        const c = document.getElementById('cleaningRequestsContainer');
+        if (!c) return;
 
         try {
-            const res = await fetch('/api/facilities/my-bookings');
-            if (!res.ok) {
-                list.innerHTML = '';
-                return;
-            }
+            const res = await fetch('/api/cleaning');
             const data = await res.json();
-            const bookings = data.bookings || [];
+            const reqs = data.requests || [];
 
-            if (bookings.length === 0) {
-                list.innerHTML = `<div class="text-xs text-slate-500 italic">You have no active facility bookings.</div>`;
+            if (reqs.length === 0) {
+                c.innerHTML = `
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-broom text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Housekeeping Scheduled</h4>
+                        <p class="text-xs text-[#8fb89e]">Schedule deep room cleaning at your convenience.</p>
+                    </div>
+                `;
                 return;
             }
 
-            list.innerHTML = bookings.map(b => `
-                <div class="glass-card p-2.5 flex items-center justify-between text-xs">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-green-400"></i>
-                        <span class="font-bold text-slate-200">${b.facility_name}</span>
-                        <span class="text-slate-400">· Date: ${b.booking_date}</span>
-                        <span class="text-indigo-400 font-mono">(${b.slot_time})</span>
+            c.innerHTML = reqs.map(r => `
+                <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-[#fefae0]">${r.preferred_slot}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">${r.status}</span>
+                        </div>
+                        <div class="text-[11px] text-[#8fb89e] mt-1">Focus: ${r.focus_area || 'Whole Room'} • Date: ${r.request_date || 'Today'}</div>
                     </div>
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20">CONFIRMED</span>
                 </div>
             `).join('');
-        } catch (err) {
-            list.innerHTML = '';
-        }
+        } catch (e) {}
     },
 
-    // --- Workflow 11: Admin Room & Bed Allocations ---
-
-    async loadRooms() {
-        const block = document.getElementById('roomBlockFilter')?.value || 'All';
-        const status = document.getElementById('roomOccupancyFilter')?.value || 'All';
-        const grid = document.getElementById('roomsGridContainer');
-        grid.innerHTML = '<div class="text-xs text-slate-400 py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading hostel rooms...</div>';
+    async handleRequestCleaning(e) {
+        e.preventDefault();
+        const payload = {
+            preferred_slot: document.getElementById('cleaningSlot').value,
+            focus_area: document.getElementById('cleaningFocus').value.trim()
+        };
 
         try {
-            const res = await fetch(`/api/admin/rooms?block=${block}&status=${status}`);
-            const data = await res.json();
-            this.cachedRooms = data.rooms || [];
-            this.renderRooms(this.cachedRooms);
-        } catch (err) {
-            grid.innerHTML = `<div class="text-xs text-red-400">Failed to load rooms: ${err.message}</div>`;
+            const res = await fetch('/api/cleaning', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                this.closeModal('requestCleaningModal');
+                this.showToast('Room housekeeping request recorded!', 'success');
+                this.loadCleaningRequests();
+            }
+        } catch (e) {
+            this.showToast('Failed to schedule cleaning', 'error');
         }
     },
 
-    renderRooms(rooms) {
-        const grid = document.getElementById('roomsGridContainer');
-        if (!rooms || rooms.length === 0) {
-            grid.innerHTML = `
-                <div class="glass-card p-8 text-center col-span-full">
-                    <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-400 text-xl mb-2">
-                        <i class="fa-solid fa-door-open"></i>
+    // ==========================================
+    // VISITOR REQUESTS MODULE
+    // ==========================================
+    async loadVisitorRequests() {
+        const studentContainer = document.getElementById('visitorRequestsContainer');
+        const adminContainer = document.getElementById('adminVisitorsListContainer');
+        const targetContainer = (this.currentUser && this.currentUser.role !== 'student') ? adminContainer : studentContainer;
+        if (!targetContainer) return;
+
+        try {
+            const res = await fetch('/api/visitors');
+            const data = await res.json();
+            const visitors = data.visitors || [];
+
+            if (visitors.length === 0) {
+                targetContainer.innerHTML = `
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-id-badge text-3xl text-[#faedcd]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Registered Visitors</h4>
+                        <p class="text-xs text-[#8fb89e]">Pre-register guests to ensure quick security clearance.</p>
                     </div>
-                    <h3 class="text-sm font-bold text-slate-200">No Rooms Found</h3>
-                    <p class="text-xs text-slate-400">No rooms match the selected block and occupancy filter.</p>
+                `;
+                return;
+            }
+
+            const isStaff = this.currentUser && this.currentUser.role !== 'student';
+
+            targetContainer.innerHTML = visitors.map(v => `
+                <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-[#fefae0]">${v.visitor_name} (${v.relationship})</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${v.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${v.status}</span>
+                        </div>
+                        <div class="text-[11px] text-[#8fb89e] mt-1">Visit Date: ${v.visit_date} • Phone: ${v.phone} • Purpose: ${v.purpose || 'General'}</div>
+                    </div>
+                    ${isStaff && v.status === 'Pending' ? `
+                        <div class="flex items-center gap-2">
+                            <button onclick="app.reviewVisitor(${v.id}, 'Approved')" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Approve Entry</button>
+                            <button onclick="app.reviewVisitor(${v.id}, 'Rejected')" class="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs">Deny</button>
+                        </div>
+                    ` : `
+                        <span class="text-xs font-mono text-[#52b788]">PASS: VP-${v.id}90X</span>
+                    `}
+                </div>
+            `).join('');
+        } catch (e) {}
+    },
+
+    async handleRequestVisitor(e) {
+        e.preventDefault();
+        const payload = {
+            visitor_name: document.getElementById('visitorName').value.trim(),
+            phone: document.getElementById('visitorPhone').value.trim(),
+            relationship: document.getElementById('visitorRelation').value,
+            visit_date: document.getElementById('visitorDate').value,
+            purpose: document.getElementById('visitorPurpose').value.trim()
+        };
+
+        try {
+            const res = await fetch('/api/visitors', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                this.closeModal('requestVisitorModal');
+                this.showToast('Visitor gate pass generated and submitted for review!', 'success');
+                this.loadVisitorRequests();
+            }
+        } catch (e) {
+            this.showToast('Failed to register visitor', 'error');
+        }
+    },
+
+    async reviewVisitor(id, status) {
+        try {
+            const res = await fetch(`/api/visitors/${id}/review`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            if (res.ok) {
+                this.showToast(`Visitor pass #${id} marked as ${status}`, 'success');
+                this.loadVisitorRequests();
+            }
+        } catch (e) {}
+    },
+
+    // ==========================================
+    // COMMUNITY HUB MODULE
+    // ==========================================
+    async loadCommunityPosts() {
+        const c = document.getElementById('communityPostsContainer');
+        if (!c) return;
+
+        try {
+            const res = await fetch('/api/community');
+            const data = await res.json();
+            const posts = data.posts || [];
+
+            if (posts.length === 0) {
+                c.innerHTML = `
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-comments text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">Community Forum Quiet</h4>
+                        <p class="text-xs text-[#8fb89e]">Start the conversation! Share study groups or hostel events.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            c.innerHTML = posts.map(p => `
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2.5">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#143528] text-[#52b788] border border-[#52b788]/30 font-bold">${p.category}</span>
+                            <span class="text-xs font-bold text-[#fefae0]">• ${p.author_name || 'Resident'}</span>
+                        </div>
+                        <span class="text-[10px] text-[#8fb89e]">${p.created_at ? p.created_at.split('T')[0] : ''}</span>
+                    </div>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${p.content}</p>
+                    <div class="flex items-center justify-between pt-1 text-xs">
+                        <button onclick="app.likeCommunityPost(${p.id})" class="text-rose-400 hover:text-rose-300 flex items-center gap-1 font-bold">
+                            <i class="fa-solid fa-heart"></i> <span>${p.likes || 0}</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {}
+    },
+
+    async handleCreateCommunityPost(e) {
+        e.preventDefault();
+        const payload = {
+            category: document.getElementById('commCategory').value,
+            content: document.getElementById('commContent').value.trim()
+        };
+
+        try {
+            const res = await fetch('/api/community', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                this.closeModal('createCommunityPostModal');
+                this.showToast('Post published to community board!', 'success');
+                this.loadCommunityPosts();
+            }
+        } catch (e) {
+            this.showToast('Failed to publish post', 'error');
+        }
+    },
+
+    async likeCommunityPost(id) {
+        try {
+            const res = await fetch(`/api/community/${id}/like`, { method: 'POST' });
+            if (res.ok) {
+                this.loadCommunityPosts();
+            }
+        } catch (e) {}
+    },
+
+    // ==========================================
+    // ANNOUNCEMENTS MODULE
+    // ==========================================
+    async loadAnnouncements() {
+        const studentContainer = document.getElementById('studentAnnouncementsContainer');
+        const adminContainer = document.getElementById('adminAnnouncementsContainer');
+        const targetContainer = (this.currentUser && this.currentUser.role !== 'student') ? adminContainer : studentContainer;
+        if (!targetContainer) return;
+
+        try {
+            const res = await fetch('/api/announcements');
+            const data = await res.json();
+            const items = data.announcements || [];
+
+            if (items.length === 0) {
+                targetContainer.innerHTML = `
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-bullhorn text-3xl text-[#faedcd]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Bulletins Active</h4>
+                        <p class="text-xs text-[#8fb89e]">Official announcements will appear here as soon as posted.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            targetContainer.innerHTML = items.map(a => {
+                const isUrgent = a.priority === 'Urgent';
+                return `
+                    <div class="forest-card p-5 rounded-2xl border ${isUrgent ? 'border-rose-500/40 bg-rose-950/10' : 'border-[#52b788]/20'} space-y-2">
+                        <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                            <div class="flex items-center gap-2">
+                                ${isUrgent ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">URGENT</span>' : ''}
+                                <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#143528] text-[#52b788] border border-[#52b788]/30 font-bold">${a.category}</span>
+                                <h4 class="text-sm font-bold text-[#fefae0]">${a.title}</h4>
+                            </div>
+                            <span class="text-[10px] text-[#8fb89e]">${a.created_at ? a.created_at.split('T')[0] : ''}</span>
+                        </div>
+                        <p class="text-xs text-[#8fb89e] leading-relaxed">${a.content}</p>
+                        <div class="text-[10px] text-[#52b788] font-semibold pt-1">
+                            Issued by: ${a.posted_by_name || 'Chief Warden Office'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) {}
+    },
+
+    async handlePublishAnnouncement(e) {
+        e.preventDefault();
+        const payload = {
+            title: document.getElementById('announcementTitle').value.trim(),
+            category: document.getElementById('announcementCategory').value,
+            priority: document.getElementById('announcementPriority').value,
+            content: document.getElementById('announcementContent').value.trim()
+        };
+
+        try {
+            const res = await fetch('/api/announcements', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                this.closeModal('publishAnnouncementModal');
+                this.showToast('Announcement broadcasted to hostel network!', 'success');
+                this.loadAnnouncements();
+            }
+        } catch (e) {
+            this.showToast('Failed to publish announcement', 'error');
+        }
+    },
+
+    // ==========================================
+    // MANN CARE: CONFIDENTIAL WELLNESS SANCTUARY
+    // ==========================================
+    async loadWellnessAppointments() {
+        const c = document.getElementById('wellnessAppointmentsContainer');
+        if (!c) return;
+
+        try {
+            const res = await fetch('/api/wellness/appointments');
+            if (res.status === 403) {
+                c.innerHTML = `
+                    <div class="p-6 rounded-2xl bg-rose-950/20 border border-rose-800/40 text-center space-y-2 text-xs">
+                        <i class="fa-solid fa-lock text-rose-400 text-2xl"></i>
+                        <h4 class="font-bold text-rose-200">Access Restricted</h4>
+                        <p class="text-rose-300/80">Wellness records are strictly confidential and inaccessible to this role.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const data = await res.json();
+            const appts = data.appointments || [];
+
+            if (appts.length === 0) {
+                c.innerHTML = `
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-purple-800/30">
+                        <i class="fa-solid fa-hand-holding-heart text-3xl text-purple-400"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Confidential Sessions Booked</h4>
+                        <p class="text-xs text-[#8fb89e]">Schedule a private, pressure-free session with our licensed counsellor anytime.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            c.innerHTML = appts.map(a => `
+                <div class="forest-card p-5 rounded-2xl border border-purple-800/40 space-y-2">
+                    <div class="flex items-center justify-between pb-2 border-b border-purple-800/30">
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs font-bold text-purple-400">CARE #${a.id}</span>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">${a.status}</span>
+                        </div>
+                        <span class="text-xs text-[#8fb89e]">${a.preferred_date} • ${a.preferred_time_slot}</span>
+                    </div>
+                    <p class="text-xs text-[#fefae0] italic">"${a.notes || 'Confidential consultation'}"</p>
+                    <div class="text-[10px] text-purple-300 pt-1">
+                        Assigned: Campus Licensed Psychological Counsellor
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {
+            c.innerHTML = `<div class="p-4 text-xs text-red-400">Failed to load appointments.</div>`;
+        }
+    },
+
+    async handleBookWellness(e) {
+        e.preventDefault();
+        const payload = {
+            preferred_date: document.getElementById('wellnessDate').value,
+            preferred_time_slot: document.getElementById('wellnessSlot').value,
+            notes: document.getElementById('wellnessNotes').value.trim()
+        };
+
+        try {
+            const res = await fetch('/api/wellness/appointments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                this.closeModal('bookWellnessModal');
+                this.showToast('Confidential counselling appointment requested.', 'success');
+                this.loadWellnessAppointments();
+            }
+        } catch (e) {
+            this.showToast('Failed to book wellness appointment', 'error');
+        }
+    },
+
+    // ==========================================
+    // RESIDENT PROFILE MODULE
+    // ==========================================
+    loadStudentProfile() {
+        const c = document.getElementById('studentProfileDetailsContainer');
+        if (!c || !this.currentUser) return;
+        const u = this.currentUser;
+
+        c.innerHTML = `
+            <div class="forest-card p-6 rounded-3xl border border-[#52b788]/30 space-y-6">
+                <div class="flex items-center gap-4 pb-4 border-b border-[#52b788]/20">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#1b4332] to-[#52b788] flex items-center justify-center text-xl font-bold text-[#fefae0] border border-[#52b788]/50 shadow-md">
+                        ${(u.full_name || u.username).substring(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-[#fefae0]">${u.full_name}</h3>
+                        <div class="text-xs text-[#52b788] font-mono mt-0.5">College ID: ${u.college_id || 'NST2026-042'}</div>
+                        <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold uppercase mt-1 inline-block">
+                            ${u.approval_status || 'Approved Resident'}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div class="p-3.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                        <span class="text-[#8fb89e] text-[10px]">Email Address</span>
+                        <div class="font-bold text-[#fefae0] mt-0.5">${u.email || 'aarav.sharma@campus.edu'}</div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                        <span class="text-[#8fb89e] text-[10px]">Mobile Phone</span>
+                        <div class="font-bold text-[#fefae0] mt-0.5">${u.phone || '+91 98765-43210'}</div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                        <span class="text-[#8fb89e] text-[10px]">Guardian / Next of Kin</span>
+                        <div class="font-bold text-[#fefae0] mt-0.5">${u.guardian_name || 'Rajesh Sharma'}</div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                        <span class="text-[#8fb89e] text-[10px]">Guardian Phone</span>
+                        <div class="font-bold text-[#fefae0] mt-0.5">${u.guardian_phone || '+91 91234-56789'}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    // ==========================================
+    // ADMIN MODULES (Overview, Students, Rooms...)
+    // ==========================================
+    async loadAdminOverview() {
+        const grid = document.getElementById('adminMetricsGrid');
+        if (!grid) return;
+
+        try {
+            const res = await fetch('/api/admin/overview-metrics');
+            const data = await res.json();
+            const m = data.metrics || {};
+
+            grid.innerHTML = `
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Total Students</span>
+                    <div class="text-3xl font-extrabold text-[#fefae0] mt-1">${m.total_students || 0}</div>
+                    <div class="text-[10px] text-[#52b788] mt-1 font-semibold">${m.occupancy_rate || 98}% Occupancy</div>
+                </div>
+                <div class="forest-card p-5 rounded-2xl border border-amber-500/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Pending Approvals</span>
+                    <div class="text-3xl font-extrabold text-amber-300 mt-1">${m.pending_approvals || 0}</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Student Admissions</div>
+                </div>
+                <div class="forest-card p-5 rounded-2xl border border-rose-500/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Open Complaints</span>
+                    <div class="text-3xl font-extrabold text-rose-400 mt-1">${m.open_complaints || 0}</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Active Work Orders</div>
+                </div>
+                <div class="forest-card p-5 rounded-2xl border border-blue-500/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Pending Leaves</span>
+                    <div class="text-3xl font-extrabold text-blue-300 mt-1">${m.pending_leaves || 0}</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Awaiting Warden Review</div>
                 </div>
             `;
+        } catch (e) {}
+    },
+
+    async loadPendingStudents() {
+        const c = document.getElementById('pendingStudentsListContainer');
+        const badge = document.getElementById('pendingStudentsCount');
+        if (!c) return;
+
+        try {
+            const res = await fetch('/api/admin/pending-students');
+            const data = await res.json();
+            const students = data.students || [];
+
+            if (badge) badge.textContent = `${students.length} Pending`;
+
+            if (students.length === 0) {
+                c.innerHTML = `<p class="text-xs text-[#8fb89e]">No pending student registrations awaiting review.</p>`;
+                return;
+            }
+
+            c.innerHTML = students.map(s => `
+                <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div>
+                        <div class="font-bold text-[#fefae0]">${s.full_name} (${s.college_id || s.username})</div>
+                        <div class="text-[11px] text-[#8fb89e]">Phone: ${s.phone || 'N/A'} • Guardian: ${s.guardian_name || 'N/A'} (${s.guardian_phone || 'N/A'})</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="app.approveStudent(${s.id})" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
+                            Approve Account
+                        </button>
+                        <button onclick="app.rejectStudent(${s.id})" class="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs">
+                            Reject
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {}
+    },
+
+    async approveStudent(id) {
+        try {
+            const res = await fetch(`/api/admin/students/${id}/approve`, { method: 'PUT' });
+            if (res.ok) {
+                this.showToast(`Student #${id} approved! Resident can now log in.`, 'success');
+                this.loadPendingStudents();
+                this.loadAdminStudents();
+            }
+        } catch (e) {}
+    },
+
+    async rejectStudent(id) {
+        try {
+            const res = await fetch(`/api/admin/students/${id}/reject`, { method: 'PUT' });
+            if (res.ok) {
+                this.showToast(`Student #${id} rejected.`, 'info');
+                this.loadPendingStudents();
+                this.loadAdminStudents();
+            }
+        } catch (e) {}
+    },
+
+    async loadAdminStudents() {
+        const c = document.getElementById('adminStudentsTableContainer');
+        if (!c) return;
+
+        try {
+            const res = await fetch('/api/admin/students');
+            const data = await res.json();
+            this.cachedStudents = data.students || [];
+
+            this.renderAdminStudents(this.cachedStudents);
+        } catch (e) {}
+    },
+
+    renderAdminStudents(students) {
+        const c = document.getElementById('adminStudentsTableContainer');
+        if (!c) return;
+
+        if (students.length === 0) {
+            c.innerHTML = `<p class="text-xs text-[#8fb89e]">No students found.</p>`;
             return;
         }
 
-        grid.innerHTML = rooms.map(r => {
-            const occBadge = {
-                'Vacant': 'bg-green-500/15 text-green-400 border border-green-500/30',
-                'Partially Occupied': 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
-                'Full': 'bg-red-500/15 text-red-400 border border-red-500/30'
-            }[r.occupancy_status] || '';
-
-            return `
-                <div class="glass-card p-4 space-y-3 border border-slate-800">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-base font-extrabold text-white">${r.room_number}</h3>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">${r.room_type}</span>
-                            </div>
-                            <div class="text-[11px] text-slate-400 mt-0.5">${r.block} · Floor ${r.floor}</div>
-                        </div>
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${occBadge}">${r.occupancy_status}</span>
-                    </div>
-
-                    <div class="space-y-1.5 pt-2 border-t border-slate-800">
-                        <span class="text-[11px] text-slate-500 font-semibold block">Bed Spaces (${r.allocated_beds}/${r.total_beds} Occupied):</span>
-                        <div class="grid grid-cols-2 gap-2">
-                            ${r.beds.map(b => `
-                                <div class="p-2 rounded-lg ${b.status === 'Allocated' ? 'bg-blue-950/30 border border-blue-800/40' : 'bg-slate-900 border border-dashed border-slate-700'} text-xs">
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-bold text-slate-300">${b.bed_label}</span>
-                                        <span class="text-[9px] px-1 py-0.2 rounded font-semibold ${b.status === 'Allocated' ? 'text-blue-400' : 'text-slate-500'}">${b.status}</span>
-                                    </div>
-                                    <div class="text-[10px] text-slate-400 truncate mt-1">
-                                        ${b.student_name ? `👤 ${b.student_name}` : 'Vacant Space'}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        c.innerHTML = `
+            <table class="w-full text-left text-xs text-[#8fb89e]">
+                <thead class="text-[10px] uppercase bg-[#143528] text-[#52b788]">
+                    <tr>
+                        <th class="p-2.5">Name / College ID</th>
+                        <th class="p-2.5">Room & Bed</th>
+                        <th class="p-2.5">Phone</th>
+                        <th class="p-2.5">Status</th>
+                        <th class="p-2.5">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#52b788]/10">
+                    ${students.map(s => `
+                        <tr class="hover:bg-[#143528]/50">
+                            <td class="p-2.5 font-bold text-[#fefae0]">${s.full_name}<br><span class="text-[10px] font-normal font-mono text-[#52b788]">${s.college_id || s.username}</span></td>
+                            <td class="p-2.5 text-[#fefae0]">${s.room_number ? `${s.room_number} (${s.bed_identifier})` : '<span class="text-amber-400">Unallocated</span>'}</td>
+                            <td class="p-2.5 font-mono">${s.phone || 'N/A'}</td>
+                            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.approval_status === 'approved' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${s.approval_status || 'approved'}</span></td>
+                            <td class="p-2.5">
+                                <button onclick="app.toggleStudentStatus(${s.id})" class="text-[11px] text-[#faedcd] hover:underline">
+                                    ${s.is_active ? 'Suspend' : 'Activate'}
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
     },
 
-    async handleAddRoomSubmit(e) {
+    filterAdminStudents() {
+        const query = (document.getElementById('adminStudentSearchInput').value || '').toLowerCase();
+        const filtered = this.cachedStudents.filter(s => 
+            (s.full_name || '').toLowerCase().includes(query) ||
+            (s.college_id || '').toLowerCase().includes(query) ||
+            (s.room_number || '').toLowerCase().includes(query)
+        );
+        this.renderAdminStudents(filtered);
+    },
+
+    async toggleStudentStatus(id) {
+        try {
+            const res = await fetch(`/api/admin/students/${id}/toggle-status`, { method: 'PUT' });
+            if (res.ok) {
+                this.showToast('Student account status updated.', 'info');
+                this.loadAdminStudents();
+            }
+        } catch (e) {}
+    },
+
+    // ==========================================
+    // ROOMS MODULE (ADMIN)
+    // ==========================================
+    async loadRooms() {
+        const c = document.getElementById('roomsGridContainer');
+        if (!c) return;
+
+        try {
+            const block = (document.getElementById('roomBlockFilter') || {}).value || '';
+            const occ = (document.getElementById('roomOccupancyFilter') || {}).value || '';
+
+            const params = new URLSearchParams();
+            if (block) params.append('block', block);
+            if (occ) params.append('occupancy', occ);
+
+            const res = await fetch(`/api/admin/rooms?${params.toString()}`);
+            const data = await res.json();
+            const rooms = data.rooms || [];
+            this.cachedRooms = rooms;
+
+            c.innerHTML = rooms.map(r => {
+                const isFull = r.occupied >= r.capacity;
+                const occPct = Math.round((r.occupied / r.capacity) * 100);
+
+                return `
+                    <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                            <div>
+                                <span class="text-[10px] text-[#52b788] uppercase font-bold">Block ${r.block} • Floor ${r.floor}</span>
+                                <h4 class="text-base font-bold text-[#fefae0]">Room ${r.room_number}</h4>
+                            </div>
+                            <span class="text-[10px] px-2.5 py-0.5 rounded-full font-bold ${isFull ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}">
+                                ${isFull ? 'Full' : `${r.capacity - r.occupied} Beds Free`}
+                            </span>
+                        </div>
+
+                        <div class="space-y-1 text-xs">
+                            <div class="flex justify-between text-[#8fb89e]">
+                                <span>Occupancy (${r.occupied}/${r.capacity})</span>
+                                <span>${occPct}%</span>
+                            </div>
+                            <div class="w-full bg-[#143528] h-2 rounded-full overflow-hidden">
+                                <div class="bg-[#52b788] h-full" style="width: ${occPct}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="text-[11px] text-[#8fb89e] flex justify-between pt-1">
+                            <span>Type: ${r.room_type || 'Standard'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) {}
+    },
+
+    async handleCreateRoom(e) {
         e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
         const payload = {
-            room_number: formData.get('room_number').toUpperCase(),
-            block: formData.get('block'),
-            floor: parseInt(formData.get('floor')),
-            capacity: parseInt(formData.get('capacity')),
-            room_type: formData.get('room_type')
+            room_number: document.getElementById('addRoomNumber').value.trim(),
+            block: document.getElementById('addRoomBlock').value,
+            floor: parseInt(document.getElementById('addRoomFloor').value),
+            capacity: parseInt(document.getElementById('addRoomCapacity').value),
+            room_type: document.getElementById('addRoomType').value
         };
 
         try {
@@ -1113,78 +1873,25 @@ const app = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const data = await res.json();
             if (res.ok) {
-                this.toast(data.message, 'success');
                 this.closeModal('addRoomModal');
-                form.reset();
+                this.showToast(`Room ${payload.room_number} created successfully!`, 'success');
                 this.loadRooms();
             } else {
-                this.toast(data.error || 'Failed to add room', 'error');
+                const data = await res.json();
+                this.showToast(data.error || 'Failed to create room', 'error');
             }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
+        } catch (e) {
+            this.showToast('Failed to create room', 'error');
         }
     },
 
-    async openAllocateBedModal() {
-        // Load students
-        const studentSelect = document.getElementById('allocateStudentSelect');
-        const roomSelect = document.getElementById('allocateRoomSelect');
-        studentSelect.innerHTML = '<option value="">Loading students...</option>';
-        roomSelect.innerHTML = '<option value="">Loading rooms...</option>';
-
-        try {
-            const [sRes, rRes] = await Promise.all([
-                fetch('/api/admin/students'),
-                fetch('/api/admin/rooms')
-            ]);
-            const sData = await sRes.json();
-            const rData = await rRes.json();
-
-            this.cachedStudents = sData.students || [];
-            this.cachedRooms = rData.rooms || [];
-
-            studentSelect.innerHTML = this.cachedStudents.map(s => `
-                <option value="${s.id}">${s.full_name} (${s.email}) — Current: ${s.room_number || 'Unallocated'}</option>
-            `).join('');
-
-            roomSelect.innerHTML = this.cachedRooms.map(r => `
-                <option value="${r.id}">${r.room_number} (${r.block}, ${r.occupancy_status})</option>
-            `).join('');
-
-            this.handleRoomSelectionChange();
-            this.openModal('allocateBedModal');
-        } catch (err) {
-            this.toast('Failed to load allocation data: ' + err.message, 'error');
-        }
-    },
-
-    handleRoomSelectionChange() {
-        const roomId = parseInt(document.getElementById('allocateRoomSelect').value);
-        const bedSelect = document.getElementById('allocateBedSelect');
-        const room = this.cachedRooms.find(r => r.id === roomId);
-
-        if (!room || !room.beds) {
-            bedSelect.innerHTML = '<option value="">No beds available</option>';
-            return;
-        }
-
-        bedSelect.innerHTML = room.beds.map(b => `
-            <option value="${b.bed_label}" ${b.status === 'Allocated' ? 'disabled' : ''}>
-                ${b.bed_label} - ${b.status === 'Allocated' ? `(Occupied by ${b.student_name})` : 'Available'}
-            </option>
-        `).join('');
-    },
-
-    async handleAllocateBedSubmit(e) {
+    async handleAllocateBed(e) {
         e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
         const payload = {
-            student_id: parseInt(formData.get('student_id')),
-            room_id: parseInt(formData.get('room_id')),
-            bed_label: formData.get('bed_label')
+            student_id: parseInt(document.getElementById('allocateStudentSelect').value),
+            room_id: parseInt(document.getElementById('allocateRoomSelect').value),
+            bed_identifier: document.getElementById('allocateBedSelect').value
         };
 
         try {
@@ -1193,233 +1900,257 @@ const app = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const data = await res.json();
             if (res.ok) {
-                this.toast(data.message, 'success');
                 this.closeModal('allocateBedModal');
+                this.showToast('Bed allocated successfully!', 'success');
                 this.loadRooms();
+                this.loadAdminStudents();
             } else {
-                this.toast(data.error || 'Allocation failed', 'error');
+                const data = await res.json();
+                this.showToast(data.error || 'Allocation error', 'error');
             }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
+        } catch (e) {
+            this.showToast('Failed to allocate bed', 'error');
         }
     },
 
-    // --- Workflow 12: Confidential Wellness Appointments ---
-
-    async loadWellnessAppointments() {
-        const container = document.getElementById('wellnessAppointmentsList');
-        container.innerHTML = '<div class="text-xs text-purple-300 py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading confidential records...</div>';
+    async loadAdminStaff() {
+        const c = document.getElementById('adminStaffDirectoryContainer');
+        if (!c) return;
 
         try {
-            const res = await fetch('/api/wellness/appointments');
-            if (res.status === 403) {
-                const err = await res.json();
-                container.innerHTML = `
-                    <div class="p-6 rounded-2xl bg-red-950/30 border border-red-800/40 text-center space-y-2">
-                        <i class="fa-solid fa-user-lock text-red-400 text-2xl"></i>
-                        <h4 class="text-sm font-bold text-red-300">Access Prohibited: Privacy Protection</h4>
-                        <p class="text-xs text-red-200/80 max-w-md mx-auto">${err.error}</p>
-                    </div>
-                `;
-                return;
-            }
+            const res = await fetch('/api/admin/staff-directory');
             const data = await res.json();
-            this.renderWellnessAppointments(data.appointments || []);
-        } catch (err) {
-            container.innerHTML = `<div class="text-xs text-red-400">Error: ${err.message}</div>`;
-        }
-    },
+            const staff = data.staff || [];
 
-    renderWellnessAppointments(appointments) {
-        const container = document.getElementById('wellnessAppointmentsList');
-        const role = this.currentUser.role;
-
-        if (appointments.length === 0) {
-            container.innerHTML = `
-                <div class="glass-card p-8 text-center space-y-3">
-                    <div class="w-12 h-12 rounded-full bg-purple-950/40 flex items-center justify-center mx-auto text-purple-400 text-xl border border-purple-800/30">
-                        <i class="fa-solid fa-heart-pulse"></i>
-                    </div>
-                    <h3 class="text-sm font-bold text-purple-200">No Counseling Sessions Logged</h3>
-                    <p class="text-xs text-slate-400 max-w-sm mx-auto">There are no confidential wellness appointments requested at this time.</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = appointments.map(a => {
-            const statusClass = {
-                'Pending': 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
-                'Confirmed': 'bg-green-500/20 text-green-300 border border-green-500/30',
-                'Completed': 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
-                'Cancelled': 'bg-red-500/20 text-red-300 border border-red-500/30'
-            }[a.status] || '';
-
-            let actionBtn = '';
-            if (role === 'counsellor' && (a.status === 'Pending' || a.status === 'Confirmed')) {
-                actionBtn = `
-                    <button onclick="app.openCounsellorStatusModal(${a.id}, '${a.student_name ? a.student_name.replace(/'/g, "\\'") : 'Student'}', '${a.issue_category}')" class="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition">
-                        <i class="fa-solid fa-calendar-check mr-1"></i> Update Session
-                    </button>
-                `;
-            }
-
-            return `
-                <div class="glass-card glass-card-hover p-4 space-y-3 border border-purple-900/40 bg-purple-950/10">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-xs font-mono font-bold text-purple-400">#WELL-${a.id}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${statusClass}">${a.status}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">${a.session_mode}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold text-purple-300 bg-purple-900/30 border border-purple-800/40">${a.issue_category}</span>
+            c.innerHTML = staff.map(s => `
+                <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 space-y-2 text-xs">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-[#1b4332] text-[#52b788] flex items-center justify-center font-bold text-xs border border-[#52b788]/30">
+                            ${s.full_name.substring(0, 2).toUpperCase()}
                         </div>
-                        <div class="text-[11px] text-purple-300/80">
-                            Requested: ${new Date(a.created_at).toLocaleDateString()}
+                        <div>
+                            <div class="font-bold text-[#fefae0]">${s.full_name}</div>
+                            <div class="text-[10px] text-[#52b788] uppercase font-bold">${s.role}</div>
                         </div>
                     </div>
-
-                    <div class="bg-slate-900/70 p-3 rounded-lg border border-purple-900/30 text-xs space-y-1">
-                        <div class="flex items-center gap-2 text-slate-300">
-                            <i class="fa-regular fa-clock text-purple-400"></i>
-                            <span class="font-semibold text-white">Preferred Slot:</span>
-                            <span>${a.preferred_date} at ${a.preferred_time}</span>
-                        </div>
-                        ${a.counsellor_name ? `
-                            <div class="text-slate-300">
-                                <span class="font-semibold text-purple-400">Assigned Counselor:</span>
-                                <span>${a.counsellor_name}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-
-                    <div>
-                        <span class="text-xs font-semibold text-purple-300">Confidential Note:</span>
-                        <p class="text-xs text-slate-300 mt-0.5 italic">"${a.confidential_notes}"</p>
-                    </div>
-
-                    ${a.counsellor_remarks ? `
-                        <div class="p-2.5 rounded-lg bg-purple-900/20 border border-purple-800/40 text-xs">
-                            <span class="text-purple-400 font-semibold">Counselor Response:</span>
-                            <span class="text-purple-200 ml-1">${a.counsellor_remarks}</span>
-                        </div>
-                    ` : ''}
-
-                    <div class="flex items-center justify-between pt-1 border-t border-purple-900/30">
-                        <div class="text-[11px] text-purple-300/70">
-                            ${a.student_name ? `Student: <span class="text-slate-200 font-semibold">${a.student_name} (${a.room_number || 'Room N/A'})</span>` : 'Encrypted Resident File'}
-                        </div>
-                        <div>${actionBtn}</div>
+                    <div class="text-[#8fb89e] text-[11px] pt-1">
+                        <div>Email: ${s.email}</div>
+                        <div>Phone: ${s.phone || 'Ext. 104'}</div>
                     </div>
                 </div>
-            `;
-        }).join('');
+            `).join('');
+        } catch (e) {}
     },
 
-    async handleWellnessSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const payload = Object.fromEntries(formData.entries());
+    async loadAdminFinance() {
+        const sumC = document.getElementById('adminFinanceSummaryContainer');
+        const tbl = document.getElementById('adminRecentPaymentsTable');
+        if (!sumC) return;
 
         try {
-            const res = await fetch('/api/wellness/appointments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const res = await fetch('/api/admin/finance-overview');
             const data = await res.json();
-            if (res.ok) {
-                this.toast(data.message, 'success');
-                this.closeModal('requestWellnessModal');
-                form.reset();
-                this.loadWellnessAppointments();
-            } else {
-                this.toast(data.error || 'Booking request failed', 'error');
+            const f = data.finance || {};
+
+            sumC.innerHTML = `
+                <div class="forest-card p-5 rounded-2xl border border-emerald-500/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Total Fees Collected</span>
+                    <div class="text-3xl font-extrabold text-emerald-400 mt-1">₹${(f.total_collected || 0).toLocaleString()}</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">${f.collection_rate || 94}% of total term billing</div>
+                </div>
+                <div class="forest-card p-5 rounded-2xl border border-rose-500/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Outstanding Receivables</span>
+                    <div class="text-3xl font-extrabold text-rose-400 mt-1">₹${(f.total_outstanding || 0).toLocaleString()}</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Across all blocks</div>
+                </div>
+                <div class="forest-card p-5 rounded-2xl border border-[#faedcd]/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Maintenance Reserve</span>
+                    <div class="text-3xl font-extrabold text-[#faedcd] mt-1">₹2,45,000</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Allocated budget</div>
+                </div>
+            `;
+
+            if (tbl) {
+                tbl.innerHTML = (f.recent_transactions || []).map(t => `
+                    <div class="p-2.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20 flex items-center justify-between text-xs">
+                        <div>
+                            <span class="font-bold text-[#fefae0]">${t.student_name}</span>
+                            <span class="text-[#8fb89e] text-[11px]"> • ${t.fee_type}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-emerald-400">+₹${t.amount.toLocaleString()}</span>
+                            <span class="text-[10px] text-[#8fb89e] font-mono">${t.receipt_number || 'TXN'}</span>
+                        </div>
+                    </div>
+                `).join('');
             }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
-        }
+        } catch (e) {}
     },
 
-    openCounsellorStatusModal(appointmentId, studentName, category) {
-        document.getElementById('counsellorAppointmentId').value = appointmentId;
-        document.getElementById('counsellorModalSubtitle').textContent = `Session #${appointmentId} with ${studentName} (${category})`;
-        this.openModal('counsellorStatusModal');
+    async loadAdminSettings() {
+        try {
+            const res = await fetch('/api/admin/settings');
+            const data = await res.json();
+            const s = data.settings || {};
+
+            const curfew = document.getElementById('settingCurfewTime');
+            if (curfew) curfew.value = s.curfew_time || '22:00';
+
+            const visitor = document.getElementById('settingVisitorCutoff');
+            if (visitor) visitor.value = s.visitor_cutoff || '20:00';
+
+            const sla = document.getElementById('settingMaintenanceSLA');
+            if (sla) sla.value = s.maintenance_sla_hours || 24;
+
+            const laundry = document.getElementById('settingLaundryAllowance');
+            if (laundry) laundry.value = s.laundry_max_loads_per_week || 3;
+
+            const phone = document.getElementById('settingEmergencyPhone');
+            if (phone) phone.value = s.emergency_contact_phone || '+91 98765-43210';
+        } catch (e) {}
     },
 
-    async handleCounsellorStatusSubmit(e) {
+    async handleSaveSettings(e) {
         e.preventDefault();
-        const form = e.target;
-        const aptId = document.getElementById('counsellorAppointmentId').value;
-        const formData = new FormData(form);
         const payload = {
-            status: formData.get('status'),
-            counsellor_remarks: formData.get('counsellor_remarks')
+            curfew_time: document.getElementById('settingCurfewTime').value,
+            visitor_cutoff: document.getElementById('settingVisitorCutoff').value,
+            maintenance_sla_hours: parseInt(document.getElementById('settingMaintenanceSLA').value),
+            laundry_max_loads_per_week: parseInt(document.getElementById('settingLaundryAllowance').value),
+            emergency_contact_phone: document.getElementById('settingEmergencyPhone').value.trim()
         };
 
         try {
-            const res = await fetch(`/api/wellness/appointments/${aptId}/status`, {
+            const res = await fetch('/api/admin/settings', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const data = await res.json();
             if (res.ok) {
-                this.toast(data.message, 'success');
-                this.closeModal('counsellorStatusModal');
-                this.loadWellnessAppointments();
-            } else {
-                this.toast(data.error || 'Failed to update appointment', 'error');
+                this.showToast('Hostel configurations updated!', 'success');
             }
-        } catch (err) {
-            this.toast('Error: ' + err.message, 'error');
+        } catch (e) {
+            this.showToast('Failed to save settings', 'error');
         }
     },
 
-    // --- Modal Management ---
-
-    openModal(modalId) {
-        const modal = document.getElementById(modalId);
+    // ==========================================
+    // MODALS & TOAST UTILITIES
+    // ==========================================
+    openModal(id) {
+        const modal = document.getElementById(id);
         if (modal) modal.classList.remove('hidden');
+
+        // Populate dynamic selects
+        if (id === 'allocateBedModal') {
+            this.populateAllocateModal();
+        }
     },
 
-    closeModal(modalId) {
-        const modal = document.getElementById(modalId);
+    closeModal(id) {
+        const modal = document.getElementById(id);
         if (modal) modal.classList.add('hidden');
     },
 
-    // --- Toast Alerts ---
+    switchModal(fromId, toId) {
+        this.closeModal(fromId);
+        this.openModal(toId);
+    },
 
-    toast(message, type = 'info') {
+    openStudentLoginModal() {
+        this.openModal('studentLoginModal');
+    },
+
+    openAdminLoginModal() {
+        this.openModal('adminLoginModal');
+    },
+
+    async populateAllocateModal() {
+        const studentSel = document.getElementById('allocateStudentSelect');
+        const roomSel = document.getElementById('allocateRoomSelect');
+        if (!studentSel || !roomSel) return;
+
+        try {
+            const res1 = await fetch('/api/admin/students');
+            const data1 = await res1.json();
+            const students = data1.students || [];
+
+            studentSel.innerHTML = students.map(s => `
+                <option value="${s.id}">${s.full_name} (${s.college_id || s.username})</option>
+            `).join('');
+
+            const res2 = await fetch('/api/admin/rooms');
+            const data2 = await res2.json();
+            const rooms = (data2.rooms || []).filter(r => r.occupied < r.capacity);
+
+            roomSel.innerHTML = rooms.map(r => `
+                <option value="${r.id}">Room ${r.room_number} (Block ${r.block} - ${r.capacity - r.occupied} Free)</option>
+            `).join('');
+        } catch (e) {}
+    },
+
+    showToast(message, type = 'info') {
         const container = document.getElementById('toastContainer');
+        if (!container) return;
+
         const toast = document.createElement('div');
-        toast.className = `toast-slide-in px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-semibold border ${
-            type === 'success' ? 'bg-emerald-950/90 text-emerald-300 border-emerald-800' :
-            type === 'error' ? 'bg-red-950/90 text-red-300 border-red-800' :
-            'bg-slate-900/90 text-slate-200 border-slate-700'
-        }`;
+        let borderClass = 'border-[#52b788]/40 bg-[#0f281e] text-[#fefae0]';
+        let icon = '<i class="fa-solid fa-circle-info text-[#52b788]"></i>';
 
-        const icon = type === 'success' ? 'fa-circle-check text-emerald-400' :
-                     type === 'error' ? 'fa-triangle-exclamation text-red-400' :
-                     'fa-circle-info text-blue-400';
+        if (type === 'success') {
+            borderClass = 'border-emerald-500/40 bg-[#0f281e] text-[#fefae0]';
+            icon = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+        } else if (type === 'error') {
+            borderClass = 'border-rose-500/40 bg-[#0f281e] text-rose-200';
+            icon = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>';
+        }
 
-        toast.innerHTML = `
-            <i class="fa-solid ${icon} text-base flex-shrink-0"></i>
-            <span class="flex-1">${message}</span>
-        `;
+        toast.className = `p-3.5 rounded-2xl border ${borderClass} shadow-2xl flex items-center gap-3 text-xs pointer-events-auto toast-slide-up backdrop-blur-md`;
+        toast.innerHTML = `${icon} <span class="font-medium">${message}</span>`;
+
         container.appendChild(toast);
-
         setTimeout(() => {
             toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.3s ease';
+            toast.style.transform = 'translateY(10px)';
+            toast.style.transition = 'all 0.3s ease';
             setTimeout(() => toast.remove(), 300);
         }, 4000);
+    },
+
+    toggleMobileSidebar() {
+        const nav = document.getElementById('sidebarNav');
+        if (nav) nav.classList.toggle('hidden');
+    },
+
+    setupEventListeners() {
+        // Complaint listeners
+        const cSearch = document.getElementById('complaintSearchInput');
+        if (cSearch) cSearch.addEventListener('input', () => this.loadComplaints());
+
+        const cStatus = document.getElementById('complaintStatusFilter');
+        if (cStatus) cStatus.addEventListener('change', () => this.loadComplaints());
+
+        const cCat = document.getElementById('complaintCategoryFilter');
+        if (cCat) cCat.addEventListener('change', () => this.loadComplaints());
+
+        // Leave listeners
+        const lSearch = document.getElementById('leaveSearchInput');
+        if (lSearch) lSearch.addEventListener('input', () => this.loadLeaveRequests());
+
+        const lStatus = document.getElementById('leaveStatusFilter');
+        if (lStatus) lStatus.addEventListener('change', () => this.loadLeaveRequests());
+
+        // Room filters
+        const rBlock = document.getElementById('roomBlockFilter');
+        if (rBlock) rBlock.addEventListener('change', () => this.loadRooms());
+
+        const rOcc = document.getElementById('roomOccupancyFilter');
+        if (rOcc) rOcc.addEventListener('change', () => this.loadRooms());
     }
 };
 
-// Initialize app on DOM ready
+// Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     app.init();
 });
