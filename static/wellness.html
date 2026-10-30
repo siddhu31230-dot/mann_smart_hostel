@@ -43,6 +43,9 @@
     <!-- Font Awesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Dexie.js (Priority 1: IndexedDB via Dexie) -->
+    <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
+
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -52,7 +55,7 @@
 <body class="h-full flex flex-col antialiased selection:bg-[#A8D5BA]/40 selection:text-[#176B50]">
 
     <!-- ======================================================== -->
-    <!-- STEALTH MODE DISGUISE VIEW (Activated by Esc or Toggle)  -->
+    <!-- STEALTH MODE DISGUISE VIEW (Priority 2: Discreet Hostel) -->
     <!-- ======================================================== -->
     <div id="stealthOverlayContainer" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-[#111827] text-[#1F2937] dark:text-[#F3F4F6] p-6 sm:p-10 font-sans">
         <div class="max-w-3xl mx-auto space-y-6">
@@ -64,9 +67,14 @@
                         <p class="text-xs text-gray-400">Offline scratchpad • Semester IV</p>
                     </div>
                 </div>
-                <button onclick="app.toggleStealthMode()" class="px-3.5 py-1.5 rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-xs font-semibold flex items-center gap-2 transition">
-                    <i class="fa-solid fa-arrow-left"></i> Exit Stealth
-                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="app.openSOSModal()" class="px-3 py-1.5 rounded-xl border border-rose-300 dark:border-rose-800 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-phone-volume"></i> SOS
+                    </button>
+                    <button onclick="app.toggleStealthMode()" class="px-3.5 py-1.5 rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-xs font-semibold flex items-center gap-2 transition">
+                        <i class="fa-solid fa-arrow-left"></i> Exit Stealth
+                    </button>
+                </div>
             </header>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -90,7 +98,7 @@
                 <div class="space-y-4">
                     <div class="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm text-xs space-y-2">
                         <h3 class="font-bold text-gray-500">Hostel Desk Notice</h3>
-                        <p class="text-gray-400 text-[11px] leading-relaxed">Regular study quiet hours: 10:00 PM to 6:00 AM daily.</p>
+                        <p class="text-gray-400 text-[11px] leading-relaxed">Quiet study hours: 10:00 PM to 6:00 AM daily.</p>
                     </div>
                     <button onclick="app.lockVault()" class="w-full py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-lock text-xs"></i> Quick Lock App
@@ -117,7 +125,7 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="font-extrabold text-base tracking-tight font-serif-title text-[#176B50] dark:text-[#A8D5BA]">MANN Care</span>
-                            <span class="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-[#D5EBDD] dark:bg-[#1C332A] text-[#176B50] dark:text-[#A8D5BA] border border-[#176B50]/20">Local Vault</span>
+                            <span class="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-[#D5EBDD] dark:bg-[#1C332A] text-[#176B50] dark:text-[#A8D5BA] border border-[#176B50]/20">Dexie IndexedDB</span>
                         </div>
                         <p class="text-[11px] text-[#4B675B] dark:text-[#A8D5BA]/80 hidden sm:block">Private Wellness Check-In • On-Device Encrypted</p>
                     </div>
@@ -222,7 +230,16 @@
             <!-- PRIMARY DYNAMIC VIEW CONTAINER -->
             <main class="flex-1 space-y-6 pb-20 md:pb-8">
 
-                <!-- GENTLE INTERVENTION BANNER (Conditionally shown if high stress) -->
+                <!-- VISIBLE PRIVACY INDICATOR BANNER (Priority 1) -->
+                <div class="p-3.5 rounded-2xl bg-[#D5EBDD]/50 dark:bg-[#1C332A] border border-[#176B50]/25 text-xs flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="font-bold text-[#176B50] dark:text-[#A8D5BA]">Your personal entries are stored on this device.</span>
+                    </div>
+                    <span class="text-[11px] text-[#4B675B] dark:text-[#A8D5BA]/80 hidden sm:inline">0 bytes cloud transmission • Web Crypto AES-256</span>
+                </div>
+
+                <!-- GENTLE EARLY INTERVENTION BANNER (Priority 4: Transparent Rules Engine) -->
                 <div id="gentleInterventionBanner" class="hidden"></div>
 
                 <!-- ============================================== -->
@@ -252,7 +269,6 @@
                             </div>
                         </div>
 
-                        <!-- Calming subtle background watermark icon -->
                         <i class="fa-solid fa-spa absolute right-6 -bottom-6 text-9xl text-[#176B50]/5 dark:text-[#A8D5BA]/5 pointer-events-none"></i>
                     </div>
 
@@ -261,7 +277,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <h3 class="font-bold text-sm text-[#1C2923] dark:text-[#F6F8F5]">Your Past 7 Days</h3>
-                                <p class="text-xs text-gray-500">Every check-in is encrypted on your hardware.</p>
+                                <p class="text-xs text-gray-500">Every check-in is encrypted on your hardware via Dexie.js.</p>
                             </div>
                             <div class="text-right">
                                 <span class="text-[10px] uppercase font-bold text-gray-400 block">Consistency Streak</span>
@@ -291,33 +307,33 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="wellness-card p-4 space-y-1.5 text-xs">
                             <i class="fa-solid fa-shield-halved text-[#176B50] dark:text-[#A8D5BA] text-lg"></i>
-                            <h4 class="font-bold">Local-First Storage</h4>
-                            <p class="text-gray-500 dark:text-gray-400 text-[11px]">Personal journal entries never touch external cloud servers. Stored in on-device IndexedDB.</p>
+                            <h4 class="font-bold">Dexie.js IndexedDB</h4>
+                            <p class="text-gray-500 dark:text-gray-400 text-[11px]">Personal mood logs stay on this physical device with zero cloud replication.</p>
                         </div>
                         <div class="wellness-card p-4 space-y-1.5 text-xs">
                             <i class="fa-solid fa-key text-[#176B50] dark:text-[#A8D5BA] text-lg"></i>
                             <h4 class="font-bold">Web Crypto AES-256</h4>
-                            <p class="text-gray-500 dark:text-gray-400 text-[11px]">Military-grade hardware encryption derived from your private 4-digit PIN.</p>
+                            <p class="text-gray-500 dark:text-gray-400 text-[11px]">Keys derived via PBKDF2 (100k rounds) from your PIN. No plaintext journal strings on disk.</p>
                         </div>
                         <div class="wellness-card p-4 space-y-1.5 text-xs">
                             <i class="fa-solid fa-user-ninja text-[#176B50] dark:text-[#A8D5BA] text-lg"></i>
                             <h4 class="font-bold">Hostel Stealth Mode</h4>
-                            <p class="text-gray-500 dark:text-gray-400 text-[11px]">Instant 1-key disguise into an academic checklist when friends walk by in the room.</p>
+                            <p class="text-gray-500 dark:text-gray-400 text-[11px]">Instant 1-key disguise (<kbd class="font-mono text-[9px]">Esc</kbd>) into an academic checklist when peers enter your room.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- ============================================== -->
-                <!-- VIEW 2: DAILY CHECK-IN (<30 Seconds)           -->
+                <!-- VIEW 2: DAILY CHECK-IN (<60s) (Priority 3)     -->
                 <!-- ============================================== -->
                 <div id="view-checkin" class="wellness-view hidden space-y-6">
                     <div class="wellness-card p-6 sm:p-8 space-y-6">
                         <div>
-                            <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Daily Emotional Check-In</h2>
-                            <p class="text-xs text-gray-500">Takes less than 30 seconds. All data stays strictly on your machine.</p>
+                            <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">One-Minute Daily Check-In</h2>
+                            <p class="text-xs text-gray-500">Takes 30–60 seconds. Personal entries stay 100% on your device.</p>
                         </div>
 
-                        <!-- Step 1: Feeling Today -->
+                        <!-- Step 1: Feeling Today (6 feelings) -->
                         <div class="space-y-3">
                             <label class="text-xs font-bold uppercase tracking-wider text-gray-500 block">1. How are you feeling today?</label>
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
@@ -336,20 +352,20 @@
                                     <span class="text-xs font-bold block">Okay</span>
                                     <span class="text-[10px] text-gray-400 block">Neutral</span>
                                 </div>
+                                <div onclick="app.selectMood('Low')" data-mood="Low" class="feeling-choice-card p-4 rounded-2xl bg-[#F6F8F5] dark:bg-[#162420] border text-center space-y-1">
+                                    <span class="text-3xl block">😔</span>
+                                    <span class="text-xs font-bold block">Low</span>
+                                    <span class="text-[10px] text-gray-400 block">Subdued</span>
+                                </div>
                                 <div onclick="app.selectMood('Stressed')" data-mood="Stressed" class="feeling-choice-card p-4 rounded-2xl bg-[#F6F8F5] dark:bg-[#162420] border text-center space-y-1">
                                     <span class="text-3xl block">😰</span>
                                     <span class="text-xs font-bold block">Stressed</span>
                                     <span class="text-[10px] text-gray-400 block">Tense</span>
                                 </div>
-                                <div onclick="app.selectMood('Sad')" data-mood="Sad" class="feeling-choice-card p-4 rounded-2xl bg-[#F6F8F5] dark:bg-[#162420] border text-center space-y-1">
-                                    <span class="text-3xl block">😢</span>
-                                    <span class="text-xs font-bold block">Sad</span>
-                                    <span class="text-[10px] text-gray-400 block">Low energy</span>
-                                </div>
                                 <div onclick="app.selectMood('Overwhelmed')" data-mood="Overwhelmed" class="feeling-choice-card p-4 rounded-2xl bg-[#F6F8F5] dark:bg-[#162420] border text-center space-y-1">
                                     <span class="text-3xl block">🤯</span>
                                     <span class="text-xs font-bold block">Overwhelmed</span>
-                                    <span class="text-[10px] text-gray-400 block">Too much</span>
+                                    <span class="text-[10px] text-gray-400 block">Heavy load</span>
                                 </div>
                             </div>
                         </div>
@@ -357,7 +373,7 @@
                         <!-- Step 2: Stress Slider -->
                         <div class="space-y-3 pt-2">
                             <div class="flex items-center justify-between">
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">2. How stressful was today?</label>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">2. How stressful was your day?</label>
                                 <span id="stressValueLabel" class="text-base font-extrabold text-[#176B50] dark:text-[#A8D5BA]">3/10</span>
                             </div>
                             <input type="range" id="stressSliderInput" min="1" max="10" value="3" oninput="app.updateStressSlider(this.value)" class="stress-slider">
@@ -370,7 +386,7 @@
 
                         <!-- Step 3: Sleep Quality -->
                         <div class="space-y-3 pt-2">
-                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 block">3. How was your sleep last night?</label>
+                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 block">3. How did you sleep?</label>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 <div onclick="app.selectSleep('Poor')" data-sleep="Poor" class="sleep-choice-card p-3 rounded-2xl bg-[#F6F8F5] dark:bg-[#162420] border text-center space-y-1">
                                     <span class="text-2xl block">😴</span>
@@ -395,26 +411,32 @@
                             </div>
                         </div>
 
-                        <!-- Step 4: Influences (Tags) -->
+                        <!-- Step 4: Influences (Context Tags + Custom) -->
                         <div class="space-y-3 pt-2">
-                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 block">4. What influenced your day?</label>
-                            <div class="flex flex-wrap gap-2 text-xs">
-                                <button type="button" onclick="app.toggleTag(this, 'Academics')" data-tag="Academics" class="tag-chip active px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🎓 Academics</button>
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">4. What influenced your day?</label>
+                                <button type="button" onclick="app.promptAddCustomTag()" class="text-[11px] font-bold text-[#176B50] dark:text-[#A8D5BA] hover:underline flex items-center gap-1">
+                                    <i class="fa-solid fa-plus text-[10px]"></i> Add Custom Tag
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-2 text-xs" id="tagsContainer">
                                 <button type="button" onclick="app.toggleTag(this, 'Exams')" data-tag="Exams" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">📝 Exams</button>
+                                <button type="button" onclick="app.toggleTag(this, 'Academics')" data-tag="Academics" class="tag-chip active px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🎓 Academics</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Roommates')" data-tag="Roommates" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">👥 Roommates</button>
-                                <button type="button" onclick="app.toggleTag(this, 'Homesickness')" data-tag="Homesickness" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🏡 Homesickness</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Friendships')" data-tag="Friendships" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🤝 Friendships</button>
+                                <button type="button" onclick="app.toggleTag(this, 'Homesickness')" data-tag="Homesickness" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🏡 Homesickness</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Family')" data-tag="Family" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">👨‍👩‍👧 Family</button>
-                                <button type="button" onclick="app.toggleTag(this, 'Financial Concerns')" data-tag="Financial Concerns" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">💰 Financial</button>
-                                <button type="button" onclick="app.toggleTag(this, 'Personal Growth')" data-tag="Personal Growth" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🌱 Growth</button>
+                                <button type="button" onclick="app.toggleTag(this, 'Finances')" data-tag="Finances" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">💰 Finances</button>
+                                <button type="button" onclick="app.toggleTag(this, 'Personal')" data-tag="Personal" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🌱 Personal</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Other')" data-tag="Other" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">💭 Other</button>
+                                <span id="customTagsContainer" class="flex flex-wrap gap-2"></span>
                             </div>
                         </div>
 
                         <!-- Step 5: Optional Private Journal -->
                         <div class="space-y-2 pt-2">
                             <div class="flex items-center justify-between">
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">5. Optional Private Journal</label>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">5. Would you like to write something privately? (Optional)</label>
                                 <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
                                     <i class="fa-solid fa-lock text-[9px]"></i> WebCrypto Encrypted
                                 </span>
@@ -437,16 +459,16 @@
                 <div id="view-insights" class="wellness-view hidden space-y-6">
                     <div>
                         <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Mood Intelligence Dashboard</h2>
-                        <p class="text-xs text-gray-500">Personal patterns & observations computed 100% on-device. Zero cloud profiling.</p>
+                        <p class="text-xs text-gray-500">Personal patterns computed on-device. Observational associations, not clinical diagnoses.</p>
                     </div>
 
-                    <!-- Empty state if no data -->
+                    <!-- Insufficient Data Warning Card -->
                     <div id="insightsEmptyState" class="wellness-card p-10 text-center space-y-3">
                         <i class="fa-solid fa-chart-pie text-4xl text-gray-300"></i>
-                        <h3 class="font-bold text-sm">No Check-In History Yet</h3>
-                        <p class="text-xs text-gray-500 max-w-sm mx-auto">Complete your first 30-second check-in to unlock personal trend analysis, sleep correlations, and pattern observations.</p>
+                        <h3 class="font-bold text-sm">Building Your Baseline</h3>
+                        <p class="text-xs text-gray-500 max-w-sm mx-auto">Complete at least 3 daily check-ins to discover meaningful trends and correlations without misleading insights.</p>
                         <button onclick="app.loadDemoSampleData()" class="btn-wellness-secondary px-4 py-2 rounded-xl text-xs font-bold">
-                            Load Demo Historical Data
+                            Load Demo Historical Data (10 Days)
                         </button>
                     </div>
 
@@ -457,7 +479,7 @@
                             <div class="wellness-card p-5 space-y-1">
                                 <span class="text-[10px] uppercase font-bold text-gray-400">Average Stress Level</span>
                                 <div id="kpiAvgStress" class="text-2xl font-extrabold text-[#176B50] dark:text-[#A8D5BA]">3.8/10</div>
-                                <span class="text-[11px] text-gray-500">Moderate & Stable</span>
+                                <span class="text-[11px] text-gray-500">Moderate & Manageable</span>
                             </div>
                             <div class="wellness-card p-5 space-y-1">
                                 <span class="text-[10px] uppercase font-bold text-gray-400">Most Frequent Mood</span>
@@ -465,15 +487,15 @@
                                 <span class="text-[11px] text-gray-500">Positive Valence</span>
                             </div>
                             <div class="wellness-card p-5 space-y-1">
-                                <span class="text-[10px] uppercase font-bold text-gray-400">Total Recorded</span>
+                                <span class="text-[10px] uppercase font-bold text-gray-400">Total Check-Ins Stored</span>
                                 <div id="kpiTotalCheckins" class="text-2xl font-extrabold text-[#176B50] dark:text-[#A8D5BA]">0 check-ins</div>
-                                <span class="text-[11px] text-gray-500">Stored in IndexedDB</span>
+                                <span class="text-[11px] text-gray-500">Stored via Dexie IndexedDB</span>
                             </div>
                         </div>
 
                         <!-- 7-Day Chart -->
                         <div class="wellness-card p-6 space-y-3">
-                            <h3 class="font-bold text-sm">7-Day Emotional Journey</h3>
+                            <h3 class="font-bold text-sm">Weekly Mood & Stress Trends</h3>
                             <div class="h-64 w-full">
                                 <canvas id="chartWeeklyJourney"></canvas>
                             </div>
@@ -481,7 +503,7 @@
 
                         <!-- Tag Frequency Chart -->
                         <div class="wellness-card p-6 space-y-3">
-                            <h3 class="font-bold text-sm">Top Influencing Factors</h3>
+                            <h3 class="font-bold text-sm">Most Frequent Context Influences</h3>
                             <div class="h-56 w-full">
                                 <canvas id="chartTagFrequency"></canvas>
                             </div>
@@ -491,29 +513,29 @@
                         <div class="wellness-card p-6 space-y-4">
                             <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
                                 <div>
-                                    <h3 class="font-bold text-sm">Personal Pattern Observations</h3>
-                                    <p class="text-[11px] text-gray-400">Self-awareness correlations based on your tagged logs.</p>
+                                    <h3 class="font-bold text-sm">Mood & Contextual Tag Associations</h3>
+                                    <p class="text-[11px] text-gray-400">Self-awareness correlations based on your personal logs.</p>
                                 </div>
-                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 font-bold">Non-Diagnostic</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 font-bold">Observational</span>
                             </div>
                             <div id="insightsObservationsList" class="space-y-3">
                                 <!-- Populated dynamically -->
                             </div>
                             <p class="text-[10px] text-gray-400 text-center italic pt-2">
-                                Disclaimer: These observations highlight correlations within your personal records. They are not medical or psychological diagnoses.
+                                Disclaimer: These observations present correlations to support self-awareness. They are not medical, psychological, or clinical diagnoses.
                             </p>
                         </div>
                     </div>
                 </div>
 
                 <!-- ============================================== -->
-                <!-- VIEW 4: MY JOURNAL                             -->
+                <!-- VIEW 4: MY JOURNAL (Priority 7)                -->
                 <!-- ============================================== -->
                 <div id="view-journal" class="wellness-view hidden space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Private Digital Journal</h2>
-                            <p class="text-xs text-gray-500">Notion-style encrypted journal. Stored on-device with zero cloud telemetry.</p>
+                            <p class="text-xs text-gray-500">Notion-style encrypted journal. Decrypted exclusively on-device.</p>
                         </div>
                         <button onclick="app.navTo('checkin')" class="btn-wellness-primary px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
                             <i class="fa-solid fa-plus text-xs"></i> New Entry
@@ -532,7 +554,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Personal Wellness Timeline</h2>
-                            <p class="text-xs text-gray-500">Calendar view of daily check-ins. Click any date to inspect details.</p>
+                            <p class="text-xs text-gray-500">Date-based calendar timeline. Click any date to inspect details.</p>
                         </div>
                         <div class="text-sm font-bold text-[#176B50] dark:text-[#A8D5BA]" id="calendarMonthTitle">
                             October 2026
@@ -540,7 +562,6 @@
                     </div>
 
                     <div class="wellness-card p-4 sm:p-6 space-y-3">
-                        <!-- Weekday header -->
                         <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider pb-2 border-b border-gray-100 dark:border-gray-800">
                             <div>Sun</div>
                             <div>Mon</div>
@@ -551,7 +572,6 @@
                             <div>Sat</div>
                         </div>
 
-                        <!-- Days Grid -->
                         <div id="calendarDaysGrid" class="grid grid-cols-7 gap-2">
                             <!-- Populated dynamically -->
                         </div>
@@ -669,12 +689,12 @@
                 </div>
 
                 <!-- ============================================== -->
-                <!-- VIEW 7: PRIVACY VAULT (Security Center)        -->
+                <!-- VIEW 7: PRIVACY VAULT (Priority 1 Dashboard)   -->
                 <!-- ============================================== -->
                 <div id="view-vault" class="wellness-view hidden space-y-6">
                     <div>
                         <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Privacy Vault & Architecture</h2>
-                        <p class="text-xs text-gray-500">Security transparency and on-device hardware encryption parameters.</p>
+                        <p class="text-xs text-gray-500">Security transparency, storage limitations, and hardware encryption parameters.</p>
                     </div>
 
                     <!-- Architecture Transparency Banner -->
@@ -687,24 +707,29 @@
                             <div class="flex items-start gap-3">
                                 <span class="px-2 py-0.5 rounded bg-emerald-500 text-white font-bold text-[10px]">100% LOCAL</span>
                                 <div>
-                                    <strong>Journal entries, mood choices, stress sliders, and sleep logs:</strong>
-                                    <p class="text-gray-600 dark:text-gray-300">Stored exclusively inside your browser's IndexedDB storage on this physical machine. Zero cloud replication.</p>
+                                    <strong>Journal entries, mood logs, stress ratings, and sleep data:</strong>
+                                    <p class="text-gray-600 dark:text-gray-300">Stored via Dexie.js in your browser's IndexedDB on this physical device. Zero central database synchronization.</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
-                                <span class="px-2 py-0.5 rounded bg-amber-500 text-white font-bold text-[10px]">LOCAL ENCRYPTION</span>
+                                <span class="px-2 py-0.5 rounded bg-amber-500 text-white font-bold text-[10px]">ENCRYPTED AT REST</span>
                                 <div>
                                     <strong>Web Crypto AES-GCM 256-bit:</strong>
-                                    <p class="text-gray-600 dark:text-gray-300">Keys derived using PBKDF2 with 100,000 iterations from your PIN. No plaintext journal strings are written to disk.</p>
+                                    <p class="text-gray-600 dark:text-gray-300">Derived via PBKDF2 (100,000 rounds) from your PIN. Plaintext is only kept in temporary RAM during an unlocked session.</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
-                                <span class="px-2 py-0.5 rounded bg-blue-500 text-white font-bold text-[10px]">OPTIONAL TRANSMISSION</span>
+                                <span class="px-2 py-0.5 rounded bg-blue-500 text-white font-bold text-[10px]">TRANSMISSION BOUNDARY</span>
                                 <div>
-                                    <strong>Counselor Appointment Requests:</strong>
-                                    <p class="text-gray-600 dark:text-gray-300">Only when you explicitly schedule an appointment is the date, slot, and alias transmitted to the campus counselor queue.</p>
+                                    <strong>Counselor Scheduling:</strong>
+                                    <p class="text-gray-600 dark:text-gray-300">Only when you explicitly schedule an appointment is the date, slot, and alias transmitted. Your journal notes are strictly excluded.</p>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Technical Limitation Honesty Box -->
+                        <div class="p-3.5 rounded-xl bg-gray-100 dark:bg-gray-800/60 border text-[11px] text-gray-500 space-y-1">
+                            <strong>Technical Limitation Note:</strong> Local-first storage resides within your active browser profile. Clearing site data, using Incognito/Private tabs, or device loss can purge local storage. Keep regular password-protected backups via the <em>Settings & Backup</em> tab.
                         </div>
                     </div>
 
@@ -737,7 +762,7 @@
 
                             <div class="p-3.5 rounded-xl border border-gray-100 dark:border-gray-800 space-y-1">
                                 <div class="font-bold">Database Volume</div>
-                                <div id="vaultItemCountsText" class="text-[11px] text-gray-500">Calculating IndexedDB records...</div>
+                                <div id="vaultItemCountsText" class="text-[11px] text-gray-500">Calculating Dexie IndexedDB records...</div>
                             </div>
                         </div>
                     </div>
@@ -746,10 +771,10 @@
                     <div class="wellness-card p-6 border-red-500/30 space-y-3">
                         <div class="flex items-center gap-2 text-rose-600 font-bold text-sm">
                             <i class="fa-solid fa-triangle-exclamation"></i>
-                            <h4>Emergency Data Wipe</h4>
+                            <h4>Complete Local Data Deletion</h4>
                         </div>
                         <p class="text-xs text-gray-500 leading-relaxed">
-                            Need to instantly purge all check-ins, journal notes, and encryption keys from this device? This action is immediate and non-recoverable.
+                            Need to instantly purge all check-in history, journals, and encryption PINs from this browser? This action is immediate and cannot be undone.
                         </p>
                         <button onclick="app.emergencyWipeData()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition">
                             <i class="fa-solid fa-trash-can mr-1.5"></i> Purge All Local Data
@@ -774,7 +799,7 @@
                                 Encrypted Backup (.enc)
                             </h3>
                             <p class="text-xs text-gray-500 leading-relaxed">
-                                Because your data does not sync to a central server, we recommend keeping an encrypted backup if you switch laptops or phones. Your backup file is protected with your custom passphrase using AES-256-GCM.
+                                Because your data does not sync to a central server, keep an encrypted backup if you switch devices. Backups are protected with your chosen passphrase using AES-256-GCM.
                             </p>
                         </div>
 
@@ -789,7 +814,7 @@
 
                             <div class="p-4 rounded-2xl bg-[#D5EBDD]/30 dark:bg-[#1C332A] border border-[#176B50]/20 space-y-3">
                                 <h4 class="font-bold text-xs">Restore From Backup</h4>
-                                <p class="text-[11px] text-gray-500">Import an existing `.enc` file using the passphrase you used to create it.</p>
+                                <p class="text-[11px] text-gray-500">Import an existing `.enc` file using your encryption passphrase.</p>
                                 <label class="btn-wellness-secondary w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer">
                                     <i class="fa-solid fa-upload"></i> Select .enc File
                                     <input type="file" accept=".enc" onchange="app.importEncryptedBackup(this)" class="hidden">
@@ -842,8 +867,8 @@
             </button>
         </nav>
 
-        <!-- FLOATING SOS SUPPORT BUTTON -->
-        <button onclick="document.getElementById('sosEmergencyModal').classList.remove('hidden')" class="fixed z-40 bottom-20 md:bottom-6 right-4 md:right-6 px-4 py-2.5 rounded-full bg-gradient-to-r from-red-600 to-rose-700 text-white font-bold text-xs shadow-2xl shadow-rose-900/40 border border-white/20 flex items-center gap-2 hover:scale-105 active:scale-95 transition" title="24/7 Verified Crisis & Counselor Helplines">
+        <!-- FLOATING SOS SUPPORT BUTTON (Priority 5) -->
+        <button onclick="app.openSOSModal()" class="fixed z-40 bottom-20 md:bottom-6 right-4 md:right-6 px-4 py-2.5 rounded-full bg-gradient-to-r from-red-600 to-rose-700 text-white font-bold text-xs shadow-2xl shadow-rose-900/40 border border-white/20 flex items-center gap-2 hover:scale-105 active:scale-95 transition" title="24/7 Verified Crisis & Counselor Helplines">
             <i class="fa-solid fa-phone-volume text-sm animate-pulse"></i> <span>SOS Support</span>
         </button>
 
@@ -852,7 +877,7 @@
     <!-- ======================================================== -->
     <!-- PIN LOCK & AUTHENTICATION MODAL                          -->
     <!-- ======================================================== -->
-    <div id="pinLockModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+    <div id="pinLockModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
         <div class="wellness-card p-6 sm:p-8 max-w-sm w-full space-y-6 text-center">
             <div class="w-12 h-12 mx-auto rounded-2xl bg-[#D5EBDD] dark:bg-[#1C332A] flex items-center justify-center text-[#176B50] dark:text-[#A8D5BA] text-xl">
                 <i class="fa-solid fa-lock"></i>
@@ -884,6 +909,13 @@
                 <button onclick="app.closePinModal()" class="pin-key-btn text-xs font-bold text-gray-400">Cancel</button>
                 <button onclick="app.pinKeyPress('0')" class="pin-key-btn">0</button>
                 <button onclick="app.pinBackspace()" class="pin-key-btn text-base"><i class="fa-solid fa-delete-left"></i></button>
+            </div>
+
+            <!-- Direct Crisis Access From Lock Screen (Priority 5) -->
+            <div class="pt-2 border-t border-gray-100 dark:border-gray-800">
+                <button onclick="app.openSOSModal()" class="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline flex items-center justify-center gap-1.5 mx-auto">
+                    <i class="fa-solid fa-phone-volume"></i> Emergency Helplines (14416 / 112)
+                </button>
             </div>
         </div>
     </div>
@@ -931,13 +963,13 @@
             </div>
 
             <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-                When anxious feelings spin your thoughts into the future, reconnect your nervous system to the present moment using physical sensory inputs:
+                When anxious feelings spin your thoughts, reconnect your nervous system to the present moment using physical sensory inputs:
             </p>
 
             <div class="space-y-3">
                 <div class="p-3 rounded-xl bg-[#D5EBDD]/40 dark:bg-[#1C332A] flex items-start gap-3">
                     <span class="font-bold text-base text-[#176B50] dark:text-[#A8D5BA]">5</span>
-                    <div><strong>Acknowledge 5 things you can SEE:</strong> Look for shapes, textures, or shadows in your room.</div>
+                    <div><strong>Acknowledge 5 things you can SEE:</strong> Shapes, desk textures, or gentle shadows in your room.</div>
                 </div>
                 <div class="p-3 rounded-xl bg-[#D5EBDD]/40 dark:bg-[#1C332A] flex items-start gap-3">
                     <span class="font-bold text-base text-[#176B50] dark:text-[#A8D5BA]">4</span>
@@ -945,11 +977,11 @@
                 </div>
                 <div class="p-3 rounded-xl bg-[#D5EBDD]/40 dark:bg-[#1C332A] flex items-start gap-3">
                     <span class="font-bold text-base text-[#176B50] dark:text-[#A8D5BA]">3</span>
-                    <div><strong>Acknowledge 3 things you can HEAR:</strong> Distant hostel chatter, fan hum, or leaves outside.</div>
+                    <div><strong>Acknowledge 3 things you can HEAR:</strong> Distant hostel chatter, fan hum, or breeze outside.</div>
                 </div>
                 <div class="p-3 rounded-xl bg-[#D5EBDD]/40 dark:bg-[#1C332A] flex items-start gap-3">
                     <span class="font-bold text-base text-[#176B50] dark:text-[#A8D5BA]">2</span>
-                    <div><strong>Acknowledge 2 things you can SMELL:</strong> Fresh air, coffee, or pillow fabric.</div>
+                    <div><strong>Acknowledge 2 things you can SMELL:</strong> Clean air, tea, or pillow fabric.</div>
                 </div>
                 <div class="p-3 rounded-xl bg-[#D5EBDD]/40 dark:bg-[#1C332A] flex items-start gap-3">
                     <span class="font-bold text-base text-[#176B50] dark:text-[#A8D5BA]">1</span>
@@ -964,7 +996,7 @@
     </div>
 
     <!-- ======================================================== -->
-    <!-- SOS VERIFIED HELPLINES MODAL                             -->
+    <!-- SOS VERIFIED HELPLINES & TRUSTED CONTACT MODAL           -->
     <!-- ======================================================== -->
     <div id="sosEmergencyModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
         <div class="wellness-card p-6 sm:p-8 max-w-md w-full space-y-5 text-xs text-center">
@@ -976,7 +1008,15 @@
                 <p class="text-gray-500">Confidential, verified 24/7 mental health and emergency services across India.</p>
             </div>
 
-            <div class="space-y-3 text-left">
+            <!-- Trusted Hostel Friend Section (Priority 5) -->
+            <div class="text-left space-y-1.5">
+                <span class="text-[10px] uppercase font-bold text-gray-400">My Trusted Hostel Friend / Contact</span>
+                <div id="trustedContactDisplay">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <div class="space-y-3 text-left pt-1">
                 <a href="tel:14416" class="p-3.5 rounded-2xl bg-[#F6F8F5] dark:bg-[#162420] border border-[#176B50]/30 hover:border-[#176B50] flex items-center justify-between transition block">
                     <div>
                         <div class="font-bold text-sm text-[#176B50] dark:text-[#A8D5BA]">Tele-MANAS (Govt of India)</div>
@@ -1007,7 +1047,7 @@
                 </div>
             </div>
 
-            <button onclick="document.getElementById('sosEmergencyModal').classList.add('hidden')" class="w-full py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 transition">
+            <button onclick="app.closeSOSModal()" class="w-full py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 transition">
                 Close Emergency Window
             </button>
         </div>

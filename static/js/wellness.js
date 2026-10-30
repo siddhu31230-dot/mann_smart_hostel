@@ -1,65 +1,81 @@
 /**
- * MANN Care — Private Wellness Check-In Engine
- * Local-First • Web Crypto AES-GCM 256 • IndexedDB • Stealth Mode
+ * MANN Care — Private Wellness Check-In Engine (Next-Generation Architecture)
+ * Local-First • Dexie.js IndexedDB • Web Crypto AES-GCM 256 • Stealth Mode
  * "YOUR FEELINGS. YOUR DEVICE. YOUR CONTROL."
  */
 
 class WellnessDB {
     constructor() {
         this.dbName = 'WellnessVaultDB';
-        this.version = 1;
-        this.db = null;
+        this.dexie = null;
+        this.useDexie = typeof window.Dexie !== 'undefined';
+        this.rawDb = null;
     }
 
     async init() {
-        if (this.db) return this.db;
+        if (this.useDexie && !this.dexie) {
+            try {
+                this.dexie = new window.Dexie(this.dbName);
+                this.dexie.version(1).stores({
+                    checkins: 'date, mood, stress, sleep, updated_at',
+                    journals: '++id, date, created_at',
+                    vault_meta: 'key',
+                    appointments: '++id, date, ref',
+                    trusted_contacts: '++id, name, phone, relationship'
+                });
+                await this.dexie.open();
+                return this.dexie;
+            } catch (err) {
+                console.warn('Dexie initialization note, falling back to native IndexedDB:', err);
+                this.useDexie = false;
+            }
+        }
+
+        // Native IndexedDB Fallback
+        if (this.rawDb) return this.rawDb;
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, this.version);
+            const request = indexedDB.open(this.dbName, 1);
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
-                // Store 1: Daily Check-Ins (one entry per date)
                 if (!db.objectStoreNames.contains('checkins')) {
-                    const checkinStore = db.createObjectStore('checkins', { keyPath: 'date' });
-                    checkinStore.createIndex('mood', 'mood', { unique: false });
-                    checkinStore.createIndex('stress', 'stress', { unique: false });
-                    checkinStore.createIndex('created_at', 'created_at', { unique: false });
+                    const s = db.createObjectStore('checkins', { keyPath: 'date' });
+                    s.createIndex('mood', 'mood');
+                    s.createIndex('stress', 'stress');
                 }
-                // Store 2: Standalone Private Journals
                 if (!db.objectStoreNames.contains('journals')) {
-                    const journalStore = db.createObjectStore('journals', { keyPath: 'id', autoIncrement: true });
-                    journalStore.createIndex('date', 'date', { unique: false });
-                    journalStore.createIndex('created_at', 'created_at', { unique: false });
+                    const j = db.createObjectStore('journals', { keyPath: 'id', autoIncrement: true });
+                    j.createIndex('date', 'date');
                 }
-                // Store 3: Security & Vault Metadata (PIN hash, salt, settings)
                 if (!db.objectStoreNames.contains('vault_meta')) {
                     db.createObjectStore('vault_meta', { keyPath: 'key' });
                 }
-                // Store 4: Confidential Appointments (Local record)
                 if (!db.objectStoreNames.contains('appointments')) {
-                    const aptStore = db.createObjectStore('appointments', { keyPath: 'id', autoIncrement: true });
-                    aptStore.createIndex('date', 'date', { unique: false });
+                    db.createObjectStore('appointments', { keyPath: 'id', autoIncrement: true });
+                }
+                if (!db.objectStoreNames.contains('trusted_contacts')) {
+                    db.createObjectStore('trusted_contacts', { keyPath: 'id', autoIncrement: true });
                 }
             };
 
             request.onsuccess = (event) => {
-                this.db = event.target.result;
-                resolve(this.db);
+                this.rawDb = event.target.result;
+                resolve(this.rawDb);
             };
 
-            request.onerror = (event) => {
-                console.error('IndexedDB Error:', event.target.error);
-                reject(event.target.error);
-            };
+            request.onerror = (event) => reject(event.target.error);
         });
     }
 
     async getMeta(key) {
         await this.init();
+        if (this.useDexie) {
+            const res = await this.dexie.vault_meta.get(key);
+            return res ? res.value : null;
+        }
         return new Promise((resolve) => {
-            const tx = this.db.transaction('vault_meta', 'readonly');
-            const store = tx.objectStore('vault_meta');
-            const req = store.get(key);
+            const tx = this.rawDb.transaction('vault_meta', 'readonly');
+            const req = tx.objectStore('vault_meta').get(key);
             req.onsuccess = () => resolve(req.result ? req.result.value : null);
             req.onerror = () => resolve(null);
         });
@@ -67,21 +83,25 @@ class WellnessDB {
 
     async setMeta(key, value) {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.vault_meta.put({ key, value, updated_at: new Date().toISOString() });
+        }
         return new Promise((resolve, reject) => {
-            const tx = this.db.transaction('vault_meta', 'readwrite');
-            const store = tx.objectStore('vault_meta');
-            const req = store.put({ key, value, updated_at: new Date().toISOString() });
+            const tx = this.rawDb.transaction('vault_meta', 'readwrite');
+            const req = tx.objectStore('vault_meta').put({ key, value, updated_at: new Date().toISOString() });
             req.onsuccess = () => resolve(true);
             req.onerror = () => reject(req.error);
         });
     }
 
-    async saveCheckIn(checkInData) {
+    async saveCheckIn(record) {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.checkins.put(record);
+        }
         return new Promise((resolve, reject) => {
-            const tx = this.db.transaction('checkins', 'readwrite');
-            const store = tx.objectStore('checkins');
-            const req = store.put(checkInData);
+            const tx = this.rawDb.transaction('checkins', 'readwrite');
+            const req = tx.objectStore('checkins').put(record);
             req.onsuccess = () => resolve(req.result);
             req.onerror = () => reject(req.error);
         });
@@ -89,10 +109,12 @@ class WellnessDB {
 
     async getCheckIn(date) {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.checkins.get(date) || null;
+        }
         return new Promise((resolve) => {
-            const tx = this.db.transaction('checkins', 'readonly');
-            const store = tx.objectStore('checkins');
-            const req = store.get(date);
+            const tx = this.rawDb.transaction('checkins', 'readonly');
+            const req = tx.objectStore('checkins').get(date);
             req.onsuccess = () => resolve(req.result || null);
             req.onerror = () => resolve(null);
         });
@@ -100,10 +122,12 @@ class WellnessDB {
 
     async getAllCheckIns() {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.checkins.toArray();
+        }
         return new Promise((resolve) => {
-            const tx = this.db.transaction('checkins', 'readonly');
-            const store = tx.objectStore('checkins');
-            const req = store.getAll();
+            const tx = this.rawDb.transaction('checkins', 'readonly');
+            const req = tx.objectStore('checkins').getAll();
             req.onsuccess = () => resolve(req.result || []);
             req.onerror = () => resolve([]);
         });
@@ -111,21 +135,25 @@ class WellnessDB {
 
     async deleteCheckIn(date) {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.checkins.delete(date);
+        }
         return new Promise((resolve, reject) => {
-            const tx = this.db.transaction('checkins', 'readwrite');
-            const store = tx.objectStore('checkins');
-            const req = store.delete(date);
+            const tx = this.rawDb.transaction('checkins', 'readwrite');
+            const req = tx.objectStore('checkins').delete(date);
             req.onsuccess = () => resolve(true);
             req.onerror = () => reject(req.error);
         });
     }
 
-    async saveJournal(journalData) {
+    async saveJournal(entry) {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.journals.add(entry);
+        }
         return new Promise((resolve, reject) => {
-            const tx = this.db.transaction('journals', 'readwrite');
-            const store = tx.objectStore('journals');
-            const req = store.put(journalData);
+            const tx = this.rawDb.transaction('journals', 'readwrite');
+            const req = tx.objectStore('journals').put(entry);
             req.onsuccess = () => resolve(req.result);
             req.onerror = () => reject(req.error);
         });
@@ -133,10 +161,12 @@ class WellnessDB {
 
     async getAllJournals() {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.journals.toArray();
+        }
         return new Promise((resolve) => {
-            const tx = this.db.transaction('journals', 'readonly');
-            const store = tx.objectStore('journals');
-            const req = store.getAll();
+            const tx = this.rawDb.transaction('journals', 'readonly');
+            const req = tx.objectStore('journals').getAll();
             req.onsuccess = () => resolve(req.result || []);
             req.onerror = () => resolve([]);
         });
@@ -144,21 +174,25 @@ class WellnessDB {
 
     async deleteJournal(id) {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.journals.delete(id);
+        }
         return new Promise((resolve, reject) => {
-            const tx = this.db.transaction('journals', 'readwrite');
-            const store = tx.objectStore('journals');
-            const req = store.delete(id);
+            const tx = this.rawDb.transaction('journals', 'readwrite');
+            const req = tx.objectStore('journals').delete(id);
             req.onsuccess = () => resolve(true);
             req.onerror = () => reject(req.error);
         });
     }
 
-    async saveAppointment(aptData) {
+    async saveAppointment(apt) {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.appointments.add(apt);
+        }
         return new Promise((resolve, reject) => {
-            const tx = this.db.transaction('appointments', 'readwrite');
-            const store = tx.objectStore('appointments');
-            const req = store.put(aptData);
+            const tx = this.rawDb.transaction('appointments', 'readwrite');
+            const req = tx.objectStore('appointments').put(apt);
             req.onsuccess = () => resolve(req.result);
             req.onerror = () => reject(req.error);
         });
@@ -166,23 +200,65 @@ class WellnessDB {
 
     async getAllAppointments() {
         await this.init();
+        if (this.useDexie) {
+            return await this.dexie.appointments.toArray();
+        }
         return new Promise((resolve) => {
-            const tx = this.db.transaction('appointments', 'readonly');
-            const store = tx.objectStore('appointments');
-            const req = store.getAll();
+            const tx = this.rawDb.transaction('appointments', 'readonly');
+            const req = tx.objectStore('appointments').getAll();
             req.onsuccess = () => resolve(req.result || []);
             req.onerror = () => resolve([]);
         });
     }
 
+    async getTrustedContact() {
+        await this.init();
+        if (this.useDexie) {
+            const list = await this.dexie.trusted_contacts.toArray();
+            return list.length > 0 ? list[0] : null;
+        }
+        return new Promise((resolve) => {
+            const tx = this.rawDb.transaction('trusted_contacts', 'readonly');
+            const req = tx.objectStore('trusted_contacts').getAll();
+            req.onsuccess = () => resolve(req.result && req.result.length > 0 ? req.result[0] : null);
+            req.onerror = () => resolve(null);
+        });
+    }
+
+    async saveTrustedContact(contact) {
+        await this.init();
+        if (this.useDexie) {
+            await this.dexie.trusted_contacts.clear();
+            return await this.dexie.trusted_contacts.add(contact);
+        }
+        return new Promise((resolve, reject) => {
+            const tx = this.rawDb.transaction('trusted_contacts', 'readwrite');
+            tx.objectStore('trusted_contacts').clear();
+            const req = tx.objectStore('trusted_contacts').put(contact);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    }
+
     async clearAllData() {
         await this.init();
+        if (this.useDexie) {
+            await Promise.all([
+                this.dexie.checkins.clear(),
+                this.dexie.journals.clear(),
+                this.dexie.vault_meta.clear(),
+                this.dexie.appointments.clear(),
+                this.dexie.trusted_contacts.clear()
+            ]);
+            return true;
+        }
         return new Promise((resolve, reject) => {
-            const tx = this.db.transaction(['checkins', 'journals', 'vault_meta', 'appointments'], 'readwrite');
+            const tx = this.rawDb.transaction(['checkins', 'journals', 'vault_meta', 'appointments', 'trusted_contacts'], 'readwrite');
             tx.objectStore('checkins').clear();
             tx.objectStore('journals').clear();
             tx.objectStore('vault_meta').clear();
             tx.objectStore('appointments').clear();
+            tx.objectStore('trusted_contacts').clear();
             tx.oncomplete = () => resolve(true);
             tx.onerror = () => reject(tx.error);
         });
@@ -297,7 +373,7 @@ class WellnessCrypto {
             return dec.decode(decryptedBuffer);
         } catch (e) {
             console.error('Decryption failed with current key:', e);
-            return '[Encrypted Entry — Incorrect Key or Locked]';
+            return '[Encrypted Entry — Unlock Vault with PIN to Decrypt]';
         }
     }
 }
@@ -319,8 +395,9 @@ class WellnessApp {
         this.lastActiveTime = Date.now();
         this.failedAttempts = 0;
         this.lockoutUntil = 0;
+        this.dismissedInterventionsToday = false;
 
-        // Current Check-in Form State
+        // Current Check-in Form State (30-60 second check-in)
         this.activeCheckIn = {
             date: new Date().toISOString().split('T')[0],
             mood: 'Calm',
@@ -330,9 +407,14 @@ class WellnessApp {
             journalNote: ''
         };
 
+        // Available Context Tags (Exact requirements)
+        this.availableTags = [
+            'Exams', 'Academics', 'Roommates', 'Friendships',
+            'Homesickness', 'Family', 'Finances', 'Personal', 'Other'
+        ];
+
         // Charts container references
         this.weeklyMoodChart = null;
-        this.stressSleepChart = null;
         this.tagFreqChart = null;
 
         // Companion daily reflection question pool
@@ -365,10 +447,10 @@ class WellnessApp {
         // Setup keyboard shortcuts (Escape for Stealth Mode)
         this.setupKeyboardShortcuts();
 
-        // If PIN is not set yet, prompt to explore in Guest Mode or Set PIN
+        // If PIN is not set yet, allow exploring in Guest Mode
         if (!pinHash) {
             this.isUnlocked = true;
-            this.showToast('🌿 Welcome to MANN Care. Your personal records will stay strictly on this device.', 'info');
+            this.showToast('🌿 Welcome to MANN Care. Personal entries remain 100% on this device.', 'info');
         } else {
             // Require PIN unlock
             this.lockVault();
@@ -384,6 +466,7 @@ class WellnessApp {
         this.navTo('home');
         this.updateHeaderStatus();
         this.renderUpcomingBookings();
+        this.loadTrustedContactUI();
 
         // Check for gentle intervention triggers
         await this.checkInterventions();
@@ -447,14 +530,12 @@ class WellnessApp {
         window.addEventListener('touchstart', resetTimer);
         document.addEventListener('visibilitychange', () => {
             if (document.hidden && this.autoLockMinutes > 0 && this.isUnlocked) {
-                // Background lock check
                 this.checkInactivityLock();
             } else {
                 resetTimer();
             }
         });
 
-        // Check inactivity every 15 seconds
         setInterval(() => this.checkInactivityLock(), 15000);
     }
 
@@ -463,7 +544,7 @@ class WellnessApp {
         const elapsedMinutes = (Date.now() - this.lastActiveTime) / 60000;
         if (elapsedMinutes >= this.autoLockMinutes) {
             this.lockVault();
-            this.showToast('🔒 Vault automatically locked due to inactivity.', 'info');
+            this.showToast('🔒 Vault locked automatically due to inactivity.', 'info');
         }
     }
 
@@ -552,7 +633,6 @@ class WellnessApp {
             const savedSaltBase64 = await this.db.getMeta('pin_salt');
 
             if (!savedHash || !savedSaltBase64) {
-                // No PIN set: generate key directly and unlock
                 this.isUnlocked = true;
                 this.closePinModal();
                 if (this.onPinSuccess) this.onPinSuccess();
@@ -563,19 +643,18 @@ class WellnessApp {
             const computedHash = await WellnessCrypto.hashPin(pin, saltBuffer);
 
             if (computedHash === savedHash) {
-                // Correct PIN
                 this.failedAttempts = 0;
                 this.vaultKey = await WellnessCrypto.deriveKey(pin, saltBuffer);
                 this.isUnlocked = true;
                 this.updateHeaderStatus();
                 this.closePinModal();
-                this.showToast('🔓 Vault unlocked. Your records are decrypted locally.', 'success');
+                this.showToast('🔓 Vault unlocked. Records decrypted locally with AES-GCM.', 'success');
                 if (this.onPinSuccess) this.onPinSuccess();
             } else {
                 this.failedAttempts++;
                 if (this.failedAttempts >= 5) {
                     this.lockoutUntil = Date.now() + 30000;
-                    this.showToast('🚨 5 incorrect attempts. Lockout for 30 seconds.', 'error');
+                    this.showToast('🚨 5 incorrect attempts. Security lockout for 30 seconds.', 'error');
                 } else {
                     this.showToast(`Incorrect PIN. ${5 - this.failedAttempts} attempts remaining.`, 'error');
                 }
@@ -593,10 +672,10 @@ class WellnessApp {
                 this.isUnlocked = true;
                 this.updateHeaderStatus();
                 this.closePinModal();
-                this.showToast('✨ PIN configured successfully! Your data is now Web Crypto encrypted.', 'success');
+                this.showToast('✨ PIN configured! Your data is Web Crypto AES-256 encrypted.', 'success');
                 if (this.onPinSuccess) this.onPinSuccess();
             } else {
-                this.showToast('PINs did not match. Please start over.', 'error');
+                this.showToast('PINs did not match. Please try again.', 'error');
                 this.openPinModal('set', this.onPinSuccess);
             }
         }
@@ -616,11 +695,10 @@ class WellnessApp {
     }
 
     // -----------------------------------------------------------------
-    // Stealth Mode
+    // Stealth Mode (Hostel Discreet Interface)
     // -----------------------------------------------------------------
     setupKeyboardShortcuts() {
         window.addEventListener('keydown', (e) => {
-            // Quick Stealth Shortcut: Escape or Alt+S
             if (e.key === 'Escape' || (e.altKey && e.key.toLowerCase() === 's')) {
                 this.toggleStealthMode();
             }
@@ -649,7 +727,7 @@ class WellnessApp {
     }
 
     // -----------------------------------------------------------------
-    // Daily Check-In Engine (<30 seconds)
+    // Daily Check-In Engine (30–60 Seconds)
     // -----------------------------------------------------------------
     async loadTodayCheckIn() {
         const todayStr = new Date().toISOString().split('T')[0];
@@ -662,10 +740,9 @@ class WellnessApp {
                 stress: existing.stress,
                 sleep: existing.sleep,
                 tags: existing.tags || [],
-                journalNote: '' // Decrypted on demand
+                journalNote: ''
             };
 
-            // If journal is attached and vault key is active, decrypt preview
             if (existing.encrypted_journal && this.vaultKey) {
                 this.activeCheckIn.journalNote = await WellnessCrypto.decryptText(
                     existing.encrypted_journal.cipherText,
@@ -729,6 +806,28 @@ class WellnessApp {
         }
     }
 
+    promptAddCustomTag() {
+        const custom = prompt('Enter custom context tag (e.g. Sports, Hackathon, Job Interview):');
+        if (!custom || !custom.trim()) return;
+        const cleanTag = custom.trim();
+        if (!this.activeCheckIn.tags.includes(cleanTag)) {
+            this.activeCheckIn.tags.push(cleanTag);
+            this.renderCustomTagChip(cleanTag);
+            this.showToast(`Tag "${cleanTag}" added.`, 'info');
+        }
+    }
+
+    renderCustomTagChip(tagName) {
+        const container = document.getElementById('customTagsContainer');
+        if (!container) return;
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'tag-chip active px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium text-xs';
+        chip.textContent = `# ${tagName}`;
+        chip.onclick = () => this.toggleTag(chip, tagName);
+        container.appendChild(chip);
+    }
+
     updateCheckInUI() {
         this.selectMood(this.activeCheckIn.mood);
         const slider = document.getElementById('stressSliderInput');
@@ -738,17 +837,22 @@ class WellnessApp {
         }
         this.selectSleep(this.activeCheckIn.sleep);
 
-        // Update tag buttons
         document.querySelectorAll('.tag-chip').forEach(chip => {
             const tagName = chip.getAttribute('data-tag');
-            if (this.activeCheckIn.tags.includes(tagName)) {
+            if (tagName && this.activeCheckIn.tags.includes(tagName)) {
                 chip.classList.add('active');
-            } else {
+            } else if (tagName) {
                 chip.classList.remove('active');
             }
         });
 
-        // Journal input
+        // Add custom non-standard tags
+        this.activeCheckIn.tags.forEach(t => {
+            if (!this.availableTags.includes(t)) {
+                this.renderCustomTagChip(t);
+            }
+        });
+
         const journalInput = document.getElementById('checkinJournalInput');
         if (journalInput && this.activeCheckIn.journalNote) {
             journalInput.value = this.activeCheckIn.journalNote;
@@ -783,7 +887,6 @@ class WellnessApp {
             if (this.vaultKey) {
                 encryptedJournalPayload = await WellnessCrypto.encryptText(journalText, this.vaultKey);
             } else {
-                // If vault is unlocked without key, store unencrypted locally with flag
                 encryptedJournalPayload = {
                     plainText: journalText,
                     unencrypted: true
@@ -803,7 +906,6 @@ class WellnessApp {
 
         await this.db.saveCheckIn(record);
 
-        // Also add to journals store if note is present
         if (journalText) {
             await this.db.saveJournal({
                 date: dateStr,
@@ -815,7 +917,7 @@ class WellnessApp {
         }
 
         this.updateTodayStatusBadge(true);
-        this.showToast('🌿 Check-in saved securely on your device.', 'success');
+        this.showToast('🌿 Check-in saved securely in on-device storage.', 'success');
         this.navTo('home');
         await this.checkInterventions();
     }
@@ -827,7 +929,6 @@ class WellnessApp {
         const allCheckins = await this.db.getAllCheckIns();
         allCheckins.sort((a, b) => b.date.localeCompare(a.date));
 
-        // 1. Calculate Streak
         let streak = 0;
         let checkDate = new Date();
         while (true) {
@@ -837,7 +938,6 @@ class WellnessApp {
                 streak++;
                 checkDate.setDate(checkDate.getDate() - 1);
             } else {
-                // Check if yesterday had it (allowing today to still be completed)
                 if (streak === 0) {
                     checkDate.setDate(checkDate.getDate() - 1);
                     const hadYesterday = allCheckins.some(c => c.date === checkDate.toISOString().split('T')[0]);
@@ -854,7 +954,6 @@ class WellnessApp {
         const streakEl = document.getElementById('homeStreakCount');
         if (streakEl) streakEl.textContent = `${streak} ${streak === 1 ? 'day' : 'days'}`;
 
-        // 2. Render 7-day pill timeline on home
         const pillsContainer = document.getElementById('homeWeekPillsContainer');
         if (pillsContainer) {
             pillsContainer.innerHTML = '';
@@ -885,8 +984,8 @@ class WellnessApp {
             case 'Happy': return '😊';
             case 'Calm': return '😌';
             case 'Okay': return '😐';
+            case 'Low': return '😔';
             case 'Stressed': return '😰';
-            case 'Sad': return '😢';
             case 'Overwhelmed': return '🤯';
             default: return '🌿';
         }
@@ -902,13 +1001,13 @@ class WellnessApp {
     }
 
     // -----------------------------------------------------------------
-    // Mood Intelligence Dashboard & Analytics
+    // Mood Intelligence Dashboard (Chart.js & Correlation)
     // -----------------------------------------------------------------
     async renderInsights() {
         const checkins = await this.db.getAllCheckIns();
         checkins.sort((a, b) => a.date.localeCompare(b.date));
 
-        if (checkins.length === 0) {
+        if (checkins.length < 3) {
             document.getElementById('insightsEmptyState')?.classList.remove('hidden');
             document.getElementById('insightsContent')?.classList.add('hidden');
             return;
@@ -917,11 +1016,9 @@ class WellnessApp {
         document.getElementById('insightsEmptyState')?.classList.add('hidden');
         document.getElementById('insightsContent')?.classList.remove('hidden');
 
-        // 1. Stats calculation
         const total = checkins.length;
         const avgStress = (checkins.reduce((sum, c) => sum + (c.stress || 0), 0) / total).toFixed(1);
 
-        // Dominant mood
         const moodCounts = {};
         checkins.forEach(c => moodCounts[c.mood] = (moodCounts[c.mood] || 0) + 1);
         let dominantMood = 'Calm';
@@ -934,13 +1031,11 @@ class WellnessApp {
         }
         const dominantPct = Math.round((maxCount / total) * 100);
 
-        // Tag frequencies
         const tagCounts = {};
         checkins.forEach(c => {
             (c.tags || []).forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1);
         });
 
-        // Set KPI cards
         const avgStressEl = document.getElementById('kpiAvgStress');
         const dominantMoodEl = document.getElementById('kpiDominantMood');
         const checkinCountEl = document.getElementById('kpiTotalCheckins');
@@ -949,10 +1044,7 @@ class WellnessApp {
         if (dominantMoodEl) dominantMoodEl.textContent = `${this.getMoodEmoji(dominantMood)} ${dominantMood} (${dominantPct}%)`;
         if (checkinCountEl) checkinCountEl.textContent = `${total} check-ins`;
 
-        // 2. Observations & Pattern correlations
-        this.renderCorrelationObservations(checkins, tagCounts, avgStress);
-
-        // 3. Render Chart.js visual charts
+        this.renderCorrelationObservations(checkins, tagCounts, parseFloat(avgStress));
         this.renderCharts(checkins, tagCounts);
     }
 
@@ -963,33 +1055,31 @@ class WellnessApp {
 
         const observations = [];
 
-        // Check tags with significantly higher stress
         for (const [tag, count] of Object.entries(tagCounts)) {
             if (count >= 2) {
                 const taggedRecords = checkins.filter(c => (c.tags || []).includes(tag));
                 const tagAvgStress = (taggedRecords.reduce((s, c) => s + c.stress, 0) / taggedRecords.length).toFixed(1);
 
-                if (tagAvgStress >= overallAvgStress + 1.2) {
+                if (parseFloat(tagAvgStress) >= overallAvgStress + 1.2) {
                     observations.push({
                         icon: 'fa-triangle-exclamation',
                         color: 'text-amber-500',
                         bg: 'bg-amber-500/10 border-amber-500/30',
-                        title: `Noticeable Strain Around "${tag}"`,
-                        text: `On days influenced by **${tag}**, your reported stress averaged **${tagAvgStress}/10** (compared to your ${overallAvgStress}/10 baseline). Giving yourself intentional breathers around this can help.`
+                        title: `Pattern Association: "${tag}"`,
+                        text: `On days influenced by **${tag}**, your reported stress averaged **${tagAvgStress}/10** (compared to your overall average of ${overallAvgStress}/10). Scheduling intentional 10-minute breaks during these days can soften the strain.`
                     });
-                } else if (tagAvgStress <= overallAvgStress - 1.0) {
+                } else if (parseFloat(tagAvgStress) <= overallAvgStress - 1.0) {
                     observations.push({
                         icon: 'fa-seedling',
                         color: 'text-emerald-500',
                         bg: 'bg-emerald-500/10 border-emerald-500/30',
                         title: `Calming Anchor: "${tag}"`,
-                        text: `Days tagged with **${tag}** correlated with a much calmer stress level of **${tagAvgStress}/10**. Investing time in this seems to restore your energy.`
+                        text: `Days associated with **${tag}** correlated with a calmer stress level of **${tagAvgStress}/10**. Investing time in these activities appears to restore your balance.`
                     });
                 }
             }
         }
 
-        // Sleep correlation observation
         const goodSleepDays = checkins.filter(c => c.sleep === 'Good' || c.sleep === 'Excellent');
         if (goodSleepDays.length >= 2) {
             const calmHappyOnGoodSleep = goodSleepDays.filter(c => c.mood === 'Calm' || c.mood === 'Happy').length;
@@ -998,8 +1088,8 @@ class WellnessApp {
                 icon: 'fa-moon',
                 color: 'text-indigo-400',
                 bg: 'bg-indigo-500/10 border-indigo-500/30',
-                title: 'Sleep & Mood Rhythm',
-                text: `On nights with Restful or Rejuvenating sleep, **${pct}% of your check-ins** were Calm or Happy. Deep rest serves as a significant stabilizer.`
+                title: 'Sleep & Mood Association',
+                text: `On nights with Restful or Excellent sleep, **${pct}% of your check-ins** were Calm or Happy. Deep rest serves as a significant stabilizer.`
             });
         }
 
@@ -1008,8 +1098,8 @@ class WellnessApp {
                 icon: 'fa-compass',
                 color: 'text-[#176B50]',
                 bg: 'bg-[#D5EBDD]/40 border-[#176B50]/20 dark:bg-[#1C332A]',
-                title: 'Building Your Baseline',
-                text: 'As you complete more check-ins over the next several days, your on-device intelligence engine will surface deeper correlations between daily hostel influences and mood patterns.'
+                title: 'Baseline In Progress',
+                text: 'As you log more check-ins over the upcoming week, your on-device engine will surface deeper associations between daily hostel factors and mood shifts.'
             });
         }
 
@@ -1032,14 +1122,13 @@ class WellnessApp {
         const textColor = isDark ? '#A8D5BA' : '#1C2923';
         const gridColor = isDark ? 'rgba(168, 213, 186, 0.1)' : 'rgba(23, 107, 80, 0.1)';
 
-        // Chart 1: 7-Day Trend
         const last7 = checkins.slice(-7);
         const labels7 = last7.map(c => {
             const d = new Date(c.date + 'T00:00:00');
             return d.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' });
         });
         const stressData = last7.map(c => c.stress);
-        const moodScoreMap = { 'Happy': 5, 'Calm': 4, 'Okay': 3, 'Stressed': 2, 'Sad': 1, 'Overwhelmed': 1 };
+        const moodScoreMap = { 'Happy': 5, 'Calm': 4, 'Okay': 3, 'Low': 2, 'Stressed': 2, 'Overwhelmed': 1 };
         const moodData = last7.map(c => moodScoreMap[c.mood] || 3);
 
         const ctx1 = document.getElementById('chartWeeklyJourney')?.getContext('2d');
@@ -1081,23 +1170,14 @@ class WellnessApp {
                         legend: { labels: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 11 } } }
                     },
                     scales: {
-                        y: {
-                            min: 0,
-                            max: 10,
-                            grid: { color: gridColor },
-                            ticks: { color: textColor }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: textColor }
-                        }
+                        y: { min: 0, max: 10, grid: { color: gridColor }, ticks: { color: textColor } },
+                        x: { grid: { display: false }, ticks: { color: textColor } }
                     }
                 }
             });
         }
 
-        // Chart 2: Influencing Factor Frequency
-        const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+        const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 7);
         const ctx2 = document.getElementById('chartTagFrequency')?.getContext('2d');
         if (ctx2) {
             if (this.tagFreqChart) this.tagFreqChart.destroy();
@@ -1106,7 +1186,7 @@ class WellnessApp {
                 data: {
                     labels: sortedTags.map(t => t[0]),
                     datasets: [{
-                        label: 'Check-In Occurrences',
+                        label: 'Check-In Frequency',
                         data: sortedTags.map(t => t[1]),
                         backgroundColor: '#176B50',
                         borderRadius: 8
@@ -1118,15 +1198,8 @@ class WellnessApp {
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: {
-                            beginAtZero: true,
-                            grid: { color: gridColor },
-                            ticks: { color: textColor, precision: 0 }
-                        },
-                        y: {
-                            grid: { display: false },
-                            ticks: { color: textColor }
-                        }
+                        x: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, precision: 0 } },
+                        y: { grid: { display: false }, ticks: { color: textColor } }
                     }
                 }
             });
@@ -1145,7 +1218,6 @@ class WellnessApp {
         const year = now.getFullYear();
         const month = now.getMonth();
 
-        // Month title
         const monthTitle = document.getElementById('calendarMonthTitle');
         if (monthTitle) {
             monthTitle.textContent = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -1158,14 +1230,12 @@ class WellnessApp {
         const checkinMap = {};
         allCheckins.forEach(c => checkinMap[c.date] = c);
 
-        // Blank padding for days before the 1st
         for (let i = 0; i < firstDayIndex; i++) {
             const blank = document.createElement('div');
             blank.className = 'h-20 sm:h-24 p-1 rounded-xl opacity-20';
             container.appendChild(blank);
         }
 
-        // Days of month
         for (let day = 1; day <= totalDays; day++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const checkin = checkinMap[dateStr];
@@ -1181,7 +1251,7 @@ class WellnessApp {
             cell.innerHTML = `
                 <div class="flex items-center justify-between text-xs">
                     <span class="font-bold ${isToday ? 'text-[#176B50] dark:text-[#A8D5BA]' : 'text-gray-500'}">${day}</span>
-                    ${checkin && checkin.encrypted_journal ? '<i class="fa-solid fa-lock text-[10px] text-gray-400" title="Private Journal Attached"></i>' : ''}
+                    ${checkin && checkin.encrypted_journal ? '<i class="fa-solid fa-lock text-[10px] text-gray-400" title="Private Encrypted Journal"></i>' : ''}
                 </div>
                 ${checkin ? `
                     <div class="text-center my-auto">
@@ -1222,7 +1292,7 @@ class WellnessApp {
                 journalContent = `<div class="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border text-xs whitespace-pre-wrap leading-relaxed">${decrypted}</div>`;
             } else {
                 journalContent = `<div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 text-xs flex items-center justify-between">
-                    <span><i class="fa-solid fa-lock mr-1.5"></i> Journal entry is encrypted.</span>
+                    <span><i class="fa-solid fa-lock mr-1.5"></i> Journal entry is encrypted with Web Crypto.</span>
                     <button onclick="app.openPinModal('unlock', () => app.inspectDay('${dateStr}', ${JSON.stringify(checkin).replace(/"/g, '&quot;')}))" class="px-2.5 py-1 rounded bg-[#176B50] text-white text-[11px] font-bold">Unlock</button>
                 </div>`;
             }
@@ -1247,7 +1317,7 @@ class WellnessApp {
                         </div>
                     </div>
                     <div>
-                        <span class="text-gray-500 text-[10px] uppercase font-bold block mb-1.5">Influences Tagged</span>
+                        <span class="text-gray-500 text-[10px] uppercase font-bold block mb-1.5">Context Tags</span>
                         <div class="flex flex-wrap gap-1.5">
                             ${(checkin.tags || []).map(t => `<span class="px-2.5 py-0.5 rounded-full bg-gray-200 dark:bg-gray-800 text-[11px] font-medium">${t}</span>`).join('') || '<span class="text-gray-400">None</span>'}
                         </div>
@@ -1331,6 +1401,151 @@ class WellnessApp {
     }
 
     // -----------------------------------------------------------------
+    // Early Support Detection (Transparent Local Rules Engine)
+    // -----------------------------------------------------------------
+    async checkInterventions() {
+        if (this.dismissedInterventionsToday) return;
+
+        const checkins = await this.db.getAllCheckIns();
+        checkins.sort((a, b) => b.date.localeCompare(a.date));
+
+        if (checkins.length < 3) return;
+
+        const banner = document.getElementById('gentleInterventionBanner');
+        if (!banner) return;
+
+        const last3 = checkins.slice(0, 3);
+        const highStressCount = last3.filter(c => c.stress >= 7).length;
+        const lowMoodCount = last3.filter(c => c.mood === 'Low' || c.mood === 'Overwhelmed').length;
+        const poorSleepCount = last3.filter(c => c.sleep === 'Poor').length;
+
+        if (highStressCount >= 3) {
+            banner.classList.remove('hidden');
+            banner.innerHTML = `
+                <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3.5 text-xs">
+                    <i class="fa-solid fa-heart-pulse text-amber-500 text-xl mt-0.5"></i>
+                    <div class="flex-1 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <h5 class="font-bold text-sm text-amber-900 dark:text-amber-200">Gentle Support Suggestion</h5>
+                            <button onclick="app.dismissIntervention()" class="text-amber-700 dark:text-amber-300 hover:underline text-[11px] font-semibold">Dismiss for today</button>
+                        </div>
+                        <p class="text-amber-800 dark:text-amber-300 leading-relaxed">
+                            It looks like you've been managing heavy pressure over the past several days. Consider taking a breather or speaking with someone you trust.
+                        </p>
+                        <div class="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/20 text-[11px] text-amber-900 dark:text-amber-200">
+                            <strong>Why you are seeing this:</strong> Your reported stress was rated 7 or higher over 3 consecutive check-ins. This is a non-diagnostic observation calculated 100% on your device.
+                        </div>
+                        <div class="flex flex-wrap gap-2 pt-1">
+                            <button onclick="app.openBoxBreathingModal()" class="px-3.5 py-1.5 rounded-xl bg-[#176B50] text-white font-bold text-[11px]"><i class="fa-solid fa-wind mr-1"></i> Box Breathing (2m)</button>
+                            <button onclick="app.openSOSModal()" class="px-3.5 py-1.5 rounded-xl border border-amber-500/40 text-amber-900 dark:text-amber-100 font-bold text-[11px]"><i class="fa-solid fa-user-group mr-1"></i> Reach Out to Friend / Counselor</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (lowMoodCount >= 3) {
+            banner.classList.remove('hidden');
+            banner.innerHTML = `
+                <div class="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-start gap-3.5 text-xs">
+                    <i class="fa-solid fa-hand-holding-heart text-indigo-400 text-xl mt-0.5"></i>
+                    <div class="flex-1 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <h5 class="font-bold text-sm text-indigo-900 dark:text-indigo-200">You Don't Have to Carry This Alone</h5>
+                            <button onclick="app.dismissIntervention()" class="text-indigo-700 dark:text-indigo-300 hover:underline text-[11px] font-semibold">Dismiss for today</button>
+                        </div>
+                        <p class="text-indigo-800 dark:text-indigo-300 leading-relaxed">
+                            Hostel life can feel isolating when energy is depleted. Free, confidential support through Tele-MANAS (14416) or our campus counseling desk is always judgment-free.
+                        </p>
+                        <div class="p-2.5 rounded-xl bg-indigo-500/15 border border-indigo-500/20 text-[11px] text-indigo-900 dark:text-indigo-200">
+                            <strong>Why you are seeing this:</strong> Your mood was marked as Low or Overwhelmed on 3 consecutive check-ins.
+                        </div>
+                        <div class="flex flex-wrap gap-2 pt-1">
+                            <a href="tel:14416" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-[11px]"><i class="fa-solid fa-phone mr-1"></i> Call Tele-MANAS (14416)</a>
+                            <button onclick="app.navTo('counselor')" class="px-3.5 py-1.5 rounded-xl border border-indigo-500/40 text-indigo-900 dark:text-indigo-100 font-bold text-[11px]">Book Campus Counselor</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (poorSleepCount >= 3) {
+            banner.classList.remove('hidden');
+            banner.innerHTML = `
+                <div class="p-4 rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-start gap-3.5 text-xs">
+                    <i class="fa-solid fa-moon text-teal-500 text-xl mt-0.5"></i>
+                    <div class="flex-1 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <h5 class="font-bold text-sm text-teal-900 dark:text-teal-200">Rest & Sleep Notice</h5>
+                            <button onclick="app.dismissIntervention()" class="text-teal-700 dark:text-teal-300 hover:underline text-[11px] font-semibold">Dismiss for today</button>
+                        </div>
+                        <p class="text-teal-800 dark:text-teal-300 leading-relaxed">
+                            Consecutive nights of fragmented sleep can compound hostel fatigue. Reflecting on bedtime screen habits or requesting quieter corridor hours may help.
+                        </p>
+                        <div class="p-2.5 rounded-xl bg-teal-500/15 border border-teal-500/20 text-[11px] text-teal-900 dark:text-teal-200">
+                            <strong>Why you are seeing this:</strong> Sleep quality was recorded as Poor over your last 3 check-ins.
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            banner.classList.add('hidden');
+        }
+    }
+
+    dismissIntervention() {
+        this.dismissedInterventionsToday = true;
+        document.getElementById('gentleInterventionBanner')?.classList.add('hidden');
+        this.showToast('Support suggestion dismissed for today.', 'info');
+    }
+
+    // -----------------------------------------------------------------
+    // Trusted Contact Support & SOS
+    // -----------------------------------------------------------------
+    async loadTrustedContactUI() {
+        const contact = await this.db.getTrustedContact();
+        const displayEl = document.getElementById('trustedContactDisplay');
+        if (!displayEl) return;
+
+        if (contact) {
+            displayEl.innerHTML = `
+                <div class="p-3 rounded-xl bg-[#D5EBDD]/40 dark:bg-[#1C332A] border border-[#176B50]/30 flex items-center justify-between text-xs">
+                    <div>
+                        <div class="font-bold text-[#176B50] dark:text-[#A8D5BA]">${contact.name} (${contact.relationship})</div>
+                        <div class="text-[11px] text-gray-500">${contact.phone}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="tel:${contact.phone}" class="px-3 py-1.5 rounded-xl bg-[#176B50] text-white font-bold text-xs"><i class="fa-solid fa-phone mr-1"></i> Call</a>
+                        <button onclick="app.promptEditTrustedContact()" class="text-gray-400 hover:text-gray-600 p-1"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                </div>
+            `;
+        } else {
+            displayEl.innerHTML = `
+                <button onclick="app.promptEditTrustedContact()" class="w-full py-2.5 px-3 rounded-xl border border-dashed border-[#176B50]/30 hover:border-[#176B50] text-[11px] font-bold text-[#176B50] dark:text-[#A8D5BA] transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-plus text-xs"></i> Set Trusted Hostel Friend / Sibling Contact
+                </button>
+            `;
+        }
+    }
+
+    async promptEditTrustedContact() {
+        const name = prompt('Enter Trusted Contact Name (e.g. Roommate Aarav, Sibling):');
+        if (!name) return;
+        const phone = prompt('Enter Phone Number:');
+        if (!phone) return;
+        const relationship = prompt('Relationship (e.g. Roommate, Best Friend, Family):', 'Roommate') || 'Peer';
+
+        await this.db.saveTrustedContact({ name, phone, relationship, updated_at: new Date().toISOString() });
+        this.showToast('Trusted contact saved on this device.', 'success');
+        this.loadTrustedContactUI();
+    }
+
+    openSOSModal() {
+        document.getElementById('sosEmergencyModal')?.classList.remove('hidden');
+    }
+
+    closeSOSModal() {
+        document.getElementById('sosEmergencyModal')?.classList.add('hidden');
+    }
+
+    // -----------------------------------------------------------------
     // Counselor Booking Prototype (Anonymous Alias)
     // -----------------------------------------------------------------
     generateRandomAlias() {
@@ -1343,7 +1558,6 @@ class WellnessApp {
         if (aliasField) {
             aliasField.textContent = this.generateRandomAlias();
         }
-        // Set min date to tomorrow
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const dateInput = document.getElementById('bookingDateInput');
@@ -1380,10 +1594,8 @@ class WellnessApp {
             created_at: new Date().toISOString()
         };
 
-        // Save into local IndexedDB
         await this.db.saveAppointment(localApt);
 
-        // Also submit to Flask backend /api/wellness/appointments so the campus counselor dashboard syncs!
         try {
             await fetch('/api/wellness/appointments', {
                 method: 'POST',
@@ -1397,10 +1609,9 @@ class WellnessApp {
                 })
             });
         } catch (err) {
-            console.log('Backend sync note (running offline or unauth):', err);
+            console.log('Backend sync note (running offline):', err);
         }
 
-        // Show confirmation modal
         document.getElementById('bookingConfirmRef').textContent = bookingRef;
         document.getElementById('bookingConfirmDate').textContent = `${date} at ${slot}`;
         document.getElementById('bookingConfirmAlias').textContent = alias;
@@ -1435,61 +1646,12 @@ class WellnessApp {
     }
 
     // -----------------------------------------------------------------
-    // Gentle Interventions & Grounding Tools
+    // Grounding Modals
     // -----------------------------------------------------------------
-    async checkInterventions() {
-        const checkins = await this.db.getAllCheckIns();
-        checkins.sort((a, b) => b.date.localeCompare(a.date));
-
-        if (checkins.length < 3) return;
-
-        const banner = document.getElementById('gentleInterventionBanner');
-        if (!banner) return;
-
-        const last3 = checkins.slice(0, 3);
-        const highStressCount = last3.filter(c => c.stress >= 7).length;
-        const lowMoodCount = last3.filter(c => c.mood === 'Sad' || c.mood === 'Overwhelmed').length;
-
-        if (highStressCount >= 3) {
-            banner.classList.remove('hidden');
-            banner.innerHTML = `
-                <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3 text-xs">
-                    <i class="fa-solid fa-heart-pulse text-amber-500 text-lg mt-0.5"></i>
-                    <div class="flex-1 space-y-1">
-                        <h5 class="font-bold text-amber-900 dark:text-amber-200">Gentle Check-In: Stress Notice</h5>
-                        <p class="text-amber-800 dark:text-amber-300">Your logs show high strain over the past 3 days. Would you like to take a 2-minute breath break or speak with campus counselor Dr. Sharma?</p>
-                        <div class="flex gap-2 pt-1">
-                            <button onclick="app.openBoxBreathingModal()" class="px-3 py-1 rounded-lg bg-[#176B50] text-white font-bold text-[11px]">Start Box Breathing</button>
-                            <button onclick="app.navTo('counselor')" class="px-3 py-1 rounded-lg border border-amber-500/40 text-amber-800 dark:text-amber-200 font-bold text-[11px]">Counselor Support</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        } else if (lowMoodCount >= 3) {
-            banner.classList.remove('hidden');
-            banner.innerHTML = `
-                <div class="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-start gap-3 text-xs">
-                    <i class="fa-solid fa-hand-holding-heart text-indigo-400 text-lg mt-0.5"></i>
-                    <div class="flex-1 space-y-1">
-                        <h5 class="font-bold text-indigo-900 dark:text-indigo-200">You don't have to carry this alone</h5>
-                        <p class="text-indigo-800 dark:text-indigo-300">It's completely okay not to feel okay. Confidential support via Tele-MANAS (14416) or campus counseling is always judgment-free and 100% private.</p>
-                        <div class="flex gap-2 pt-1">
-                            <a href="tel:14416" class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-[11px]"><i class="fa-solid fa-phone mr-1"></i> Call Tele-MANAS (14416)</a>
-                            <button onclick="app.openGroundingModal()" class="px-3 py-1 rounded-lg border border-indigo-500/40 text-indigo-800 dark:text-indigo-200 font-bold text-[11px]">5-4-3-2-1 Grounding</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        } else {
-            banner.classList.add('hidden');
-        }
-    }
-
     openBoxBreathingModal() {
         const modal = document.getElementById('boxBreathingModal');
         modal.classList.remove('hidden');
 
-        // Start 4-4-4-4 cycle sequence
         const promptText = document.getElementById('breathingStepText');
         const timerText = document.getElementById('breathingTimerText');
 
@@ -1543,12 +1705,12 @@ class WellnessApp {
         if (pinStatusEl) {
             pinStatusEl.innerHTML = pinHash
                 ? '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-shield-halved"></i> Active & Encrypted (PBKDF2 + AES-GCM 256)</span>'
-                : '<span class="text-amber-600 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Not Set (Guest Local Mode)</span>';
+                : '<span class="text-amber-600 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Not Set (Local Storage Mode)</span>';
         }
 
         const countsEl = document.getElementById('vaultItemCountsText');
         if (countsEl) {
-            countsEl.textContent = `${checkins.length} check-in logs, ${journals.length} journal notes stored in on-device IndexedDB.`;
+            countsEl.textContent = `${checkins.length} check-in logs, ${journals.length} journal notes stored in on-device IndexedDB via Dexie.js.`;
         }
 
         const autoLockSelect = document.getElementById('vaultAutoLockSelect');
@@ -1589,7 +1751,8 @@ class WellnessApp {
         const appointments = await this.db.getAllAppointments();
 
         const payload = JSON.stringify({
-            version: '1.0',
+            version: '2.0',
+            engine: 'Dexie_WebCrypto',
             exported_at: new Date().toISOString(),
             checkins,
             journals,
@@ -1676,15 +1839,15 @@ class WellnessApp {
 
         const today = new Date();
         const sampleEntries = [
-            { dayOffset: 9, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Academics', 'Friendships'], note: 'Spent peaceful evening at hostel terrace reading.' },
-            { dayOffset: 8, mood: 'Happy', stress: 2, sleep: 'Excellent', tags: ['Friendships', 'Personal Growth'], note: 'Great conversation with my roommate, felt very supportive.' },
-            { dayOffset: 7, mood: 'Stressed', stress: 7, sleep: 'Average', tags: ['Exams', 'Academics'], note: 'Mid-term prep started. Too much syllabus to cover.' },
-            { dayOffset: 6, mood: 'Overwhelmed', stress: 8, sleep: 'Poor', tags: ['Exams', 'Roommates'], note: 'Noisy corridor, could not sleep past 2 AM.' },
-            { dayOffset: 5, mood: 'Stressed', stress: 8, sleep: 'Poor', tags: ['Exams', 'Financial Concerns'], note: 'Stress peak before the algorithms quiz.' },
-            { dayOffset: 4, mood: 'Okay', stress: 5, sleep: 'Average', tags: ['Exams'], note: 'Quiz finished. Relieved that it is over.' },
-            { dayOffset: 3, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Homesickness', 'Family'], note: 'Called mom, felt much more grounded afterwards.' },
-            { dayOffset: 2, mood: 'Happy', stress: 2, sleep: 'Good', tags: ['Friendships'], note: 'Mess food was actually delicious tonight, had fun with friends.' },
-            { dayOffset: 1, mood: 'Calm', stress: 4, sleep: 'Good', tags: ['Personal Growth', 'Academics'], note: 'Productive study session in the library.' }
+            { dayOffset: 9, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Academics', 'Friendships'], note: 'Quiet evening reading in my hostel room.' },
+            { dayOffset: 8, mood: 'Happy', stress: 2, sleep: 'Excellent', tags: ['Friendships', 'Personal'], note: 'Roommate made tea, felt very supportive.' },
+            { dayOffset: 7, mood: 'Stressed', stress: 7, sleep: 'Average', tags: ['Exams', 'Academics'], note: 'Mid-term revision week began. Lots of content.' },
+            { dayOffset: 6, mood: 'Overwhelmed', stress: 8, sleep: 'Poor', tags: ['Exams', 'Roommates'], note: 'Noisy corridor, woke up multiple times.' },
+            { dayOffset: 5, mood: 'Stressed', stress: 8, sleep: 'Poor', tags: ['Exams', 'Finances'], note: 'Late night study group before lab submission.' },
+            { dayOffset: 4, mood: 'Okay', stress: 5, sleep: 'Average', tags: ['Exams'], note: 'Algorithms test completed. Feeling relief.' },
+            { dayOffset: 3, mood: 'Low', stress: 4, sleep: 'Average', tags: ['Homesickness', 'Family'], note: 'Missing home cooked meals today.' },
+            { dayOffset: 2, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Family', 'Personal'], note: 'Video call with parents restored my calm.' },
+            { dayOffset: 1, mood: 'Happy', stress: 2, sleep: 'Good', tags: ['Friendships'], note: 'Celebrated a project milestone with wingmates.' }
         ];
 
         for (const s of sampleEntries) {
@@ -1718,7 +1881,7 @@ class WellnessApp {
             });
         }
 
-        this.showToast('✨ 10-day historical demo data populated into local IndexedDB!', 'success');
+        this.showToast('✨ 10-day historical demo data populated into local Dexie IndexedDB!', 'success');
         this.navTo('insights');
     }
 
@@ -1742,7 +1905,6 @@ class WellnessApp {
         localStorage.setItem('mann_theme', isDark ? 'dark' : 'light');
         this.showToast(isDark ? '🌙 Switched to Calm Dark Theme' : '☀️ Switched to Soft Light Theme', 'info');
 
-        // Re-render charts with updated theme text colors if in insights
         if (this.currentView === 'insights') {
             this.renderInsights();
         }
@@ -1778,7 +1940,6 @@ class WellnessApp {
     }
 }
 
-// Global Application Instance
 const app = new WellnessApp();
 document.addEventListener('DOMContentLoaded', () => {
     app.init();
