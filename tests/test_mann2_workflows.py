@@ -434,5 +434,24 @@ class TestMann2Workflows(unittest.TestCase):
         self.assertIn('ai_engine', pub_data)
         print(f"[PASS] 10.4: Dynamic public metrics verified")
 
+        # 5. Verify Gemma-4 Mobile/Web Interactive Chat
+        chat_res = self.client.post('/api/gema4/chat',
+                                    data=json.dumps({'message': 'What is the curfew time?'}),
+                                    content_type='application/json')
+        self.assertEqual(chat_res.status_code, 200)
+        chat_data = chat_res.get_json()
+        self.assertIn('10:00 PM', chat_data['response'])
+        print(f"[PASS] 10.5: Gemma-4 interactive mobile/web chat query verified")
+
+        # 6. Verify Gemma-4 AI Complaint Polish Assist
+        assist_res = self.client.post('/api/gema4/assist-complaint',
+                                      data=json.dumps({'text': 'fan making loud vibrating sound and getting very hot'}),
+                                      content_type='application/json')
+        self.assertEqual(assist_res.status_code, 200)
+        assist_data = assist_res.get_json()
+        self.assertEqual(assist_data['suggested_category'], 'Electrical')
+        self.assertIn('gema4_triage', assist_data)
+        print(f"[PASS] 10.6: Gemma-4 AI auto-draft and polish assist verified")
+
 if __name__ == '__main__':
     unittest.main()

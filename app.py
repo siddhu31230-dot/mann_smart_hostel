@@ -971,6 +971,29 @@ def run_gema4_triage():
     analysis = gema4.triage_complaint(title, desc, cat, urgency)
     return jsonify({'gema4_analysis': analysis})
 
+@app.route('/api/gema4/chat', methods=['POST'])
+def gema4_chat_endpoint():
+    """Interactive Gemma-4 conversational intelligence for mobile and desktop"""
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+    message = data.get('message', '').strip()
+    if not message:
+        return jsonify({'error': 'Message cannot be empty', 'code': 'VALIDATION_ERROR'}), 400
+    role = user['role'] if user else 'student'
+    name = user['full_name'] if user else 'Resident'
+    reply = gema4.chat(message, user_role=role, user_name=name)
+    return jsonify(reply)
+
+@app.route('/api/gema4/assist-complaint', methods=['POST'])
+def gema4_assist_complaint():
+    """Gemma-4 automated ticket polishing and categorization"""
+    data = request.get_json(silent=True) or {}
+    text = data.get('text', '').strip()
+    if not text:
+        return jsonify({'error': 'Input text is required', 'code': 'VALIDATION_ERROR'}), 400
+    res = gema4.assist_complaint_draft(text)
+    return jsonify(res)
+
 @app.route('/api/public-metrics', methods=['GET'])
 def get_public_metrics():
     """Live metrics for the landing page hero ribbon computed directly from SQLite"""

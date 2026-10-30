@@ -1385,7 +1385,22 @@
             <button onclick="app.closeModal('submitComplaintModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-lg font-bold text-[#fefae0]">Lodge Maintenance Ticket</h3>
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-[#fefae0]">Lodge Maintenance Ticket</h3>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#52b788]/20 text-[#52b788] font-mono font-bold">Gemma-4 Triage</span>
+            </div>
+
+            <!-- Gemma-4 AI Auto-Fill / Polish Banner -->
+            <div class="p-2.5 rounded-xl bg-[#143528]/80 border border-[#52b788]/30 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-1.5 text-[#52b788] font-bold">
+                    <i class="fa-solid fa-sparkles text-[#faedcd]"></i>
+                    <span>Gemma-4 AI Drafter</span>
+                </div>
+                <button type="button" onclick="app.aiAssistComplaintPrompt()" class="px-2.5 py-1 rounded-lg bg-[#2d6a4f] hover:bg-[#40916c] text-[11px] font-semibold text-[#fefae0] transition flex items-center gap-1">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Polish with Gemma-4
+                </button>
+            </div>
+
             <form onsubmit="app.handleCreateComplaint(event)" class="space-y-3">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -1866,6 +1881,110 @@
                 </button>
             </form>
         </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MOBILE BOTTOM NAVIGATION BAR (md:hidden)  -->
+    <!-- ========================================== -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0f281e]/95 backdrop-blur-lg border-t border-[#52b788]/20 flex items-center justify-around py-2 px-2 text-[10px] text-[#8fb89e] shadow-2xl">
+        <button onclick="app.mobileNavTo('home')" class="flex flex-col items-center gap-1 hover:text-[#52b788] transition px-2 py-1">
+            <i class="fa-solid fa-house text-base"></i>
+            <span>Home</span>
+        </button>
+        <button onclick="app.mobileNavTo('complaints')" class="flex flex-col items-center gap-1 hover:text-[#52b788] transition px-2 py-1">
+            <i class="fa-solid fa-wrench text-base"></i>
+            <span>Tickets</span>
+        </button>
+        <!-- Center Gemma-4 AI Hub Button -->
+        <button onclick="app.toggleGema4Chat()" class="flex flex-col items-center -mt-6 transition group">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#1b4332] via-[#2d6a4f] to-[#52b788] flex items-center justify-center text-[#faedcd] text-xl shadow-lg shadow-[#52b788]/30 border-2 border-[#52b788] group-hover:scale-110 active:scale-95 transition">
+                <i class="fa-solid fa-sparkles animate-pulse"></i>
+            </div>
+            <span class="font-bold text-[#52b788] text-[10px] mt-0.5">Gemma-4</span>
+        </button>
+        <button onclick="app.mobileNavTo('mess')" class="flex flex-col items-center gap-1 hover:text-[#52b788] transition px-2 py-1">
+            <i class="fa-solid fa-utensils text-base"></i>
+            <span>Mess</span>
+        </button>
+        <button onclick="app.mobileNavTo('leaves')" class="flex flex-col items-center gap-1 hover:text-[#52b788] transition px-2 py-1">
+            <i class="fa-solid fa-passport text-base"></i>
+            <span>Out-Pass</span>
+        </button>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- FLOATING GEMMA-4 AI BUTTON (DESKTOP & MOB) -->
+    <!-- ========================================== -->
+    <button id="gema4FloatingBtn" onclick="app.toggleGema4Chat()" class="fixed z-40 bottom-20 md:bottom-6 right-4 md:right-6 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#1b4332] via-[#2d6a4f] to-[#52b788] border border-[#52b788]/50 shadow-2xl shadow-[#52b788]/30 text-[#fefae0] text-xs font-bold flex items-center gap-2 hover:scale-105 active:scale-95 transition group" title="Open Gemma-4 AI Assistant">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#faedcd] animate-ping"></span>
+        <i class="fa-solid fa-sparkles text-[#faedcd] text-sm"></i>
+        <span>Gemma-4 AI</span>
+        <span class="hidden lg:inline text-[9px] px-1.5 py-0.5 rounded bg-black/30 text-[#8fb89e] font-mono">Open-Source</span>
+    </button>
+
+    <!-- ========================================== -->
+    <!-- GEMMA-4 CONVERSATIONAL AI DRAWER / MODAL   -->
+    <!-- ========================================== -->
+    <div id="gema4ChatModal" class="fixed inset-x-0 bottom-0 sm:inset-auto sm:right-6 sm:bottom-6 z-50 hidden flex flex-col sm:w-[400px] h-[85vh] sm:h-[560px] forest-card rounded-t-3xl sm:rounded-3xl border border-[#52b788]/40 shadow-2xl backdrop-blur-xl transition-all duration-300">
+        
+        <!-- Header -->
+        <div class="p-3.5 sm:p-4 border-b border-[#52b788]/20 flex items-center justify-between bg-[#0f281e]/90 rounded-t-3xl">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1b4332] to-[#52b788] flex items-center justify-center text-[#faedcd] text-sm shadow border border-[#52b788]/40">
+                    <i class="fa-solid fa-sparkles"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-sm text-[#fefae0]">Gemma-4 AI Companion</span>
+                        <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">Local</span>
+                    </div>
+                    <p class="text-[10px] text-[#8fb89e] leading-tight">Campus Housing & Policy Intelligence</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-1">
+                <button onclick="app.toggleGema4Chat()" class="w-7 h-7 rounded-lg hover:bg-[#143528] flex items-center justify-center text-[#8fb89e] hover:text-[#fefae0]">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Chips Bar (Horizontal Scrollable) -->
+        <div class="p-2 border-b border-[#52b788]/10 bg-[#0a1711]/50 flex gap-1.5 overflow-x-auto text-[11px] scrollbar-none">
+            <button onclick="app.sendGema4QuickPrompt('What is the hostel curfew and gate time?')" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] whitespace-nowrap transition">
+                🌙 Curfew & Rules
+            </button>
+            <button onclick="app.sendGema4QuickPrompt('What are the meal timings and menu?')" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] whitespace-nowrap transition">
+                🍽️ Mess Menu
+            </button>
+            <button onclick="app.sendGema4QuickPrompt('How do I apply for leave out-pass?')" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] whitespace-nowrap transition">
+                🎒 Leave Pass
+            </button>
+            <button onclick="app.sendGema4QuickPrompt('What are the emergency contact numbers?')" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] whitespace-nowrap transition">
+                🚨 Emergency
+            </button>
+        </div>
+
+        <!-- Messages Stream -->
+        <div id="gema4MessagesContainer" class="flex-1 p-3.5 space-y-3 overflow-y-auto text-xs scrollbar-none">
+            <!-- Initial AI Greeting Bubble -->
+            <div class="flex items-start gap-2.5">
+                <div class="w-6 h-6 rounded-lg bg-[#1b4332] flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
+                    <i class="fa-solid fa-sparkles"></i>
+                </div>
+                <div class="p-3 rounded-2xl rounded-tl-sm bg-[#0f281e] border border-[#52b788]/20 text-[#fefae0] leading-relaxed max-w-[85%] shadow-sm">
+                    <p class="font-semibold text-[#52b788] text-[11px] mb-1">Gemma-4 On-Device Intelligence</p>
+                    Hello! I'm Gemma-4, your open-source hostel assistant. How can I help you today? You can ask about curfew rules, mess dining, maintenance repairs, or campus emergency hotlines.
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Box -->
+        <form id="gema4ChatForm" onsubmit="app.handleGema4ChatSubmit(event)" class="p-3 border-t border-[#52b788]/20 bg-[#0f281e]/90 flex items-center gap-2">
+            <input type="text" id="gema4ChatInput" placeholder="Ask Gemma-4 anything..." autocomplete="off" class="flex-1 bg-[#143528] border border-[#52b788]/30 rounded-xl px-3.5 py-2.5 text-xs text-[#fefae0] placeholder-[#8fb89e]/60 focus:outline-none focus:border-[#52b788]">
+            <button type="submit" id="gema4SendBtn" class="w-9 h-9 rounded-xl btn-forest-primary flex items-center justify-center text-sm shadow-md flex-shrink-0">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
     </div>
 
     <!-- Application Controller JS -->

@@ -2223,6 +2223,163 @@ const app = {
         if (nav) nav.classList.toggle('hidden');
     },
 
+    // ==========================================
+    // GEMMA-4 MOBILE & DESKTOP AI CONTROLLER
+    // ==========================================
+    toggleGema4Chat() {
+        const modal = document.getElementById('gema4ChatModal');
+        if (!modal) return;
+        const isHidden = modal.classList.toggle('hidden');
+        if (!isHidden) {
+            const input = document.getElementById('gema4ChatInput');
+            if (input) setTimeout(() => input.focus(), 150);
+            this.scrollGema4ToBottom();
+        }
+    },
+
+    scrollGema4ToBottom() {
+        const c = document.getElementById('gema4MessagesContainer');
+        if (c) c.scrollTop = c.scrollHeight;
+    },
+
+    sendGema4QuickPrompt(promptText) {
+        const input = document.getElementById('gema4ChatInput');
+        if (input) {
+            input.value = promptText;
+            document.getElementById('gema4ChatForm').requestSubmit();
+        }
+    },
+
+    async handleGema4ChatSubmit(e) {
+        e.preventDefault();
+        const input = document.getElementById('gema4ChatInput');
+        const container = document.getElementById('gema4MessagesContainer');
+        const message = input.value.trim();
+        if (!message) return;
+
+        // Add user message bubble
+        const userBubble = document.createElement('div');
+        userBubble.className = 'flex justify-end';
+        userBubble.innerHTML = `
+            <div class="p-3 rounded-2xl rounded-tr-sm bg-[#2d6a4f] text-[#fefae0] max-w-[85%] shadow-sm">
+                ${message}
+            </div>
+        `;
+        container.appendChild(userBubble);
+        input.value = '';
+        this.scrollGema4ToBottom();
+
+        // Add loading indicator bubble
+        const loadingBubble = document.createElement('div');
+        loadingBubble.className = 'flex items-start gap-2.5';
+        loadingBubble.id = 'gema4ThinkingBubble';
+        loadingBubble.innerHTML = `
+            <div class="w-6 h-6 rounded-lg bg-[#1b4332] flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
+                <i class="fa-solid fa-sparkles animate-spin"></i>
+            </div>
+            <div class="p-3 rounded-2xl rounded-tl-sm bg-[#0f281e] border border-[#52b788]/20 text-[#8fb89e] text-xs">
+                Gemma-4 is thinking...
+            </div>
+        `;
+        container.appendChild(loadingBubble);
+        this.scrollGema4ToBottom();
+
+        try {
+            const res = await fetch('/api/gema4/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await res.json();
+            const thinking = document.getElementById('gema4ThinkingBubble');
+            if (thinking) thinking.remove();
+
+            const aiBubble = document.createElement('div');
+            aiBubble.className = 'flex items-start gap-2.5';
+            
+            let replyText = (data.response || 'I am processing your campus inquiry.')
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/\n/g, '<br>');
+
+            aiBubble.innerHTML = `
+                <div class="w-6 h-6 rounded-lg bg-[#1b4332] flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
+                    <i class="fa-solid fa-sparkles"></i>
+                </div>
+                <div class="p-3 rounded-2xl rounded-tl-sm bg-[#0f281e] border border-[#52b788]/20 text-[#fefae0] leading-relaxed max-w-[85%] shadow-sm">
+                    <div class="flex items-center justify-between text-[10px] text-[#52b788] mb-1 font-mono">
+                        <span>${data.engine || 'Gemma-4'}</span>
+                        <span class="text-[#8fb89e]">${data.timestamp || ''}</span>
+                    </div>
+                    <div>${replyText}</div>
+                </div>
+            `;
+            container.appendChild(aiBubble);
+            this.scrollGema4ToBottom();
+
+        } catch (err) {
+            const thinking = document.getElementById('gema4ThinkingBubble');
+            if (thinking) thinking.remove();
+
+            const errBubble = document.createElement('div');
+            errBubble.className = 'p-2.5 rounded-xl bg-rose-950/20 text-rose-300 text-xs border border-rose-800/40';
+            errBubble.textContent = 'Gemma-4 offline or busy. Please try again.';
+            container.appendChild(errBubble);
+            this.scrollGema4ToBottom();
+        }
+    },
+
+    async aiAssistComplaintPrompt() {
+        const titleInput = document.getElementById('complaintTitle');
+        const descInput = document.getElementById('complaintDescription');
+        const catSelect = document.getElementById('complaintCategory');
+        const urgSelect = document.getElementById('complaintUrgency');
+
+        const currentText = (descInput.value.trim() || titleInput.value.trim() || prompt('Briefly describe your maintenance issue (e.g. fan vibrating, tap leaking, no wifi):') || '').trim();
+        if (!currentText) return;
+
+        this.showToast('Gemma-4 is analyzing and auto-drafting ticket...', 'info');
+
+        try {
+            const res = await fetch('/api/gema4/assist-complaint', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: currentText })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                if (titleInput) titleInput.value = data.suggested_title;
+                if (descInput) descInput.value = data.suggested_description;
+                if (catSelect && data.suggested_category) catSelect.value = data.suggested_category;
+                if (urgSelect && data.suggested_urgency) urgSelect.value = data.suggested_urgency;
+
+                const triage = data.gema4_triage || {};
+                this.showToast(`✨ Gemma-4 Polish applied! Target SLA: ${triage.recommended_sla_hours || 8}h (${triage.hazard_level || 'Normal'})`, 'success');
+            }
+        } catch (e) {
+            this.showToast('Gemma-4 drafting assist unavailable', 'error');
+        }
+    },
+
+    mobileNavTo(section) {
+        if (!this.currentUser) {
+            if (section === 'home') this.navigateTo('landing');
+            else this.openStudentLoginModal();
+            return;
+        }
+
+        if (this.currentUser.role === 'student') {
+            if (section === 'home') this.navigateToStudentSubTab('my-room');
+            else if (section === 'complaints') this.navigateToStudentSubTab('complaints');
+            else if (section === 'mess') this.navigateToStudentSubTab('mess');
+            else if (section === 'leaves') this.navigateToStudentSubTab('leaves');
+        } else {
+            if (section === 'home') this.navigateToAdminSubTab('admin-overview');
+            else if (section === 'complaints') this.navigateToAdminSubTab('admin-complaints');
+            else if (section === 'mess') this.navigateToAdminSubTab('admin-mess');
+            else if (section === 'leaves') this.navigateToAdminSubTab('admin-leaves');
+        }
+    },
+
     setupEventListeners() {
         // Complaint listeners
         const cSearch = document.getElementById('complaintSearchInput');
