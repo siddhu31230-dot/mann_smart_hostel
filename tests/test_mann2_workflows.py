@@ -386,5 +386,53 @@ class TestMann2Workflows(unittest.TestCase):
         self.assertTrue(any(a['id'] == appt_id for a in counsellor_view.get_json()['appointments']))
         print(f"\n[PASS] 9: MANN Care wellness privacy vault strictly enforced")
 
+    # ---------------------------------------------------------------
+    # EXTRA 10: GEMA-4 Open-Source Intelligence & Analytics Engine
+    # ---------------------------------------------------------------
+    def test_gema4_ai_intelligence_and_analytics(self):
+        """Test GEMA-4 model spec, live NLP triage, public metrics, and admin analytics"""
+        # 1. Verify GEMA-4 Model Specification & Open Source License
+        info_res = self.client.get('/api/gema4/info')
+        self.assertEqual(info_res.status_code, 200)
+        info = info_res.get_json()
+        self.assertIn("GEMA-4", info['model_name'])
+        self.assertIn("Apache 2.0", info['license'])
+        print(f"\n[PASS] 10.1: GEMA-4 open-source model verified ({info['model_name']})")
+
+        # 2. Verify GEMA-4 AI Triage for High Hazard Issue
+        triage_res = self.client.post('/api/gema4/triage',
+                                      data=json.dumps({
+                                          'title': 'Bathroom heater sparking vigorously',
+                                          'description': 'Sparking occurs near main wall wire switch',
+                                          'category': 'Electrical',
+                                          'urgency': 'Emergency'
+                                      }),
+                                      content_type='application/json')
+        self.assertEqual(triage_res.status_code, 200)
+        triage = triage_res.get_json()['gema4_analysis']
+        self.assertEqual(triage['hazard_level'], 'High Critical Hazard')
+        self.assertLessEqual(triage['recommended_sla_hours'], 2)
+        print(f"[PASS] 10.2: GEMA-4 live NLP triage accurately detected High Critical Hazard (SLA: {triage['recommended_sla_hours']}h)")
+
+        # 3. Verify Live Dynamic Admin Analytics powered by GEMA-4
+        self.login('ADMIN-001', 'Admin@123', portal='admin')
+        analytics_res = self.client.get('/api/admin/analytics')
+        self.assertEqual(analytics_res.status_code, 200)
+        analytics = analytics_res.get_json()['analytics']
+        self.assertIn('complaints_by_category', analytics)
+        self.assertIn('occupancy_by_block', analytics)
+        self.assertIn('gema4_sentiment', analytics)
+        self.assertIn('gema4_occupancy_forecast', analytics)
+        self.assertGreaterEqual(analytics['gema4_sentiment']['sentiment_score'], 70.0)
+        print(f"[PASS] 10.3: GEMA-4 live operational analytics & forecasting verified")
+
+        # 4. Verify Public Hero Metrics
+        pub_res = self.client.get('/api/public-metrics')
+        self.assertEqual(pub_res.status_code, 200)
+        pub_data = pub_res.get_json()
+        self.assertIn('occupancy_rate', pub_data)
+        self.assertIn('ai_engine', pub_data)
+        print(f"[PASS] 10.4: Dynamic public metrics verified")
+
 if __name__ == '__main__':
     unittest.main()
