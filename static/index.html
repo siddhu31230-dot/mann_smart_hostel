@@ -81,6 +81,11 @@
 
                 <!-- Right Actions: Theme Toggle + Auth Buttons / Profile -->
                 <div class="flex items-center gap-3">
+                    <!-- Mobile QR Code Modal Trigger -->
+                    <button id="mobileQrBtn" onclick="app.openModal('mobileQrModal')" class="w-9 h-9 rounded-xl bg-[#143528]/80 border border-[#52b788]/20 text-[#8fb89e] hover:text-[#faedcd] flex items-center justify-center transition" title="Open on Mobile Phone (QR Code)">
+                        <i class="fa-solid fa-mobile-screen text-sm"></i>
+                    </button>
+
                     <!-- Light / Dark Theme Switcher -->
                     <button id="themeToggleBtn" onclick="app.toggleTheme()" class="w-9 h-9 rounded-xl bg-[#143528]/80 border border-[#52b788]/20 text-[#8fb89e] hover:text-[#faedcd] flex items-center justify-center transition" title="Toggle Light/Dark Theme">
                         <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
@@ -1880,6 +1885,34 @@
                     Reserve Slot
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MOBILE QR CODE ACCESS MODAL                -->
+    <!-- ========================================== -->
+    <div id="mobileQrModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="forest-card rounded-2xl max-w-sm w-full p-6 space-y-4 border border-[#52b788]/40 shadow-2xl relative text-center">
+            <button onclick="app.closeModal('mobileQrModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-[#1b4332] to-[#52b788] flex items-center justify-center text-[#faedcd] text-xl shadow-lg border border-[#52b788]/30">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-[#fefae0]">Open on Your Mobile Phone</h3>
+                <p class="text-xs text-[#8fb89e] mt-1">Connect your phone to the same Wi-Fi and scan this QR code:</p>
+            </div>
+            <div class="p-3 bg-white rounded-2xl inline-block shadow-inner mx-auto border-4 border-[#2d6a4f]/30">
+                <img src="/static/img/mobile_qr.svg" alt="Mobile Access QR Code" class="w-48 h-48 mx-auto">
+            </div>
+            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/30 text-xs space-y-1">
+                <div class="text-[10px] text-[#8fb89e] uppercase font-bold tracking-wider">Local Network IP</div>
+                <div class="font-mono text-[#52b788] font-bold text-sm select-all">http://10.100.49.92:5050</div>
+            </div>
+            <p class="text-[11px] text-[#8fb89e]">
+                ✨ Fully responsive with sticky bottom navigation & Gemma-4 companion drawer!
+            </p>
         </div>
     </div>
 
