@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANN Smart Hostel OS | Enterprise Campus Housing</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        },
+                        hostel: {
+                            dark: '#0a0d14',
+                            card: '#121722',
+                            border: '#1f293d',
+                            accent: '#3b82f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Font Awesome / Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="h-full flex flex-col bg-[#0a0d14] text-slate-100 font-sans antialiased overflow-x-hidden">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-[#0d121d]/90 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-3">
+                    <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-400 hover:text-white focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-building-user text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-lg tracking-tight text-white">MANN</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold tracking-wider">SMART HOSTEL OS</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 hidden sm:block">Campus Residential & Wellness Management</p>
+                    </div>
+                </div>
+
+                <!-- Quick Role Switcher Bar (QA Tester Friendly) -->
+                <div class="hidden lg:flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+                    <span class="text-[11px] text-slate-400 px-2 font-semibold uppercase tracking-wider">QA Role:</span>
+                    <button onclick="app.quickSwitch('student')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition" data-role="student">Student</button>
+                    <button onclick="app.quickSwitch('warden')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition" data-role="warden">Warden</button>
+                    <button onclick="app.quickSwitch('maintenance')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition" data-role="maintenance">Maintenance</button>
+                    <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition" data-role="mess_manager">Mess Mgr</button>
+                    <button onclick="app.quickSwitch('counsellor')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition" data-role="counsellor">Counsellor</button>
+                    <button onclick="app.quickSwitch('admin')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition" data-role="admin">Admin</button>
+                </div>
+
+                <!-- User Profile & Action -->
+                <div class="flex items-center gap-3">
+                    <div id="userInfoBadge" class="hidden sm:flex items-center gap-2 text-right">
+                        <div>
+                            <div id="userFullName" class="text-sm font-semibold text-slate-200">Loading...</div>
+                            <div id="userRoleBadge" class="text-[11px] font-mono text-blue-400 uppercase">STUDENT</div>
+                        </div>
+                    </div>
+                    <button onclick="app.logout()" class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Role Switcher (Shown on smaller screens) -->
+            <div class="lg:hidden flex overflow-x-auto py-2 gap-1 border-t border-slate-800 text-xs scrollbar-none">
+                <span class="text-[10px] text-slate-400 self-center px-1 font-semibold uppercase">Role:</span>
+                <button onclick="app.quickSwitch('student')" class="role-btn px-2 py-0.5 rounded text-xs whitespace-nowrap" data-role="student">Student</button>
+                <button onclick="app.quickSwitch('warden')" class="role-btn px-2 py-0.5 rounded text-xs whitespace-nowrap" data-role="warden">Warden</button>
+                <button onclick="app.quickSwitch('maintenance')" class="role-btn px-2 py-0.5 rounded text-xs whitespace-nowrap" data-role="maintenance">Maint</button>
+                <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-2 py-0.5 rounded text-xs whitespace-nowrap" data-role="mess_manager">Mess</button>
+                <button onclick="app.quickSwitch('counsellor')" class="role-btn px-2 py-0.5 rounded text-xs whitespace-nowrap" data-role="counsellor">Counsellor</button>
+                <button onclick="app.quickSwitch('admin')" class="role-btn px-2 py-0.5 rounded text-xs whitespace-nowrap" data-role="admin">Admin</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area with Dynamic Tabs -->
+    <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6">
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebarNav" class="w-full md:w-64 flex-shrink-0 space-y-1">
+            <div class="p-3 mb-2 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Current Portal</div>
+                <div id="sidebarPortalName" class="font-bold text-white text-base">Student Portal</div>
+                <div id="sidebarUserSubtext" class="text-xs text-slate-400 mt-0.5">Room A-204 · Bed A</div>
+            </div>
+
+            <nav id="navItemsList" class="space-y-1">
+                <!-- Dynamically populated based on active role -->
+            </nav>
+
+            <!-- Confidentiality Privacy Badge -->
+            <div id="wellnessPrivacyNotice" class="hidden mt-6 p-3.5 rounded-xl bg-purple-950/20 border border-purple-800/40 text-xs">
+                <div class="flex items-center gap-2 text-purple-400 font-bold mb-1">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span>Wellness Privacy Vault</span>
+                </div>
+                <p class="text-purple-300/80 text-[11px] leading-relaxed">
+                    Counseling requests & wellness logs are encrypted and strictly isolated. Wardens, maintenance & staff have zero access.
+                </p>
+            </div>
+        </aside>
+
+        <!-- Main Workspace View Container -->
+        <main class="flex-1 min-w-0">
+            <!-- Toast container for live alerts -->
+            <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
+
+            <!-- VIEW: Complaints Redressal -->
+            <section id="view-complaints" class="view-panel space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                    <div>
+                        <h1 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                            <i class="fa-solid fa-wrench text-blue-400"></i>
+                            <span id="complaintViewTitle">Hostel Maintenance & Complaints</span>
+                        </h1>
+                        <p class="text-xs text-slate-400 mt-1">Submit, assign technicians, track resolution progress, and rate repairs</p>
+                    </div>
+                    <div id="complaintActionButtons">
+                        <button onclick="app.openModal('submitComplaintModal')" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/20 flex items-center gap-2 transition">
+                            <i class="fa-solid fa-plus"></i> Lodge Complaint
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters & Search Bar -->
+                <div class="flex flex-wrap items-center gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs">
+                    <div class="flex-1 min-w-[200px]">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
+                            <input type="text" id="complaintSearchInput" placeholder="Search by title, room, or student..." class="w-full pl-9 pr-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-slate-400">Status:</label>
+                        <select id="complaintStatusFilter" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
+                            <option value="All">All Statuses</option>
+                            <option value="Open">Open</option>
+                            <option value="Assigned">Assigned</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-slate-400">Category:</label>
+                        <select id="complaintCategoryFilter" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
+                            <option value="All">All Categories</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Plumbing">Plumbing</option>
+                            <option value="Carpentry">Carpentry</option>
+                            <option value="Appliance">Appliance</option>
+                            <option value="Cleanliness">Cleanliness</option>
+                            <option value="Internet">Internet</option>
+                        </select>
+                    </div>
+                    <button onclick="app.loadComplaints()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh
+                    </button>
+                </div>
+
+                <!-- Complaints List Container -->
+                <div id="complaintsListContainer" class="space-y-3">
+                    <!-- Dynamic complaints rendered here -->
+                </div>
+            </section>
+
+            <!-- VIEW: Leave Requests -->
+            <section id="view-leave" class="view-panel hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                    <div>
+                        <h1 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                            <i class="fa-solid fa-plane-departure text-emerald-400"></i>
+                            <span id="leaveViewTitle">Digital Gate Outpass & Leave Requests</span>
+                        </h1>
+                        <p class="text-xs text-slate-400 mt-1">Official hostel outpass, home visit permissions & medical leave tracking</p>
+                    </div>
+                    <div id="leaveActionButtons">
+                        <button onclick="app.openModal('submitLeaveModal')" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition">
+                            <i class="fa-solid fa-plus"></i> Request Outpass / Leave
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Leave Filters -->
+                <div class="flex flex-wrap items-center gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs">
+                    <div class="flex-1 min-w-[200px]">
+                        <input type="text" id="leaveSearchInput" placeholder="Search by student, room, or destination..." class="w-full px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-slate-400">Status:</label>
+                        <select id="leaveStatusFilter" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-emerald-500">
+                            <option value="All">All Statuses</option>
+                            <option value="Pending">Pending Review</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <button onclick="app.loadLeaveRequests()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh
+                    </button>
+                </div>
+
+                <!-- Leave Requests List -->
+                <div id="leaveListContainer" class="space-y-3">
+                    <!-- Dynamic leave requests rendered here -->
+                </div>
+            </section>
+
+            <!-- VIEW: Mess Menu & Dining -->
+            <section id="view-mess" class="view-panel hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                    <div>
+                        <h1 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                            <i class="fa-solid fa-utensils text-amber-400"></i>
+                            <span>Mess Dining & Food Quality Hub</span>
+                        </h1>
+                        <p class="text-xs text-slate-400 mt-1">Weekly nutritious dining schedule, dietary selections, and transparent student food reviews</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="messFeedbackBtn" onclick="app.openModal('submitFoodFeedbackModal')" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs shadow-lg shadow-amber-600/20 flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-star"></i> Submit Food Feedback
+                        </button>
+                        <button id="updateMessMenuBtn" onclick="app.openModal('updateMessMenuModal')" class="hidden px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/20 flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-pen-to-square"></i> Update Today's Menu
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Day Selector Tabs -->
+                <div class="flex overflow-x-auto gap-2 border-b border-slate-800 pb-2 text-xs scrollbar-none" id="messDayTabs">
+                    <button onclick="app.selectMessDay('Monday')" class="mess-day-btn px-4 py-1.5 rounded-lg font-semibold bg-blue-600 text-white" data-day="Monday">Monday</button>
+                    <button onclick="app.selectMessDay('Tuesday')" class="mess-day-btn px-4 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-400 hover:text-white" data-day="Tuesday">Tuesday</button>
+                    <button onclick="app.selectMessDay('Wednesday')" class="mess-day-btn px-4 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-400 hover:text-white" data-day="Wednesday">Wednesday</button>
+                    <button onclick="app.selectMessDay('Thursday')" class="mess-day-btn px-4 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-400 hover:text-white" data-day="Thursday">Thursday</button>
+                    <button onclick="app.selectMessDay('Friday')" class="mess-day-btn px-4 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-400 hover:text-white" data-day="Friday">Friday</button>
+                    <button onclick="app.selectMessDay('Saturday')" class="mess-day-btn px-4 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-400 hover:text-white" data-day="Saturday">Saturday</button>
+                    <button onclick="app.selectMessDay('Sunday')" class="mess-day-btn px-4 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-400 hover:text-white" data-day="Sunday">Sunday</button>
+                </div>
+
+                <!-- Daily Menu Cards Grid -->
+                <div id="messMenuGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- 4 Meals: Breakfast, Lunch, Snacks, Dinner -->
+                </div>
+
+                <!-- Recent Food Feedback Section -->
+                <div class="mt-8 pt-6 border-t border-slate-800">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-base font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-comment-dots text-amber-400"></i> Resident Dining Feedback & Ratings
+                            </h2>
+                            <p class="text-xs text-slate-400">Hygiene & food satisfaction audits</p>
+                        </div>
+                        <div id="feedbackStatsBadge" class="text-xs font-semibold px-3 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            Avg Rating: --
+                        </div>
+                    </div>
+                    <div id="messFeedbackList" class="space-y-3">
+                        <!-- Dynamic reviews -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Facility Bookings -->
+            <section id="view-facilities" class="view-panel hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                    <div>
+                        <h1 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                            <i class="fa-solid fa-basketball text-indigo-400"></i>
+                            <span>Hostel Facilities & Sports Booking</span>
+                        </h1>
+                        <p class="text-xs text-slate-400 mt-1">Book slots for TT tables, Badminton, Gym, Music room & Laundry with collision prevention</p>
+                    </div>
+                    <button onclick="app.openModal('bookFacilityModal')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/20 flex items-center gap-2 transition">
+                        <i class="fa-solid fa-calendar-plus"></i> Book Facility Slot
+                    </button>
+                </div>
+
+                <!-- Date selector & Facility Cards -->
+                <div class="flex items-center gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs">
+                    <label class="text-slate-400 font-semibold">Select Date for Slots:</label>
+                    <input type="date" id="facilityBookingDateInput" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <button onclick="app.loadFacilityAvailability()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium">Check Slots</button>
+                </div>
+
+                <div id="facilityGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Facility slot cards -->
+                </div>
+
+                <!-- My Bookings List -->
+                <div class="mt-8 pt-6 border-t border-slate-800">
+                    <h2 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-ticket text-indigo-400"></i> My Active Facility Reservations
+                    </h2>
+                    <div id="myFacilityBookingsList" class="space-y-2"></div>
+                </div>
+            </section>
+
+            <!-- VIEW: Admin Room & Bed Allocations -->
+            <section id="view-rooms" class="view-panel hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                    <div>
+                        <h1 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                            <i class="fa-solid fa-door-open text-cyan-400"></i>
+                            <span>Hostel Inventory: Room & Bed Allocation</span>
+                        </h1>
+                        <p class="text-xs text-slate-400 mt-1">Manage hostel blocks, room types, capacity, and assign resident beds</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="addRoomBtn" onclick="app.openModal('addRoomModal')" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs shadow-lg shadow-cyan-600/20 flex items-center gap-2 transition">
+                            <i class="fa-solid fa-plus"></i> Add New Room
+                        </button>
+                        <button id="allocateBedBtn" onclick="app.openModal('allocateBedModal')" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/20 flex items-center gap-2 transition">
+                            <i class="fa-solid fa-bed"></i> Allocate Bed
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex flex-wrap items-center gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs">
+                    <div class="flex items-center gap-2">
+                        <label class="text-slate-400">Block:</label>
+                        <select id="roomBlockFilter" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200">
+                            <option value="All">All Blocks</option>
+                            <option value="Block A">Block A</option>
+                            <option value="Block B">Block B</option>
+                            <option value="Block C">Block C</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-slate-400">Occupancy:</label>
+                        <select id="roomOccupancyFilter" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200">
+                            <option value="All">All Statuses</option>
+                            <option value="Vacant">Vacant</option>
+                            <option value="Partially Occupied">Partially Occupied</option>
+                            <option value="Full">Fully Occupied</option>
+                        </select>
+                    </div>
+                    <button onclick="app.loadRooms()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh Rooms
+                    </button>
+                </div>
+
+                <!-- Rooms & Bed Grid -->
+                <div id="roomsGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamic room cards -->
+                </div>
+            </section>
+
+            <!-- VIEW: Confidential Wellness & Counselling (Strictly Private) -->
+            <section id="view-wellness" class="view-panel hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                    <div>
+                        <h1 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                            <i class="fa-solid fa-heart-pulse text-purple-400"></i>
+                            <span id="wellnessViewTitle">Confidential Wellness & Mental Health Desk</span>
+                        </h1>
+                        <p class="text-xs text-purple-300/80 mt-1">End-to-end encrypted student wellness consultations. Zero access for wardens or general staff.</p>
+                    </div>
+                    <div id="wellnessActionButtons">
+                        <button onclick="app.openModal('requestWellnessModal')" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-lg shadow-purple-600/20 flex items-center gap-2 transition">
+                            <i class="fa-solid fa-calendar-check"></i> Request Confidential Session
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Privacy Banner -->
+                <div class="p-3.5 rounded-xl bg-purple-950/30 border border-purple-800/40 flex items-start gap-3">
+                    <i class="fa-solid fa-shield-halved text-purple-400 text-lg mt-0.5"></i>
+                    <div class="text-xs text-purple-200">
+                        <span class="font-bold">Strict Institutional Confidentiality Guarantee:</span>
+                        All notes, session details, and psychological support records are visible only between the student and licensed counselor Dr. Priya Nair. Hostel wardens, administration, and peers are strictly isolated.
+                    </div>
+                </div>
+
+                <!-- Appointments List -->
+                <div id="wellnessAppointmentsList" class="space-y-3">
+                    <!-- Rendered appointments -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Modal 1: Submit Complaint (Student) -->
+    <div id="submitComplaintModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('submitComplaintModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-blue-400"></i> Lodge Maintenance Ticket
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Report an issue in your hostel room or common amenities.</p>
+
+            <form id="submitComplaintForm" onsubmit="app.handleComplaintSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Issue Category *</label>
+                    <select name="category" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <option value="Electrical">Electrical (Fan, Lights, Sockets, Geyser)</option>
+                        <option value="Plumbing">Plumbing (Tap, Leakage, Flush, Drain)</option>
+                        <option value="Carpentry">Carpentry (Bed, Desk, Almirah, Door Lock)</option>
+                        <option value="Appliance">Appliance (Water Purifier, AC)</option>
+                        <option value="Cleanliness">Cleanliness (Washroom, Corridor)</option>
+                        <option value="Internet">Internet / LAN / Wi-Fi</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Brief Title *</label>
+                    <input type="text" name="title" required minlength="3" placeholder="e.g. Ceiling fan humming loudly & not spinning" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Room Number *</label>
+                        <input type="text" name="room_number" id="complaintRoomInput" required placeholder="A-204" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Urgency Priority *</label>
+                        <select name="urgency" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                            <option value="Low">Low (Routine maintenance)</option>
+                            <option value="Medium" selected>Medium (Normal attention)</option>
+                            <option value="High">High (Impacting study / sleep)</option>
+                            <option value="Emergency">Emergency (Short circuit, flooding)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Detailed Description *</label>
+                    <textarea name="description" required minlength="5" rows="3" placeholder="Provide details, timing, and any prior attempts to fix..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('submitComplaintModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold">Submit Complaint</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Assign Staff (Warden) -->
+    <div id="assignStaffModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('assignStaffModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-user-gear text-blue-400"></i> Assign Maintenance Technician
+            </h3>
+            <p class="text-xs text-slate-400 mb-4" id="assignModalSubtitle">Assign ticket to certified on-duty staff</p>
+
+            <form id="assignStaffForm" onsubmit="app.handleAssignSubmit(event)" class="space-y-3 text-xs">
+                <input type="hidden" name="complaint_id" id="assignComplaintId">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Select Technician *</label>
+                    <select name="staff_id" id="assignStaffSelect" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Warden Instructions / Target Time</label>
+                    <textarea name="warden_notes" rows="2" placeholder="e.g. Please inspect switchboard before 5 PM today" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('assignStaffModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold">Assign Staff</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: Update Work Order Progress (Maintenance Staff) -->
+    <div id="updateProgressModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('updateProgressModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-screwdriver-wrench text-blue-400"></i> Update Work Order
+            </h3>
+            <p class="text-xs text-slate-400 mb-4" id="progressModalSubtitle">Log maintenance actions and mark resolution</p>
+
+            <form id="updateProgressForm" onsubmit="app.handleProgressSubmit(event)" class="space-y-3 text-xs">
+                <input type="hidden" name="complaint_id" id="progressComplaintId">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Updated Status *</label>
+                    <select name="status" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <option value="In Progress">In Progress (Parts ordered / Underway)</option>
+                        <option value="Resolved" selected>Resolved (Work completed on site)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Technician Resolution Notes *</label>
+                    <textarea name="resolution_notes" required minlength="5" rows="3" placeholder="Detail the fix applied (e.g. Replaced capacitor and lubricated bearings. Fan tested normal speed)." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('updateProgressModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold">Save Progress</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 4: Confirm Resolution & Feedback (Student) -->
+    <div id="confirmResolutionModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('confirmResolutionModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-green-400"></i> Confirm Repair Resolution
+            </h3>
+            <p class="text-xs text-slate-400 mb-4" id="confirmModalSubtitle">Verify that the issue has been satisfactory resolved in your room.</p>
+
+            <form id="confirmResolutionForm" onsubmit="app.handleResolutionConfirmSubmit(event)" class="space-y-3 text-xs">
+                <input type="hidden" name="complaint_id" id="confirmComplaintId">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Action *</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="action" value="confirm" checked class="text-blue-600 focus:ring-0">
+                            <span class="text-green-400 font-semibold">Yes, Close Complaint</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="action" value="reopen" class="text-blue-600 focus:ring-0">
+                            <span class="text-red-400 font-semibold">No, Reopen Ticket</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Satisfaction Rating (1 to 5 Stars)</label>
+                    <select name="rating" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <option value="5">⭐⭐⭐⭐⭐ 5 - Highly Satisfied</option>
+                        <option value="4">⭐⭐⭐⭐ 4 - Good Work</option>
+                        <option value="3">⭐⭐⭐ 3 - Average</option>
+                        <option value="2">⭐⭐ 2 - Poor Work</option>
+                        <option value="1">⭐ 1 - Unsatisfactory</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Student Comments</label>
+                    <textarea name="feedback" rows="2" placeholder="e.g. Thanks for the prompt fix, fan works smoothly now!" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('confirmResolutionModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold">Submit Confirmation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 5: Submit Leave Request (Student) -->
+    <div id="submitLeaveModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('submitLeaveModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-passport text-emerald-400"></i> Request Hostel Gate Outpass
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Required for overnight hostel leaves and gate security passes.</p>
+
+            <form id="submitLeaveForm" onsubmit="app.handleLeaveSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Leave Classification *</label>
+                    <select name="leave_type" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                        <option value="Home Visit">Home Visit</option>
+                        <option value="Medical">Medical / Hospital</option>
+                        <option value="Academic">Academic / Hackathon / Conference</option>
+                        <option value="Emergency">Family Emergency</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Departure Date & Time *</label>
+                        <input type="datetime-local" name="departure_date" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Return Date & Time *</label>
+                        <input type="datetime-local" name="return_date" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Parent / Guardian Contact Phone *</label>
+                    <input type="tel" name="parent_contact" required minlength="8" placeholder="+91 98765 43210" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Destination Address *</label>
+                    <input type="text" name="destination_address" required minlength="5" placeholder="e.g. 42 MG Road, Sector 14, Gurugram, Haryana" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Detailed Reason *</label>
+                    <textarea name="reason" required minlength="5" rows="2" placeholder="e.g. Travelling home for Diwali break with family" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('submitLeaveModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold">Submit Leave Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 6: Review Leave Request (Warden) -->
+    <div id="reviewLeaveModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('reviewLeaveModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-signature text-emerald-400"></i> Review Gate Outpass Request
+            </h3>
+            <p class="text-xs text-slate-400 mb-4" id="reviewLeaveModalSubtitle">Approve or reject student leave application</p>
+
+            <form id="reviewLeaveForm" onsubmit="app.handleLeaveReviewSubmit(event)" class="space-y-3 text-xs">
+                <input type="hidden" name="leave_id" id="reviewLeaveId">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Decision *</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="decision" value="Approved" checked class="text-emerald-600 focus:ring-0">
+                            <span class="text-emerald-400 font-bold">Approve Outpass</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="decision" value="Rejected" class="text-red-600 focus:ring-0">
+                            <span class="text-red-400 font-bold">Reject Application</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Warden Remarks / Conditions</label>
+                    <textarea name="remarks" rows="2" placeholder="e.g. Approved. Must report back to hostel before 8 PM on Sunday." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('reviewLeaveModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold">Confirm Decision</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 7: Update Mess Menu (Mess Manager) -->
+    <div id="updateMessMenuModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('updateMessMenuModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-bowl-food text-blue-400"></i> Update Daily Mess Menu
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Publish updated meal schedule for campus dining hall.</p>
+
+            <form id="updateMessMenuForm" onsubmit="app.handleMessMenuSubmit(event)" class="space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Day of the Week *</label>
+                        <select name="day_of_week" id="menuDaySelect" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Meal Timing *</label>
+                        <select name="meal_type" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="Lunch">Lunch</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Dinner">Dinner</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Dietary Category *</label>
+                    <select name="dietary_type" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <option value="Veg">Vegetarian</option>
+                        <option value="Non-Veg">Non-Vegetarian Options Available</option>
+                        <option value="Jain">Jain Friendly</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Menu Items & Dishes *</label>
+                    <textarea name="items" required minlength="3" rows="3" placeholder="e.g. Paneer Butter Masala, Yellow Dal Tadka, Jeera Rice, Tandoori Roti, Boondi Raita, Gulab Jamun" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Chef / Dining Special Notes</label>
+                    <input type="text" name="special_notes" placeholder="e.g. Special festive dessert counter open till 10 PM" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('updateMessMenuModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold">Publish Menu Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 8: Food Feedback (Student) -->
+    <div id="submitFoodFeedbackModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('submitFoodFeedbackModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-thumbs-up text-amber-400"></i> Dining Feedback
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Rate today's hostel catering and suggest meal improvements.</p>
+
+            <form id="submitFoodFeedbackForm" onsubmit="app.handleFoodFeedbackSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Meal Rated *</label>
+                    <select name="meal_type" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500">
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch" selected>Lunch</option>
+                        <option value="Snacks">Snacks</option>
+                        <option value="Dinner">Dinner</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Taste & Quality *</label>
+                        <select name="rating" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500">
+                            <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                            <option value="4" selected>⭐⭐⭐⭐ (4/5)</option>
+                            <option value="3">⭐⭐⭐ (3/5)</option>
+                            <option value="2">⭐⭐ (2/5)</option>
+                            <option value="1">⭐ (1/5)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Hygiene & Cleanliness *</label>
+                        <select name="hygiene_rating" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500">
+                            <option value="5" selected>⭐⭐⭐⭐⭐ (5/5)</option>
+                            <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                            <option value="3">⭐⭐⭐ (3/5)</option>
+                            <option value="2">⭐⭐ (2/5)</option>
+                            <option value="1">⭐ (1/5)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Comments & Suggestions</label>
+                    <textarea name="comments" rows="3" placeholder="e.g. Rice was fresh, but dal needed more salt." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('submitFoodFeedbackModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-semibold">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 9: Book Facility Slot (Student) -->
+    <div id="bookFacilityModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('bookFacilityModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-dumbbell text-indigo-400"></i> Reserve Hostel Facility
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Book slots with automatic conflict detection.</p>
+
+            <form id="bookFacilityForm" onsubmit="app.handleFacilityBookSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Facility Name *</label>
+                    <select name="facility_name" id="bookFacilitySelect" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                        <option value="Study Room">Study Room (Quiet Zone)</option>
+                        <option value="Table Tennis">Table Tennis Table #1</option>
+                        <option value="Badminton Court">Badminton Indoor Court</option>
+                        <option value="Gym Slot">Fitness Gym Slot</option>
+                        <option value="Music Room">Music & Jamming Room</option>
+                        <option value="Laundry Slot">Automated Laundry Slot</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Reservation Date *</label>
+                    <input type="date" name="booking_date" id="bookFacilityDate" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Time Slot *</label>
+                    <select name="slot_time" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+                        <option value="08:00 - 09:00">08:00 AM - 09:00 AM</option>
+                        <option value="09:00 - 10:00">09:00 AM - 10:00 AM</option>
+                        <option value="16:00 - 17:00">04:00 PM - 05:00 PM</option>
+                        <option value="17:00 - 18:00" selected>05:00 PM - 06:00 PM</option>
+                        <option value="18:00 - 19:00">06:00 PM - 07:00 PM</option>
+                        <option value="19:00 - 20:00">07:00 PM - 08:00 PM</option>
+                        <option value="20:00 - 21:00">08:00 PM - 09:00 PM</option>
+                        <option value="21:00 - 22:00">09:00 PM - 10:00 PM</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('bookFacilityModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold">Confirm Reservation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 10: Add New Room (Admin) -->
+    <div id="addRoomModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('addRoomModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-hotel text-cyan-400"></i> Add Hostel Room
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Add a new room to hostel inventory with automated bed slots.</p>
+
+            <form id="addRoomForm" onsubmit="app.handleAddRoomSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Room Number *</label>
+                    <input type="text" name="room_number" required placeholder="e.g. A-305 or B-201" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 uppercase focus:outline-none focus:border-cyan-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Block *</label>
+                        <select name="block" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-cyan-500">
+                            <option value="Block A">Block A</option>
+                            <option value="Block B">Block B</option>
+                            <option value="Block C">Block C</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Floor Level *</label>
+                        <input type="number" name="floor" required min="0" max="10" value="3" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Bed Capacity *</label>
+                        <input type="number" name="capacity" required min="1" max="6" value="2" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Room Type *</label>
+                        <select name="room_type" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-cyan-500">
+                            <option value="AC">AC Room</option>
+                            <option value="Non-AC">Non-AC Room</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('addRoomModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold">Create Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 11: Allocate Bed to Student (Admin / Warden) -->
+    <div id="allocateBedModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('allocateBedModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-bed text-blue-400"></i> Bed Space Allocation
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Assign an unoccupied bed in a hostel room to a student.</p>
+
+            <form id="allocateBedForm" onsubmit="app.handleAllocateBedSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Select Student *</label>
+                    <select name="student_id" id="allocateStudentSelect" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Select Room *</label>
+                    <select name="room_id" id="allocateRoomSelect" onchange="app.handleRoomSelectionChange()" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Select Bed Slot *</label>
+                    <select name="bed_label" id="allocateBedSelect" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('allocateBedModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold">Allocate Bed</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 12: Request Confidential Wellness Appointment (Student) -->
+    <div id="requestWellnessModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('requestWellnessModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-shield-heart text-purple-400"></i> Request Confidential Counseling Session
+            </h3>
+            <p class="text-xs text-purple-300/80 mb-4">Direct private channel to Dr. Priya Nair (Lead Psychologist). Wardens have no visibility.</p>
+
+            <form id="requestWellnessForm" onsubmit="app.handleWellnessSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Primary Area of Concern *</label>
+                    <select name="issue_category" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-purple-500">
+                        <option value="Academic Stress">Academic Pressure & Exam Anxiety</option>
+                        <option value="Anxiety & Overwhelm">Anxiety & Emotional Overwhelm</option>
+                        <option value="Homesickness">Homesickness & Adjustment Issues</option>
+                        <option value="Interpersonal Conflict">Roommate / Peer Interpersonal Conflict</option>
+                        <option value="General Well-being">General Well-being & Guidance</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Preferred Date *</label>
+                        <input type="date" name="preferred_date" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1">Preferred Time *</label>
+                        <select name="preferred_time" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-purple-500">
+                            <option value="10:00 AM">10:00 AM</option>
+                            <option value="11:30 AM">11:30 AM</option>
+                            <option value="02:30 PM">02:30 PM</option>
+                            <option value="04:00 PM">04:00 PM</option>
+                            <option value="05:30 PM">05:30 PM</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Consultation Mode *</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="session_mode" value="In-Person" checked class="text-purple-600 focus:ring-0">
+                            <span class="text-slate-200">In-Person (Counselor Suite, Block C)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="session_mode" value="Online" class="text-purple-600 focus:ring-0">
+                            <span class="text-slate-200">Online Video Consultation</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Confidential Notes for Counselor *</label>
+                    <textarea name="confidential_notes" required minlength="5" rows="3" placeholder="Share what is on your mind. This text is never shared with college or hostel administration." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-purple-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('requestWellnessModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold">Book Confidential Slot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 13: Counselor Appointment Review (Counselor) -->
+    <div id="counsellorStatusModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="app.closeModal('counsellorStatusModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-user-doctor text-purple-400"></i> Update Wellness Session
+            </h3>
+            <p class="text-xs text-slate-400 mb-4" id="counsellorModalSubtitle">Confirm or complete counseling appointment</p>
+
+            <form id="counsellorStatusForm" onsubmit="app.handleCounsellorStatusSubmit(event)" class="space-y-3 text-xs">
+                <input type="hidden" name="appointment_id" id="counsellorAppointmentId">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Appointment Status *</label>
+                    <select name="status" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-purple-500">
+                        <option value="Confirmed" selected>Confirmed (Scheduled)</option>
+                        <option value="Completed">Completed (Session Concluded)</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Counselor Confidential Remarks</label>
+                    <textarea name="counsellor_remarks" rows="2" placeholder="e.g. Session confirmed for Room 104, Block C. Sent meeting invitation." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-purple-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="app.closeModal('counsellorStatusModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold">Save Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
