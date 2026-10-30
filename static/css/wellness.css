@@ -1,0 +1,315 @@
+/* MANN Care — Private Wellness Check-In Design System */
+/* Calming aesthetic: Apple Health + Notion + Headspace */
+
+:root {
+    --primary: #176B50;
+    --primary-hover: #125740;
+    --primary-light: #208F6C;
+    --secondary: #A8D5BA;
+    --accent: #D5EBDD;
+    --bg-light: #F6F8F5;
+    --bg-card: #FFFFFF;
+    --text-primary: #1C2923;
+    --text-secondary: #4B675B;
+    --text-muted: #7A9A8C;
+    --border-subtle: rgba(23, 107, 80, 0.12);
+    --border-accent: rgba(23, 107, 80, 0.25);
+    --shadow-soft: 0 10px 30px -5px rgba(23, 107, 80, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+    --shadow-elevated: 0 20px 40px -10px rgba(23, 107, 80, 0.14), 0 6px 16px -3px rgba(0, 0, 0, 0.04);
+}
+
+/* Dark Theme Overrides */
+html.dark, html.dark body, body.dark-theme {
+    --primary: #176B50;
+    --primary-hover: #208F6C;
+    --primary-light: #A8D5BA;
+    --secondary: #2C483D;
+    --accent: #1C332A;
+    --bg-light: #101A17;
+    --bg-card: #162420;
+    --text-primary: #F6F8F5;
+    --text-secondary: #A8D5BA;
+    --text-muted: #6B8F7F;
+    --border-subtle: rgba(168, 213, 186, 0.15);
+    --border-accent: rgba(168, 213, 186, 0.3);
+    --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
+    --shadow-elevated: 0 20px 45px -10px rgba(0, 0, 0, 0.8);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Glass & Calm Cards */
+.wellness-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wellness-card-hover:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-elevated);
+}
+
+/* Primary Button */
+.btn-wellness-primary {
+    background: linear-gradient(135deg, #176B50 0%, #208F6C 100%);
+    color: #FFFFFF !important;
+    border: 1px solid rgba(168, 213, 186, 0.4);
+    box-shadow: 0 4px 14px rgba(23, 107, 80, 0.25);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-wellness-primary:hover {
+    background: linear-gradient(135deg, #125740 0%, #176B50 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(23, 107, 80, 0.35);
+}
+
+.btn-wellness-primary:active {
+    transform: translateY(1px);
+}
+
+/* Secondary Button */
+.btn-wellness-secondary {
+    background: var(--bg-card);
+    color: var(--primary);
+    border: 1px solid var(--border-accent);
+    transition: all 0.2s ease;
+}
+
+.btn-wellness-secondary:hover {
+    background: #D5EBDD;
+    color: #125740;
+    transform: translateY(-1px);
+}
+
+html.dark .btn-wellness-secondary:hover {
+    background: #1C332A;
+    color: #A8D5BA;
+}
+
+/* Active Nav Pill */
+.wellness-nav-active {
+    background: #D5EBDD !important;
+    color: #176B50 !important;
+    font-weight: 700;
+}
+
+html.dark .wellness-nav-active {
+    background: #1C332A !important;
+    color: #A8D5BA !important;
+}
+
+/* Feeling Card Selection */
+.feeling-choice-card {
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.feeling-choice-card:hover {
+    transform: scale(1.04);
+}
+
+.feeling-choice-card.selected {
+    border-color: #176B50;
+    background-color: #D5EBDD !important;
+    box-shadow: 0 8px 24px -4px rgba(23, 107, 80, 0.25);
+}
+
+html.dark .feeling-choice-card.selected {
+    border-color: #A8D5BA;
+    background-color: #1C332A !important;
+    box-shadow: 0 8px 24px -4px rgba(168, 213, 186, 0.2);
+}
+
+/* Sleep Choice Card Selection */
+.sleep-choice-card {
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sleep-choice-card:hover {
+    transform: scale(1.02);
+}
+
+.sleep-choice-card.selected {
+    border-color: #176B50;
+    background-color: #D5EBDD !important;
+}
+
+html.dark .sleep-choice-card.selected {
+    border-color: #A8D5BA;
+    background-color: #1C332A !important;
+}
+
+/* Tag Chips */
+.tag-chip {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+
+.tag-chip.active {
+    background-color: #176B50 !important;
+    color: #FFFFFF !important;
+    border-color: #176B50 !important;
+}
+
+/* Stress Slider Styling */
+.stress-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #A8D5BA 0%, #EAB308 50%, #EF4444 100%);
+    outline: none;
+    transition: opacity 0.2s;
+}
+
+.stress-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #176B50;
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.stress-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.stress-slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #176B50;
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+/* Box Breathing Animation */
+@keyframes breatheScale {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.45);
+    }
+    50% {
+        transform: scale(1.45);
+    }
+    75% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes breathePulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(23, 107, 80, 0.3);
+    }
+    25%, 50% {
+        box-shadow: 0 0 45px 15px rgba(168, 213, 186, 0.6);
+    }
+}
+
+.breathing-circle {
+    animation: breatheScale 16s infinite ease-in-out, breathePulse 16s infinite ease-in-out;
+}
+
+/* Lock Screen Keypad */
+.pin-key-btn {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(23, 107, 80, 0.08);
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.pin-key-btn:hover {
+    background: rgba(23, 107, 80, 0.2);
+    transform: scale(1.05);
+}
+
+.pin-key-btn:active {
+    transform: scale(0.95);
+    background: #176B50;
+    color: #FFFFFF;
+}
+
+html.dark .pin-key-btn {
+    background: rgba(168, 213, 186, 0.12);
+}
+
+html.dark .pin-key-btn:hover {
+    background: rgba(168, 213, 186, 0.25);
+}
+
+/* PIN Indicator Dots */
+.pin-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #176B50;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.pin-dot.filled {
+    background: #176B50;
+    transform: scale(1.15);
+}
+
+html.dark .pin-dot {
+    border-color: #A8D5BA;
+}
+
+html.dark .pin-dot.filled {
+    background: #A8D5BA;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #A8D5BA;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #176B50;
+}

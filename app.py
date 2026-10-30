@@ -68,6 +68,21 @@ def require_role(*roles):
 def index():
     return send_from_directory(app.static_folder, 'index.html')
 
+@app.route('/wellness')
+@app.route('/wellness/')
+def wellness_portal():
+    return send_from_directory(app.static_folder, 'wellness.html')
+
+@app.route('/manifest.json')
+def web_manifest():
+    return send_from_directory(app.static_folder, 'manifest.json')
+
+@app.route('/wellness-sw.js')
+def wellness_service_worker():
+    res = send_from_directory(app.static_folder, 'wellness-sw.js')
+    res.headers['Service-Worker-Allowed'] = '/'
+    return res
+
 # --- Authentication Endpoints (MANN 2.0) ---
 
 @app.route('/api/auth/login', methods=['POST'])

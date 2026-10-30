@@ -398,6 +398,22 @@
                         </button>
                     </div>
 
+                    <!-- MANN Care Private Wellness Quick Card -->
+                    <div class="forest-card p-4 rounded-2xl bg-gradient-to-r from-[#ffffff] via-[#f0fdf9] to-[#ccfbf1]/50 border border-[#99f6e0]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0d9488] to-[#14b8a6] text-white flex items-center justify-center text-lg flex-shrink-0 shadow-sm">
+                                <i class="fa-solid fa-spa"></i>
+                            </div>
+                            <div>
+                                <span class="font-bold text-[#132220]">Private Wellness Check-In (MANN Care)</span>
+                                <p class="text-[#5c7c77] text-[11px]">30-second daily check-in • Web Crypto encrypted • 100% on your device</p>
+                            </div>
+                        </div>
+                        <a href="/wellness" class="px-4 py-2 rounded-xl btn-forest-primary font-bold text-xs flex items-center gap-1.5 flex-shrink-0 shadow-sm">
+                            <span>Check In (30s)</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
+
                     <div id="studentRoomDetailsContainer" class="space-y-4">
                         <!-- Dynamic room card loaded by app.loadStudentRoomDetails() -->
                         <div class="skeleton-shimmer h-48 rounded-2xl"></div>
@@ -676,24 +692,69 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#99f6e0]/20">
                         <div>
                             <h2 class="text-2xl font-extrabold text-[#132220] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-shield-heart text-purple-400"></i>
-                                <span>MANN Care: Confidential Sanctuary</span>
+                                <i class="fa-solid fa-spa text-[#0d9488]"></i>
+                                <span>MANN Care: Private Wellness Check-In</span>
                             </h2>
-                            <p class="text-xs text-purple-300/80 mt-0.5">100% private psychological counselling and student wellness care</p>
+                            <p class="text-xs text-[#5c7c77] mt-0.5">Your feelings. Your device. Your control. Local-first & Web Crypto encrypted.</p>
                         </div>
-                        <button onclick="app.openModal('bookWellnessModal')" class="px-4 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-purple-900/30">
-                            <i class="fa-solid fa-hand-holding-heart"></i> Book Confidential Session
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <a href="/wellness" target="_blank" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-bold flex items-center gap-2 shadow-lg">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Fullscreen App
+                            </a>
+                            <button onclick="app.openModal('bookWellnessModal')" class="px-4 py-2.5 rounded-xl btn-cream-accent text-xs font-semibold flex items-center gap-2">
+                                <i class="fa-solid fa-hand-holding-heart"></i> Book Session
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Flagship Private Wellness App Banner -->
+                    <div class="forest-card p-6 rounded-3xl bg-gradient-to-br from-[#ffffff] via-[#f0fdf9] to-[#ccfbf1]/40 border border-[#99f6e0]/40 space-y-4">
+                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div class="space-y-2 max-w-xl">
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#0d9488]/15 text-[#0d9488] border border-[#0d9488]/30">
+                                    <i class="fa-solid fa-shield-halved"></i> 100% On-Device IndexedDB • Zero Cloud Journal Logs
+                                </div>
+                                <h3 class="text-xl font-bold font-serif-title text-[#132220]">
+                                    Private Wellness Vault & Daily Emotional Check-In
+                                </h3>
+                                <p class="text-xs text-[#5c7c77] leading-relaxed">
+                                    Includes 30-second daily check-ins, sleep-stress correlation intelligence, Notion-style encrypted journal, calendar timeline, interactive 4-4-4-4 Box Breathing, and Hostel Stealth Mode (<kbd class="px-1 py-0.5 rounded bg-gray-100 font-mono text-[10px]">Esc</kbd>).
+                                </p>
+                            </div>
+                            <a href="/wellness" class="px-5 py-3 rounded-2xl btn-forest-primary text-xs font-bold flex items-center gap-2 shadow-xl flex-shrink-0">
+                                <i class="fa-solid fa-heart-pulse"></i> Launch Wellness App
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Verified Emergency Helplines (Govt of India) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl bg-[#f0fdf9] border border-[#99f6e0]/40 flex items-center justify-between text-xs">
+                            <div class="space-y-0.5">
+                                <span class="text-[10px] uppercase font-bold text-[#0d9488]">Tele-MANAS 24/7 Helpline</span>
+                                <div class="font-extrabold text-sm text-[#132220]">National Toll-Free: 14416</div>
+                                <p class="text-[10px] text-[#5c7c77]">Free, confidential mental wellness counseling</p>
+                            </div>
+                            <a href="tel:14416" class="px-3.5 py-1.5 rounded-xl btn-forest-primary font-bold text-xs"><i class="fa-solid fa-phone mr-1"></i> Call</a>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-[#f0fdf9] border border-[#99f6e0]/40 flex items-center justify-between text-xs">
+                            <div class="space-y-0.5">
+                                <span class="text-[10px] uppercase font-bold text-rose-600">National Emergency Support</span>
+                                <div class="font-extrabold text-sm text-[#132220]">Emergency Services: 112</div>
+                                <p class="text-[10px] text-[#5c7c77]">Immediate response across India</p>
+                            </div>
+                            <a href="tel:112" class="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs"><i class="fa-solid fa-phone mr-1"></i> Call</a>
+                        </div>
                     </div>
 
                     <!-- Privacy Assurance Card -->
-                    <div class="p-4 rounded-2xl bg-purple-950/40 border border-purple-800/40 flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-purple-900/60 border border-purple-700/50 flex items-center justify-center text-purple-300 text-lg flex-shrink-0">
+                    <div class="p-4 rounded-2xl bg-[#0d9488]/10 border border-[#0d9488]/20 flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#0d9488]/20 border border-[#0d9488]/30 flex items-center justify-center text-[#0d9488] text-lg flex-shrink-0">
                             <i class="fa-solid fa-lock"></i>
                         </div>
                         <div class="space-y-1 text-xs">
-                            <h4 class="font-bold text-purple-200">Strict Medical & Ethical Confidentiality</h4>
-                            <p class="text-purple-300/80 text-[11px] leading-relaxed">
+                            <h4 class="font-bold text-[#132220]">Strict Medical & Ethical Confidentiality</h4>
+                            <p class="text-[#5c7c77] text-[11px] leading-relaxed">
                                 Your appointments and counselling notes are strictly restricted between you and the Licensed Campus Counsellor. Wardens, maintenance staff, and administrative management have zero database visibility or access.
                             </p>
                         </div>
