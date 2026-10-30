@@ -12,27 +12,39 @@
             theme: {
                 extend: {
                     colors: {
+                        sky: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e'
+                        },
                         forest: {
-                            50: '#f0fdf4',
-                            100: '#d8f3dc',
-                            200: '#95d5b2',
-                            300: '#74c69d',
-                            400: '#52b788',
-                            500: '#40916c',
-                            600: '#2d6a4f',
-                            700: '#1b4332',
-                            800: '#143528',
-                            900: '#0f281e',
-                            950: '#08140e'
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#ffffff',
+                            950: '#f8fafc'
                         },
                         cream: {
-                            50: '#fdfbf7',
-                            100: '#fefae0',
-                            200: '#faedcd',
-                            300: '#f7e6be',
-                            400: '#e9d8a6',
-                            500: '#d4a373',
-                            gold: '#d4af37'
+                            50: '#ffffff',
+                            100: '#0f172a',
+                            200: '#0ea5e9',
+                            300: '#0284c7',
+                            400: '#0369a1',
+                            500: '#075985',
+                            gold: '#0284c7'
                         }
                     }
                 }
@@ -43,62 +55,62 @@
     <!-- Font Awesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="h-full flex flex-col bg-[#0a1711] text-[#fefae0] font-sans antialiased overflow-x-hidden selection:bg-[#52b788]/30">
+<body class="h-full flex flex-col bg-[#f8fafc] text-[#0f172a] font-sans antialiased overflow-x-hidden selection:bg-[#0284c7]/30">
 
     <!-- TOP GLOBAL NAVBAR -->
-    <header class="sticky top-0 z-40 bg-[#0f281e]/90 backdrop-blur-md border-b border-[#52b788]/20 transition-colors">
+    <header class="sticky top-0 z-40 bg-[#ffffff]/90 backdrop-blur-md border-b border-[#bae6fd]/20 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Brand / Logo -->
                 <div class="flex items-center gap-3">
-                    <button id="mobileSidebarToggle" onclick="app.toggleMobileSidebar()" class="md:hidden p-2 text-[#8fb89e] hover:text-[#fefae0] focus:outline-none">
+                    <button id="mobileSidebarToggle" onclick="app.toggleMobileSidebar()" class="md:hidden p-2 text-[#64748b] hover:text-[#0f172a] focus:outline-none">
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
                     <a href="javascript:void(0)" onclick="app.navigateTo('landing')" class="flex items-center gap-3 group">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#1b4332] via-[#2d6a4f] to-[#52b788] flex items-center justify-center shadow-lg shadow-[#52b788]/20 border border-[#52b788]/30 group-hover:scale-105 transition">
-                            <i class="fa-solid fa-building-shield text-[#fefae0] text-lg"></i>
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0284c7] via-[#0ea5e9] to-[#38bdf8] flex items-center justify-center shadow-lg shadow-[#0ea5e9]/20 border border-[#bae6fd]/30 group-hover:scale-105 transition">
+                            <i class="fa-solid fa-building-shield text-white text-lg"></i>
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <span class="font-extrabold text-xl tracking-tight text-[#fefae0] font-serif-title">MANN</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#52b788]/20 text-[#52b788] border border-[#52b788]/40 font-bold tracking-widest uppercase">2.0 OS</span>
+                                <span class="font-extrabold text-xl tracking-tight text-[#0f172a] font-serif-title">MANN</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#0284c7]/20 text-[#0284c7] border border-[#bae6fd]/40 font-bold tracking-widest uppercase">2.0 OS</span>
                             </div>
-                            <p class="text-[10px] text-[#8fb89e] hidden sm:block tracking-wide">Smart Residential Living & Wellness</p>
+                            <p class="text-[10px] text-[#64748b] hidden sm:block tracking-wide">Smart Residential Living & Wellness</p>
                         </div>
                     </a>
                 </div>
 
                 <!-- Center Quick Switcher / Breadcrumbs (Demo & QA Friendly) -->
-                <div id="quickRoleBar" class="hidden lg:flex items-center gap-1 bg-[#143528]/80 p-1 rounded-xl border border-[#52b788]/20 text-xs shadow-inner">
-                    <span class="text-[10px] text-[#8fb89e] px-2 font-bold uppercase tracking-wider">Demo Quick-Role:</span>
-                    <button onclick="app.quickSwitch('student')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="student">Student</button>
-                    <button onclick="app.quickSwitch('warden')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="warden">Warden</button>
-                    <button onclick="app.quickSwitch('admin')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="admin">Admin</button>
-                    <button onclick="app.quickSwitch('maintenance')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="maintenance">Maint</button>
-                    <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="mess_manager">Mess</button>
-                    <button onclick="app.quickSwitch('counsellor')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="counsellor">Counsellor</button>
+                <div id="quickRoleBar" class="hidden lg:flex items-center gap-1 bg-[#f0f9ff]/80 p-1 rounded-xl border border-[#bae6fd]/20 text-xs shadow-inner">
+                    <span class="text-[10px] text-[#64748b] px-2 font-bold uppercase tracking-wider">Demo Quick-Role:</span>
+                    <button onclick="app.quickSwitch('student')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#0ea5e9]" data-role="student">Student</button>
+                    <button onclick="app.quickSwitch('warden')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#0ea5e9]" data-role="warden">Warden</button>
+                    <button onclick="app.quickSwitch('admin')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#0ea5e9]" data-role="admin">Admin</button>
+                    <button onclick="app.quickSwitch('maintenance')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#0ea5e9]" data-role="maintenance">Maint</button>
+                    <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#0ea5e9]" data-role="mess_manager">Mess</button>
+                    <button onclick="app.quickSwitch('counsellor')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#0ea5e9]" data-role="counsellor">Counsellor</button>
                 </div>
 
                 <!-- Right Actions: Theme Toggle + Auth Buttons / Profile -->
                 <div class="flex items-center gap-3">
                     <!-- Mobile QR Code Modal Trigger -->
-                    <button id="mobileQrBtn" onclick="app.openModal('mobileQrModal')" class="w-9 h-9 rounded-xl bg-[#143528]/80 border border-[#52b788]/20 text-[#8fb89e] hover:text-[#faedcd] flex items-center justify-center transition" title="Open on Mobile Phone (QR Code)">
+                    <button id="mobileQrBtn" onclick="app.openModal('mobileQrModal')" class="w-9 h-9 rounded-xl bg-[#f0f9ff]/80 border border-[#bae6fd]/20 text-[#64748b] hover:text-[#0284c7] flex items-center justify-center transition" title="Open on Mobile Phone (QR Code)">
                         <i class="fa-solid fa-mobile-screen text-sm"></i>
                     </button>
 
                     <!-- Light / Dark Theme Switcher -->
-                    <button id="themeToggleBtn" onclick="app.toggleTheme()" class="w-9 h-9 rounded-xl bg-[#143528]/80 border border-[#52b788]/20 text-[#8fb89e] hover:text-[#faedcd] flex items-center justify-center transition" title="Toggle Light/Dark Theme">
+                    <button id="themeToggleBtn" onclick="app.toggleTheme()" class="w-9 h-9 rounded-xl bg-[#f0f9ff]/80 border border-[#bae6fd]/20 text-[#64748b] hover:text-[#0284c7] flex items-center justify-center transition" title="Toggle Light/Dark Theme">
                         <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
                     </button>
 
                     <!-- Unauthenticated Buttons (Landing Mode) -->
                     <div id="unauthHeaderActions" class="flex items-center gap-2">
-                        <button onclick="app.openStudentLoginModal()" class="px-3.5 py-1.5 rounded-xl border border-[#52b788]/30 bg-[#1b4332]/70 hover:bg-[#2d6a4f] text-xs font-semibold text-[#fefae0] transition flex items-center gap-1.5 shadow-sm">
-                            <i class="fa-solid fa-graduation-cap text-[#52b788]"></i>
+                        <button onclick="app.openStudentLoginModal()" class="px-3.5 py-1.5 rounded-xl border border-[#bae6fd]/30 bg-[#0284c7]/70 hover:bg-[#0ea5e9] text-xs font-semibold text-white transition flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-graduation-cap text-[#0284c7]"></i>
                             <span>Student Login</span>
                         </button>
-                        <button onclick="app.openAdminLoginModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#2d6a4f] to-[#1b4332] hover:from-[#40916c] hover:to-[#2d6a4f] text-xs font-semibold text-[#fefae0] transition flex items-center gap-1.5 border border-[#52b788]/40 shadow-sm">
-                            <i class="fa-solid fa-user-shield text-[#faedcd]"></i>
+                        <button onclick="app.openAdminLoginModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] hover:from-[#38bdf8] hover:to-[#0284c7] text-xs font-semibold text-white transition flex items-center gap-1.5 border border-[#bae6fd]/40 shadow-sm">
+                            <i class="fa-solid fa-user-shield text-white"></i>
                             <span>Admin Portal</span>
                         </button>
                     </div>
@@ -106,13 +118,13 @@
                     <!-- Authenticated Profile Dropdown & Logout -->
                     <div id="authHeaderActions" class="hidden flex items-center gap-3">
                         <div id="userInfoBadge" class="flex items-center gap-2.5 text-right">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#52b788] to-[#1b4332] flex items-center justify-center text-xs font-bold text-white border border-[#52b788]/50 shadow-inner" id="userAvatarText">ST</div>
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#0284c7] to-[#0284c7] flex items-center justify-center text-xs font-bold text-white border border-[#bae6fd]/50 shadow-inner" id="userAvatarText">ST</div>
                             <div class="hidden sm:block">
-                                <div id="userFullName" class="text-xs font-bold text-[#fefae0] leading-none">Aarav Sharma</div>
-                                <div id="userRoleBadge" class="text-[10px] font-mono text-[#52b788] uppercase mt-0.5">STUDENT</div>
+                                <div id="userFullName" class="text-xs font-bold text-[#0f172a] leading-none">Aarav Sharma</div>
+                                <div id="userRoleBadge" class="text-[10px] font-mono text-[#0284c7] uppercase mt-0.5">STUDENT</div>
                             </div>
                         </div>
-                        <button onclick="app.logout()" class="px-3 py-1.5 rounded-xl border border-[#52b788]/20 bg-[#143528]/80 hover:bg-[#1b4332] text-xs font-semibold text-[#fefae0] transition flex items-center gap-1.5">
+                        <button onclick="app.logout()" class="px-3 py-1.5 rounded-xl border border-[#bae6fd]/20 bg-[#f0f9ff]/80 hover:bg-[#0284c7] text-xs font-semibold text-white transition flex items-center gap-1.5">
                             <i class="fa-solid fa-arrow-right-from-bracket text-red-400"></i>
                             <span class="hidden sm:inline">Logout</span>
                         </button>
@@ -121,14 +133,14 @@
             </div>
 
             <!-- Mobile Quick Role Switcher Strip -->
-            <div id="mobileRoleBar" class="lg:hidden flex overflow-x-auto py-2 gap-1.5 border-t border-[#52b788]/20 text-xs scrollbar-none">
-                <span class="text-[10px] text-[#8fb89e] self-center px-1 font-bold uppercase">QA:</span>
-                <button onclick="app.quickSwitch('student')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="student">Student</button>
-                <button onclick="app.quickSwitch('warden')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="warden">Warden</button>
-                <button onclick="app.quickSwitch('admin')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="admin">Admin</button>
-                <button onclick="app.quickSwitch('maintenance')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="maintenance">Maint</button>
-                <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="mess_manager">Mess</button>
-                <button onclick="app.quickSwitch('counsellor')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="counsellor">Counsellor</button>
+            <div id="mobileRoleBar" class="lg:hidden flex overflow-x-auto py-2 gap-1.5 border-t border-[#bae6fd]/20 text-xs scrollbar-none">
+                <span class="text-[10px] text-[#64748b] self-center px-1 font-bold uppercase">QA:</span>
+                <button onclick="app.quickSwitch('student')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#f0f9ff]" data-role="student">Student</button>
+                <button onclick="app.quickSwitch('warden')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#f0f9ff]" data-role="warden">Warden</button>
+                <button onclick="app.quickSwitch('admin')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#f0f9ff]" data-role="admin">Admin</button>
+                <button onclick="app.quickSwitch('maintenance')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#f0f9ff]" data-role="maintenance">Maint</button>
+                <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#f0f9ff]" data-role="mess_manager">Mess</button>
+                <button onclick="app.quickSwitch('counsellor')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#f0f9ff]" data-role="counsellor">Counsellor</button>
             </div>
         </div>
     </header>
@@ -144,22 +156,22 @@
         <!-- ========================================== -->
         <section id="view-landing" class="view-panel flex-1 flex flex-col">
             <!-- Hero Section -->
-            <div class="relative overflow-hidden border-b border-[#52b788]/20 forest-gradient-hero py-16 lg:py-24">
-                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#52b788_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div class="relative overflow-hidden border-b border-[#bae6fd]/20 forest-gradient-hero py-16 lg:py-24">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#0284c7_1px,transparent_1px)] [background-size:16px_16px]"></div>
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
                     
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1b4332]/90 border border-[#52b788]/40 text-xs font-semibold text-[#faedcd] mb-6 shadow-md">
-                        <span class="w-2 h-2 rounded-full bg-[#52b788] animate-pulse"></span>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0284c7]/90 border border-[#bae6fd]/40 text-xs font-semibold text-white mb-6 shadow-md">
+                        <span class="w-2 h-2 rounded-full bg-[#0284c7] animate-pulse"></span>
                         <span>Enterprise Campus Housing OS</span>
-                        <span class="text-[#8fb89e]">•</span>
-                        <span class="text-[#52b788] font-mono"><i class="fa-solid fa-microchip"></i> Powered by GEMA-4 Open-Source AI</span>
+                        <span class="text-[#64748b]">•</span>
+                        <span class="text-[#0284c7] font-mono"><i class="fa-solid fa-microchip"></i> Powered by GEMA-4 Open-Source AI</span>
                     </div>
 
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#fefae0] tracking-tight font-serif-title max-w-4xl mx-auto leading-tight">
-                        Next-Gen Living. <span class="bg-gradient-to-r from-[#52b788] via-[#faedcd] to-[#d4af37] bg-clip-text text-transparent">Intelligent Residential Housing with GEMA-4</span>.
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f172a] tracking-tight font-serif-title max-w-4xl mx-auto leading-tight">
+                        Next-Gen Living. <span class="bg-gradient-to-r from-[#0284c7] via-[#faedcd] to-[#d4af37] bg-clip-text text-transparent">Intelligent Residential Housing with GEMA-4</span>.
                     </h1>
 
-                    <p class="mt-6 text-base sm:text-lg text-[#8fb89e] max-w-2xl mx-auto leading-relaxed">
+                    <p class="mt-6 text-base sm:text-lg text-[#64748b] max-w-2xl mx-auto leading-relaxed">
                         Seamlessly connecting residents, wardens, dining services, facilities, and confidential mental wellness care with GEMA-4 open-source AI intelligence.
                     </p>
 
@@ -173,8 +185,8 @@
                             <i class="fa-solid fa-shield-halved"></i>
                             <span>Admin & Staff Console</span>
                         </button>
-                        <button onclick="app.openModal('registerModal')" class="px-5 py-3.5 rounded-xl border border-[#52b788]/30 bg-[#143528]/80 hover:bg-[#1b4332] text-xs font-semibold text-[#faedcd] transition flex items-center gap-2">
-                            <i class="fa-solid fa-user-plus text-[#52b788]"></i>
+                        <button onclick="app.openModal('registerModal')" class="px-5 py-3.5 rounded-xl border border-[#bae6fd]/30 bg-[#f0f9ff]/80 hover:bg-[#0284c7] text-xs font-semibold text-white transition flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-[#0284c7]"></i>
                             <span>New Student Registration</span>
                         </button>
                     </div>
@@ -182,20 +194,20 @@
                     <!-- Live KPI Metrics Ribbon (Dynamic Data via /api/public-metrics) -->
                     <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                         <div class="forest-card p-4 text-center rounded-2xl">
-                            <div id="heroOccupancyVal" class="text-2xl font-extrabold text-[#fefae0]">98.2%</div>
-                            <div class="text-xs text-[#8fb89e] font-medium mt-1">Bed Occupancy Rate</div>
+                            <div id="heroOccupancyVal" class="text-2xl font-extrabold text-[#0f172a]">98.2%</div>
+                            <div class="text-xs text-[#64748b] font-medium mt-1">Bed Occupancy Rate</div>
                         </div>
                         <div class="forest-card p-4 text-center rounded-2xl">
-                            <div id="heroSLAVal" class="text-2xl font-extrabold text-[#52b788]">12 Mins</div>
-                            <div class="text-xs text-[#8fb89e] font-medium mt-1">GEMA-4 Triage SLA</div>
+                            <div id="heroSLAVal" class="text-2xl font-extrabold text-[#0284c7]">12 Mins</div>
+                            <div class="text-xs text-[#64748b] font-medium mt-1">GEMA-4 Triage SLA</div>
                         </div>
                         <div class="forest-card p-4 text-center rounded-2xl">
-                            <div id="heroFoodVal" class="text-2xl font-extrabold text-[#faedcd]">4.8 / 5.0</div>
-                            <div class="text-xs text-[#8fb89e] font-medium mt-1">GEMA-4 Food Sentiment</div>
+                            <div id="heroFoodVal" class="text-2xl font-extrabold text-[#0284c7]">4.8 / 5.0</div>
+                            <div class="text-xs text-[#64748b] font-medium mt-1">GEMA-4 Food Sentiment</div>
                         </div>
                         <div class="forest-card p-4 text-center rounded-2xl">
-                            <div id="heroCareVal" class="text-2xl font-extrabold text-[#52b788]">100%</div>
-                            <div class="text-xs text-[#8fb89e] font-medium mt-1">Confidential Wellness Care</div>
+                            <div id="heroCareVal" class="text-2xl font-extrabold text-[#0284c7]">100%</div>
+                            <div class="text-xs text-[#64748b] font-medium mt-1">Confidential Wellness Care</div>
                         </div>
                     </div>
                 </div>
@@ -204,73 +216,73 @@
             <!-- Feature Showcase Grid -->
             <div class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center max-w-2xl mx-auto mb-12">
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-[#fefae0] font-serif-title">Engineered for Campus Residential Excellence</h2>
-                    <p class="text-sm text-[#8fb89e] mt-2">Everything students and hostel administrators need in real time, from biometric leaves to mess nutrition.</p>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0f172a] font-serif-title">Engineered for Campus Residential Excellence</h2>
+                    <p class="text-sm text-[#64748b] mt-2">Everything students and hostel administrators need in real time, from biometric leaves to mess nutrition.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Feature 1 -->
                     <div class="forest-card p-6 rounded-2xl forest-card-hover transition space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-[#52b788]/20 border border-[#52b788]/40 flex items-center justify-center text-[#52b788] text-xl">
+                        <div class="w-12 h-12 rounded-xl bg-[#0284c7]/20 border border-[#bae6fd]/40 flex items-center justify-center text-white text-xl">
                             <i class="fa-solid fa-bed"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-[#fefae0]">Smart Room & Bed Allocation</h3>
-                        <p class="text-xs text-[#8fb89e] leading-relaxed">
+                        <h3 class="text-lg font-bold text-[#0f172a]">Smart Room & Bed Allocation</h3>
+                        <p class="text-xs text-[#64748b] leading-relaxed">
                             Dynamic room configuration, floor & wing layouts, roommate directory, and automated occupancy balancing for 100% transparent campus living.
                         </p>
                     </div>
 
                     <!-- Feature 2 -->
                     <div class="forest-card p-6 rounded-2xl forest-card-hover transition space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-[#faedcd]/20 border border-[#faedcd]/40 flex items-center justify-center text-[#faedcd] text-xl">
+                        <div class="w-12 h-12 rounded-xl bg-[#faedcd]/20 border border-[#faedcd]/40 flex items-center justify-center text-white text-xl">
                             <i class="fa-solid fa-passport"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-[#fefae0]">Biometric Leave & Gate Passes</h3>
-                        <p class="text-xs text-[#8fb89e] leading-relaxed">
+                        <h3 class="text-lg font-bold text-[#0f172a]">Biometric Leave & Gate Passes</h3>
+                        <p class="text-xs text-[#64748b] leading-relaxed">
                             Digital out-pass applications with warden one-click approval, automated parent notification, emergency contact verification, and digital gate QR.
                         </p>
                     </div>
 
                     <!-- Feature 3 -->
                     <div class="forest-card p-6 rounded-2xl forest-card-hover transition space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-[#52b788]/20 border border-[#52b788]/40 flex items-center justify-center text-[#52b788] text-xl">
+                        <div class="w-12 h-12 rounded-xl bg-[#0284c7]/20 border border-[#bae6fd]/40 flex items-center justify-center text-white text-xl">
                             <i class="fa-solid fa-utensils"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-[#fefae0]">Digital Mess & Nutrition Hub</h3>
-                        <p class="text-xs text-[#8fb89e] leading-relaxed">
+                        <h3 class="text-lg font-bold text-[#0f172a]">Digital Mess & Nutrition Hub</h3>
+                        <p class="text-xs text-[#64748b] leading-relaxed">
                             Real-time weekly menus with calorie tags, student dietary feedback, meal rating index, and kitchen inventory coordination.
                         </p>
                     </div>
 
                     <!-- Feature 4 -->
                     <div class="forest-card p-6 rounded-2xl forest-card-hover transition space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-[#faedcd]/20 border border-[#faedcd]/40 flex items-center justify-center text-[#faedcd] text-xl">
+                        <div class="w-12 h-12 rounded-xl bg-[#faedcd]/20 border border-[#faedcd]/40 flex items-center justify-center text-white text-xl">
                             <i class="fa-solid fa-shirt"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-[#fefae0]">Express Laundry & Housekeeping</h3>
-                        <p class="text-xs text-[#8fb89e] leading-relaxed">
+                        <h3 class="text-lg font-bold text-[#0f172a]">Express Laundry & Housekeeping</h3>
+                        <p class="text-xs text-[#64748b] leading-relaxed">
                             Schedule linen washing, dry cleaning, and weekly room deep-cleaning with automated pickup notices and real-time status tracking.
                         </p>
                     </div>
 
                     <!-- Feature 5 -->
                     <div class="forest-card p-6 rounded-2xl forest-card-hover transition space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-[#52b788]/20 border border-[#52b788]/40 flex items-center justify-center text-[#52b788] text-xl">
+                        <div class="w-12 h-12 rounded-xl bg-[#0284c7]/20 border border-[#bae6fd]/40 flex items-center justify-center text-white text-xl">
                             <i class="fa-solid fa-heart-pulse"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-[#fefae0]">MANN Care: Confidential Sanctuary</h3>
-                        <p class="text-xs text-[#8fb89e] leading-relaxed">
+                        <h3 class="text-lg font-bold text-[#0f172a]">MANN Care: Confidential Sanctuary</h3>
+                        <p class="text-xs text-[#64748b] leading-relaxed">
                             Zero-compromise student mental wellness sanctuary. Direct private counselling appointments strictly isolated from hostel wardens and administrative records.
                         </p>
                     </div>
 
                     <!-- Feature 6 -->
                     <div class="forest-card p-6 rounded-2xl forest-card-hover transition space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-[#faedcd]/20 border border-[#faedcd]/40 flex items-center justify-center text-[#faedcd] text-xl">
+                        <div class="w-12 h-12 rounded-xl bg-[#faedcd]/20 border border-[#faedcd]/40 flex items-center justify-center text-white text-xl">
                             <i class="fa-solid fa-receipt"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-[#fefae0]">Financial Ledger & Online Dues</h3>
-                        <p class="text-xs text-[#8fb89e] leading-relaxed">
+                        <h3 class="text-lg font-bold text-[#0f172a]">Financial Ledger & Online Dues</h3>
+                        <p class="text-xs text-[#64748b] leading-relaxed">
                             Integrated student fee ledger, instant digital receipt generation, security deposit tracking, and administrative finance analytics.
                         </p>
                     </div>
@@ -279,48 +291,48 @@
 
             <!-- Quick Demo Credentials Box (Prompted Requirement) -->
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full">
-                <div class="forest-card p-6 sm:p-8 rounded-3xl border border-[#52b788]/30 relative overflow-hidden">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#52b788]/20">
+                <div class="forest-card p-6 sm:p-8 rounded-3xl border border-[#bae6fd]/30 relative overflow-hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#bae6fd]/20">
                         <div>
-                            <span class="text-xs font-bold uppercase tracking-wider text-[#faedcd]">Pre-Configured Demo Credentials</span>
-                            <h3 class="text-xl font-bold text-[#fefae0] mt-0.5">Instant One-Click Login & QA Testing</h3>
+                            <span class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">Pre-Configured Demo Credentials</span>
+                            <h3 class="text-xl font-bold text-[#0f172a] mt-0.5">Instant One-Click Login & QA Testing</h3>
                         </div>
-                        <span class="text-xs px-3 py-1 rounded-full bg-[#52b788]/20 text-[#52b788] border border-[#52b788]/40 font-semibold self-start sm:self-auto">
+                        <span class="text-xs px-3 py-1 rounded-full bg-[#0284c7]/20 text-[#0284c7] border border-[#bae6fd]/40 font-semibold self-start sm:self-auto">
                             SHA-256 Hashed Passwords
                         </span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                         <!-- Student Card -->
-                        <div class="p-4 rounded-xl bg-[#0f281e]/80 border border-[#52b788]/20 space-y-2">
+                        <div class="p-4 rounded-xl bg-[#ffffff]/80 border border-[#bae6fd]/20 space-y-2">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
+                                <span class="text-xs font-bold text-[#0284c7] flex items-center gap-1.5">
                                     <i class="fa-solid fa-graduation-cap"></i> Demo Student Resident
                                 </span>
-                                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">Approved</span>
+                                <span class="text-[10px] bg-emerald-500/10 text-sky-600 px-2 py-0.5 rounded border border-sky-300">Approved</span>
                             </div>
-                            <div class="text-xs font-mono text-[#fefae0] space-y-1">
-                                <div><span class="text-[#8fb89e]">College ID:</span> <span class="font-bold">NST2026-042</span> (or <span class="text-[#faedcd]">student1</span>)</div>
-                                <div><span class="text-[#8fb89e]">Password:</span> <span class="font-bold">Student@123</span></div>
+                            <div class="text-xs font-mono text-[#0f172a] space-y-1">
+                                <div><span class="text-[#64748b]">College ID:</span> <span class="font-bold">NST2026-042</span> (or <span class="text-[#0284c7]">student1</span>)</div>
+                                <div><span class="text-[#64748b]">Password:</span> <span class="font-bold">Student@123</span></div>
                             </div>
-                            <button onclick="app.fillAndLoginStudent('NST2026-042', 'Student@123')" class="w-full mt-2 py-2 rounded-lg bg-[#1b4332] hover:bg-[#2d6a4f] text-xs font-semibold text-[#fefae0] transition border border-[#52b788]/30">
+                            <button onclick="app.fillAndLoginStudent('NST2026-042', 'Student@123')" class="w-full mt-2 py-2 rounded-lg bg-[#0284c7] hover:bg-[#0ea5e9] text-xs font-semibold text-white transition border border-[#bae6fd]/30">
                                 Log In as Demo Student
                             </button>
                         </div>
 
                         <!-- Admin Card -->
-                        <div class="p-4 rounded-xl bg-[#0f281e]/80 border border-[#52b788]/20 space-y-2">
+                        <div class="p-4 rounded-xl bg-[#ffffff]/80 border border-[#bae6fd]/20 space-y-2">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-[#faedcd] flex items-center gap-1.5">
+                                <span class="text-xs font-bold text-[#0284c7] flex items-center gap-1.5">
                                     <i class="fa-solid fa-user-shield"></i> Demo Administrator
                                 </span>
                                 <span class="text-[10px] bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded border border-amber-500/20">Executive</span>
                             </div>
-                            <div class="text-xs font-mono text-[#fefae0] space-y-1">
-                                <div><span class="text-[#8fb89e]">Admin ID:</span> <span class="font-bold">ADMIN-001</span> (or <span class="text-[#faedcd]">admin1</span>)</div>
-                                <div><span class="text-[#8fb89e]">Password:</span> <span class="font-bold">Admin@123</span></div>
+                            <div class="text-xs font-mono text-[#0f172a] space-y-1">
+                                <div><span class="text-[#64748b]">Admin ID:</span> <span class="font-bold">ADMIN-001</span> (or <span class="text-[#0284c7]">admin1</span>)</div>
+                                <div><span class="text-[#64748b]">Password:</span> <span class="font-bold">Admin@123</span></div>
                             </div>
-                            <button onclick="app.fillAndLoginAdmin('ADMIN-001', 'Admin@123')" class="w-full mt-2 py-2 rounded-lg bg-[#2d6a4f] hover:bg-[#40916c] text-xs font-semibold text-[#fefae0] transition border border-[#52b788]/40">
+                            <button onclick="app.fillAndLoginAdmin('ADMIN-001', 'Admin@123')" class="w-full mt-2 py-2 rounded-lg bg-[#0ea5e9] hover:bg-[#38bdf8] text-xs font-semibold text-white transition border border-[#bae6fd]/40">
                                 Log In as Demo Admin
                             </button>
                         </div>
@@ -329,16 +341,16 @@
             </div>
 
             <!-- Campus Emergency Strip -->
-            <footer class="mt-auto border-t border-[#52b788]/20 bg-[#0f281e] py-6">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#8fb89e]">
+            <footer class="mt-auto border-t border-[#bae6fd]/20 bg-[#ffffff] py-6">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#64748b]">
                     <div class="flex items-center gap-2">
-                        <span class="font-bold text-[#fefae0]">MANN Smart Hostel OS 2.0</span>
+                        <span class="font-bold text-[#0f172a]">MANN Smart Hostel OS 2.0</span>
                         <span>• Campus Security & Resident Command</span>
                     </div>
                     <div class="flex flex-wrap items-center gap-4">
                         <span class="flex items-center gap-1 text-red-400 font-semibold"><i class="fa-solid fa-phone-volume"></i> Emergency: +91 98765-43210</span>
-                        <span class="flex items-center gap-1 text-[#52b788]"><i class="fa-solid fa-hospital"></i> Campus Medical: Ext. 108</span>
-                        <span class="flex items-center gap-1 text-[#faedcd]"><i class="fa-solid fa-shield"></i> Security Desk: Ext. 101</span>
+                        <span class="flex items-center gap-1 text-[#0284c7]"><i class="fa-solid fa-hospital"></i> Campus Medical: Ext. 108</span>
+                        <span class="flex items-center gap-1 text-[#0284c7]"><i class="fa-solid fa-shield"></i> Security Desk: Ext. 101</span>
                     </div>
                 </div>
             </footer>
@@ -353,10 +365,10 @@
             <!-- SIDEBAR NAVIGATION -->
             <aside id="sidebarNav" class="w-full md:w-64 flex-shrink-0 space-y-2">
                 <!-- User Profile & Context Card -->
-                <div class="p-4 rounded-2xl bg-[#0f281e]/90 border border-[#52b788]/20 shadow-md">
-                    <div class="text-[10px] font-bold text-[#8fb89e] uppercase tracking-wider mb-1">Active Portal</div>
-                    <div id="sidebarPortalName" class="font-extrabold text-[#fefae0] text-base font-serif-title">Student Portal</div>
-                    <div id="sidebarUserSubtext" class="text-xs text-[#52b788] font-mono mt-0.5">Room A-204 · Bed A</div>
+                <div class="p-4 rounded-2xl bg-[#ffffff]/90 border border-[#bae6fd]/20 shadow-md">
+                    <div class="text-[10px] font-bold text-[#64748b] uppercase tracking-wider mb-1">Active Portal</div>
+                    <div id="sidebarPortalName" class="font-extrabold text-[#0f172a] text-base font-serif-title">Student Portal</div>
+                    <div id="sidebarUserSubtext" class="text-xs text-[#0284c7] font-mono mt-0.5">Room A-204 · Bed A</div>
                 </div>
 
                 <!-- Dynamic Nav Menu Items -->
@@ -365,12 +377,12 @@
                 </nav>
 
                 <!-- Confidentiality Privacy Vault Notice (Always visible when in MANN Care or Student mode) -->
-                <div id="wellnessPrivacyNotice" class="p-3.5 rounded-2xl bg-emerald-950/30 border border-[#52b788]/30 text-xs">
-                    <div class="flex items-center gap-2 text-[#52b788] font-bold mb-1">
+                <div id="wellnessPrivacyNotice" class="p-3.5 rounded-2xl bg-sky-50/80 border-sky-200 border border-[#bae6fd]/30 text-xs">
+                    <div class="flex items-center gap-2 text-[#0284c7] font-bold mb-1">
                         <i class="fa-solid fa-user-shield"></i>
                         <span>Confidentiality Seal</span>
                     </div>
-                    <p class="text-[#8fb89e] text-[11px] leading-relaxed">
+                    <p class="text-[#64748b] text-[11px] leading-relaxed">
                         Student wellness counseling logs and mental health records are encrypted and strictly isolated. Hostel wardens and admins have zero access.
                     </p>
                 </div>
@@ -383,13 +395,13 @@
                 <!-- STUDENT MODULE 1: MY ROOM                 -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-my-room" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-door-open text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-door-open text-[#0284c7]"></i>
                                 <span>My Room & Residence Details</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Manage your residential allotment, inventory, and digital room key</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Manage your residential allotment, inventory, and digital room key</p>
                         </div>
                         <button onclick="app.downloadRoomKeyPass()" class="px-4 py-2 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2 self-start sm:self-auto">
                             <i class="fa-solid fa-qrcode"></i> Digital Key Pass
@@ -406,29 +418,29 @@
                 <!-- STUDENT MODULE 2: MY COMPLAINTS           -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-complaints" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-wrench text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-wrench text-[#0284c7]"></i>
                                 <span id="complaintViewTitle">Hostel Maintenance & Complaints</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Submit maintenance tickets, track repair technicians, and confirm resolutions</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Submit maintenance tickets, track repair technicians, and confirm resolutions</p>
                         </div>
                         <div id="complaintActionButtons">
-                            <button onclick="app.openModal('submitComplaintModal')" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2 shadow-lg shadow-[#52b788]/20">
+                            <button onclick="app.openModal('submitComplaintModal')" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2 shadow-lg shadow-[#0ea5e9]/20">
                                 <i class="fa-solid fa-plus"></i> Submit Complaint
                             </button>
                         </div>
                     </div>
 
                     <!-- Search & Filters -->
-                    <div class="flex flex-wrap items-center gap-3 bg-[#0f281e]/80 p-3 rounded-2xl border border-[#52b788]/20 text-xs">
+                    <div class="flex flex-wrap items-center gap-3 bg-[#ffffff]/80 p-3 rounded-2xl border border-[#bae6fd]/20 text-xs">
                         <div class="flex-1 min-w-[200px] relative">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-[#8fb89e]"></i>
-                            <input type="text" id="complaintSearchInput" placeholder="Search complaints by ID, title, room..." class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-[#64748b]"></i>
+                            <input type="text" id="complaintSearchInput" placeholder="Search complaints by ID, title, room..." class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd]">
                         </div>
                         <div class="flex items-center gap-2">
-                            <select id="complaintStatusFilter" class="bg-[#143528] border border-[#52b788]/20 rounded-xl px-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                            <select id="complaintStatusFilter" class="bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl px-3 py-1.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd]">
                                 <option value="">All Statuses</option>
                                 <option value="Open">Open</option>
                                 <option value="Assigned">Assigned</option>
@@ -436,7 +448,7 @@
                                 <option value="Resolved">Resolved</option>
                                 <option value="Closed">Closed</option>
                             </select>
-                            <select id="complaintCategoryFilter" class="bg-[#143528] border border-[#52b788]/20 rounded-xl px-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                            <select id="complaintCategoryFilter" class="bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl px-3 py-1.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd]">
                                 <option value="">All Categories</option>
                                 <option value="Electrical">Electrical</option>
                                 <option value="Plumbing">Plumbing</option>
@@ -459,13 +471,13 @@
                 <!-- STUDENT MODULE 3: MESS MENU               -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-mess" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-utensils text-[#faedcd]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-utensils text-[#0284c7]"></i>
                                 <span>Digital Dining & Weekly Mess Menu</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Explore weekly nutrition schedules, today's meals, and share feedback</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Explore weekly nutrition schedules, today's meals, and share feedback</p>
                         </div>
                         <button onclick="app.openModal('submitMessFeedbackModal')" class="px-4 py-2 rounded-xl btn-cream-accent text-xs font-semibold flex items-center gap-2 self-start sm:self-auto">
                             <i class="fa-solid fa-star text-amber-400"></i> Rate Today's Food
@@ -483,9 +495,9 @@
                     </div>
 
                     <!-- Mess Feedback List -->
-                    <div class="pt-4 border-t border-[#52b788]/20">
-                        <h3 class="text-base font-bold text-[#fefae0] mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-comments text-[#52b788]"></i> Recent Resident Meal Feedback
+                    <div class="pt-4 border-t border-[#bae6fd]/20">
+                        <h3 class="text-base font-bold text-[#0f172a] mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-comments text-[#0284c7]"></i> Recent Resident Meal Feedback
                         </h3>
                         <div id="messFeedbackContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="skeleton-shimmer h-20 rounded-2xl"></div>
@@ -497,26 +509,26 @@
                 <!-- STUDENT MODULE 4: LEAVE REQUESTS          -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-leaves" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-calendar-check text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-check text-[#0284c7]"></i>
                                 <span>Leave & Gate Pass Management</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Apply for weekend/home leave, verify warden approvals, and view digital out-pass</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Apply for weekend/home leave, verify warden approvals, and view digital out-pass</p>
                         </div>
-                        <button onclick="app.openModal('applyLeaveModal')" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2 shadow-lg shadow-[#52b788]/20">
+                        <button onclick="app.openModal('applyLeaveModal')" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2 shadow-lg shadow-[#0ea5e9]/20">
                             <i class="fa-solid fa-paper-plane"></i> Apply for Leave
                         </button>
                     </div>
 
                     <!-- Search & Filter -->
-                    <div class="flex flex-wrap items-center gap-3 bg-[#0f281e]/80 p-3 rounded-2xl border border-[#52b788]/20 text-xs">
+                    <div class="flex flex-wrap items-center gap-3 bg-[#ffffff]/80 p-3 rounded-2xl border border-[#bae6fd]/20 text-xs">
                         <div class="flex-1 min-w-[200px] relative">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-[#8fb89e]"></i>
-                            <input type="text" id="leaveSearchInput" placeholder="Search leave by ID, reason, destination..." class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-[#64748b]"></i>
+                            <input type="text" id="leaveSearchInput" placeholder="Search leave by ID, reason, destination..." class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd]">
                         </div>
-                        <select id="leaveStatusFilter" class="bg-[#143528] border border-[#52b788]/20 rounded-xl px-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                        <select id="leaveStatusFilter" class="bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl px-3 py-1.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd]">
                             <option value="">All Statuses</option>
                             <option value="Pending">Pending Approval</option>
                             <option value="Approved">Approved</option>
@@ -533,13 +545,13 @@
                 <!-- STUDENT MODULE 5: FEES AND PAYMENTS       -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-fees" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-credit-card text-[#faedcd]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-credit-card text-[#0284c7]"></i>
                                 <span>Hostel Fees & Digital Ledger</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Check outstanding dues, pay hostel & mess fees, and generate official receipts</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Check outstanding dues, pay hostel & mess fees, and generate official receipts</p>
                         </div>
                     </div>
 
@@ -550,9 +562,9 @@
                         <div class="skeleton-shimmer h-28 rounded-2xl"></div>
                     </div>
 
-                    <div class="forest-card p-6 rounded-2xl border border-[#52b788]/20">
-                        <h3 class="text-base font-bold text-[#fefae0] mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-file-invoice text-[#52b788]"></i> Current Term Fee Invoices
+                    <div class="forest-card p-6 rounded-2xl border border-[#bae6fd]/20">
+                        <h3 class="text-base font-bold text-[#0f172a] mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice text-[#0284c7]"></i> Current Term Fee Invoices
                         </h3>
                         <div id="studentFeesInvoicesContainer" class="space-y-3">
                             <div class="skeleton-shimmer h-20 rounded-2xl"></div>
@@ -564,13 +576,13 @@
                 <!-- STUDENT MODULE 6: LAUNDRY                 -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-laundry" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-shirt text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-shirt text-[#0284c7]"></i>
                                 <span>Express Laundry Services</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Schedule linen & clothes wash, dry cleaning, and check pickup readiness</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Schedule linen & clothes wash, dry cleaning, and check pickup readiness</p>
                         </div>
                         <button onclick="app.openModal('requestLaundryModal')" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2">
                             <i class="fa-solid fa-basket-shopping"></i> Request Laundry Pickup
@@ -586,13 +598,13 @@
                 <!-- STUDENT MODULE 7: CLEANING REQUESTS       -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-cleaning" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-broom text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-broom text-[#0284c7]"></i>
                                 <span>Room Housekeeping & Deep Clean</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Book dedicated room sanitization, floor scrubbing, and washroom cleaning</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Book dedicated room sanitization, floor scrubbing, and washroom cleaning</p>
                         </div>
                         <button onclick="app.openModal('requestCleaningModal')" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2">
                             <i class="fa-solid fa-sparkles"></i> Book Cleaning Slot
@@ -608,13 +620,13 @@
                 <!-- STUDENT MODULE 8: VISITOR REQUESTS        -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-visitors" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-id-badge text-[#faedcd]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-id-badge text-[#0284c7]"></i>
                                 <span>Visitor & Guest Gate Passes</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Pre-register family and guests for smooth campus security gate entry</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Pre-register family and guests for smooth campus security gate entry</p>
                         </div>
                         <button onclick="app.openModal('requestVisitorModal')" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2">
                             <i class="fa-solid fa-user-plus"></i> Pre-Register Visitor
@@ -630,13 +642,13 @@
                 <!-- STUDENT MODULE 9: COMMUNITY HUB           -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-community" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-users text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-users text-[#0284c7]"></i>
                                 <span>Hostel Community Hub</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Connect with hostel peers, share study circles, and report lost & found items</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Connect with hostel peers, share study circles, and report lost & found items</p>
                         </div>
                         <button onclick="app.openModal('createCommunityPostModal')" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2">
                             <i class="fa-solid fa-pen-nib"></i> New Community Post
@@ -652,13 +664,13 @@
                 <!-- STUDENT MODULE 10: ANNOUNCEMENTS          -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-announcements" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-bullhorn text-[#faedcd]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-bullhorn text-[#0284c7]"></i>
                                 <span>Official Hostel Bulletins</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Direct announcements from Chief Warden, Maintenance Desk, and Administration</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Direct announcements from Chief Warden, Maintenance Desk, and Administration</p>
                         </div>
                     </div>
 
@@ -671,9 +683,9 @@
                 <!-- STUDENT MODULE 11: MANN CARE (WELLNESS)   -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-mann-care" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
                                 <i class="fa-solid fa-shield-heart text-purple-400"></i>
                                 <span>MANN Care: Confidential Sanctuary</span>
                             </h2>
@@ -706,13 +718,13 @@
                 <!-- STUDENT MODULE 12: PROFILE                -->
                 <!-- ----------------------------------------- -->
                 <div id="view-student-profile" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-id-card text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-id-card text-[#0284c7]"></i>
                                 <span>Resident Identity & Profile</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Official student records, emergency contacts, and housing credentials</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Official student records, emergency contacts, and housing credentials</p>
                         </div>
                     </div>
 
@@ -727,16 +739,16 @@
 
                 <!-- ADMIN MODULE 1: OVERVIEW -->
                 <div id="view-admin-overview" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-chart-line text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line text-[#0284c7]"></i>
                                 <span>Command Overview & Hostel Metrics</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Real-time occupancy rates, work orders, leave passes, and student verifications</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Real-time occupancy rates, work orders, leave passes, and student verifications</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs text-[#8fb89e]"><i class="fa-solid fa-circle text-emerald-400 text-[8px] animate-pulse"></i> Live Sync</span>
+                            <span class="text-xs text-[#64748b]"><i class="fa-solid fa-circle text-sky-600 text-[8px] animate-pulse"></i> Live Sync</span>
                         </div>
                     </div>
 
@@ -752,44 +764,44 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <button onclick="app.navigateToAdminSubTab('admin-students')" class="forest-card p-4 rounded-2xl forest-card-hover text-left flex items-center justify-between">
                             <div>
-                                <div class="text-xs font-bold text-[#8fb89e] uppercase">Verification Queue</div>
-                                <div class="text-sm font-bold text-[#fefae0] mt-0.5">Review Pending Students</div>
+                                <div class="text-xs font-bold text-[#64748b] uppercase">Verification Queue</div>
+                                <div class="text-sm font-bold text-[#0f172a] mt-0.5">Review Pending Students</div>
                             </div>
-                            <i class="fa-solid fa-user-check text-[#52b788] text-xl"></i>
+                            <i class="fa-solid fa-user-check text-[#0284c7] text-xl"></i>
                         </button>
                         <button onclick="app.navigateToAdminSubTab('admin-complaints')" class="forest-card p-4 rounded-2xl forest-card-hover text-left flex items-center justify-between">
                             <div>
-                                <div class="text-xs font-bold text-[#8fb89e] uppercase">Maintenance Hub</div>
-                                <div class="text-sm font-bold text-[#fefae0] mt-0.5">Assign Technicians</div>
+                                <div class="text-xs font-bold text-[#64748b] uppercase">Maintenance Hub</div>
+                                <div class="text-sm font-bold text-[#0f172a] mt-0.5">Assign Technicians</div>
                             </div>
-                            <i class="fa-solid fa-wrench text-[#faedcd] text-xl"></i>
+                            <i class="fa-solid fa-wrench text-[#0284c7] text-xl"></i>
                         </button>
                         <button onclick="app.navigateToAdminSubTab('admin-announcements')" class="forest-card p-4 rounded-2xl forest-card-hover text-left flex items-center justify-between">
                             <div>
-                                <div class="text-xs font-bold text-[#8fb89e] uppercase">Campus Broadcast</div>
-                                <div class="text-sm font-bold text-[#fefae0] mt-0.5">Publish Announcement</div>
+                                <div class="text-xs font-bold text-[#64748b] uppercase">Campus Broadcast</div>
+                                <div class="text-sm font-bold text-[#0f172a] mt-0.5">Publish Announcement</div>
                             </div>
-                            <i class="fa-solid fa-bullhorn text-[#52b788] text-xl"></i>
+                            <i class="fa-solid fa-bullhorn text-[#0284c7] text-xl"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- ADMIN MODULE 2: STUDENT MANAGEMENT -->
                 <div id="view-admin-students" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-user-graduate text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-user-graduate text-[#0284c7]"></i>
                                 <span>Resident Student Directory & Approvals</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Review pending admissions, approve accounts, allocate beds, and manage records</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Review pending admissions, approve accounts, allocate beds, and manage records</p>
                         </div>
                     </div>
 
                     <!-- Pending Approvals Callout Section -->
-                    <div class="forest-card p-5 rounded-2xl border-l-4 border-l-amber-400 border border-[#52b788]/20">
+                    <div class="forest-card p-5 rounded-2xl border-l-4 border-l-amber-400 border border-[#bae6fd]/20">
                         <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-sm font-bold text-[#fefae0] flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-[#0f172a] flex items-center gap-2">
                                 <i class="fa-solid fa-user-clock text-amber-400"></i>
                                 <span>Pending Student Registration Approvals</span>
                             </h3>
@@ -801,12 +813,12 @@
                     </div>
 
                     <!-- Full Student Roster -->
-                    <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-4">
+                    <div class="forest-card p-5 rounded-2xl border border-[#bae6fd]/20 space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <h3 class="text-sm font-bold text-[#fefae0] flex items-center gap-2">
-                                <i class="fa-solid fa-users text-[#52b788]"></i> Active Student Roster
+                            <h3 class="text-sm font-bold text-[#0f172a] flex items-center gap-2">
+                                <i class="fa-solid fa-users text-[#0284c7]"></i> Active Student Roster
                             </h3>
-                            <input type="text" id="adminStudentSearchInput" oninput="app.filterAdminStudents()" placeholder="Search by name, College ID, room..." class="bg-[#143528] border border-[#52b788]/20 rounded-xl px-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788] max-w-xs">
+                            <input type="text" id="adminStudentSearchInput" oninput="app.filterAdminStudents()" placeholder="Search by name, College ID, room..." class="bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl px-3 py-1.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd] max-w-xs">
                         </div>
                         <div id="adminStudentsTableContainer" class="overflow-x-auto">
                             <div class="skeleton-shimmer h-40 rounded-xl"></div>
@@ -816,13 +828,13 @@
 
                 <!-- ADMIN MODULE 3: ROOM MANAGEMENT -->
                 <div id="view-admin-rooms" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-hotel text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-hotel text-[#0284c7]"></i>
                                 <span>Room & Bed Inventory Management</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Manage hostel blocks, capacity, allocate vacant beds, and track occupancy</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Manage hostel blocks, capacity, allocate vacant beds, and track occupancy</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <button onclick="app.openModal('allocateBedModal')" class="px-3.5 py-2 rounded-xl btn-cream-accent text-xs font-semibold flex items-center gap-1.5">
@@ -835,14 +847,14 @@
                     </div>
 
                     <!-- Room Block & Occupancy Filters -->
-                    <div class="flex flex-wrap items-center gap-3 bg-[#0f281e]/80 p-3 rounded-2xl border border-[#52b788]/20 text-xs">
-                        <select id="roomBlockFilter" class="bg-[#143528] border border-[#52b788]/20 rounded-xl px-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                    <div class="flex flex-wrap items-center gap-3 bg-[#ffffff]/80 p-3 rounded-2xl border border-[#bae6fd]/20 text-xs">
+                        <select id="roomBlockFilter" class="bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl px-3 py-1.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd]">
                             <option value="">All Blocks (A, B, C)</option>
                             <option value="A">Block A</option>
                             <option value="B">Block B</option>
                             <option value="C">Block C</option>
                         </select>
-                        <select id="roomOccupancyFilter" class="bg-[#143528] border border-[#52b788]/20 rounded-xl px-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                        <select id="roomOccupancyFilter" class="bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl px-3 py-1.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd]">
                             <option value="">All Occupancy Levels</option>
                             <option value="vacant">Has Vacant Beds</option>
                             <option value="full">Completely Full</option>
@@ -856,13 +868,13 @@
 
                 <!-- ADMIN MODULE 4: COMPLAINT MANAGEMENT (ADMIN) -->
                 <div id="view-admin-complaints" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-list-check text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-[#0284c7]"></i>
                                 <span>Master Maintenance & Complaint Queue</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Assign technicians, monitor progress SLAs, and resolve work tickets</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Assign technicians, monitor progress SLAs, and resolve work tickets</p>
                         </div>
                     </div>
 
@@ -873,13 +885,13 @@
 
                 <!-- ADMIN MODULE 5: LEAVE APPROVALS (WARDEN) -->
                 <div id="view-admin-leaves" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-envelope-open-text text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-envelope-open-text text-[#0284c7]"></i>
                                 <span>Leave & Gate Out-Pass Review Desk</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Verify guardian contact, validate curfew timings, and grant digital gate passes</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Verify guardian contact, validate curfew timings, and grant digital gate passes</p>
                         </div>
                     </div>
 
@@ -890,23 +902,23 @@
 
                 <!-- ADMIN MODULE 6: MESS MANAGEMENT -->
                 <div id="view-admin-mess" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-utensils text-[#faedcd]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-utensils text-[#0284c7]"></i>
                                 <span>Mess Operations & Menu Publisher</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Update daily weekly dining schedules and track resident food satisfaction</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Update daily weekly dining schedules and track resident food satisfaction</p>
                         </div>
                     </div>
 
                     <!-- Menu Editor Card -->
-                    <div class="forest-card p-6 rounded-2xl border border-[#52b788]/20 space-y-4">
+                    <div class="forest-card p-6 rounded-2xl border border-[#bae6fd]/20 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-3">
-                            <h3 class="text-base font-bold text-[#fefae0]">Edit Daily Menu</h3>
+                            <h3 class="text-base font-bold text-[#0f172a]">Edit Daily Menu</h3>
                             <div class="flex items-center gap-2">
-                                <label class="text-xs text-[#8fb89e]">Select Day:</label>
-                                <select id="adminMessDaySelect" onchange="app.loadAdminMessMenuDay()" class="bg-[#143528] border border-[#52b788]/20 rounded-xl px-3 py-1.5 text-xs text-[#fefae0]">
+                                <label class="text-xs text-[#64748b]">Select Day:</label>
+                                <select id="adminMessDaySelect" onchange="app.loadAdminMessMenuDay()" class="bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl px-3 py-1.5 text-xs text-[#0f172a]">
                                     <option value="Monday">Monday</option>
                                     <option value="Tuesday">Tuesday</option>
                                     <option value="Wednesday">Wednesday</option>
@@ -920,24 +932,24 @@
 
                         <form id="adminMessMenuForm" onsubmit="app.handleUpdateMessMenu(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Breakfast (07:30 - 09:30)</label>
-                                <textarea id="editBreakfast" rows="2" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2.5 text-xs text-[#fefae0]"></textarea>
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Breakfast (07:30 - 09:30)</label>
+                                <textarea id="editBreakfast" rows="2" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2.5 text-xs text-[#0f172a]"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Lunch (12:30 - 14:30)</label>
-                                <textarea id="editLunch" rows="2" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2.5 text-xs text-[#fefae0]"></textarea>
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Lunch (12:30 - 14:30)</label>
+                                <textarea id="editLunch" rows="2" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2.5 text-xs text-[#0f172a]"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Evening Snacks (17:00 - 18:00)</label>
-                                <textarea id="editSnacks" rows="2" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2.5 text-xs text-[#fefae0]"></textarea>
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Evening Snacks (17:00 - 18:00)</label>
+                                <textarea id="editSnacks" rows="2" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2.5 text-xs text-[#0f172a]"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Dinner (19:30 - 21:30)</label>
-                                <textarea id="editDinner" rows="2" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2.5 text-xs text-[#fefae0]"></textarea>
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Dinner (19:30 - 21:30)</label>
+                                <textarea id="editDinner" rows="2" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2.5 text-xs text-[#0f172a]"></textarea>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Special Diet / Chef Note</label>
-                                <input type="text" id="editSpecialNotes" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2 text-xs text-[#fefae0]">
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Special Diet / Chef Note</label>
+                                <input type="text" id="editSpecialNotes" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2 text-xs text-[#0f172a]">
                             </div>
                             <div class="md:col-span-2 flex justify-end">
                                 <button type="submit" class="px-5 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2">
@@ -950,13 +962,13 @@
 
                 <!-- ADMIN MODULE 7: VISITOR MANAGEMENT -->
                 <div id="view-admin-visitors" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-id-badge text-[#faedcd]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-id-badge text-[#0284c7]"></i>
                                 <span>Security Gate & Visitor Entry Ledger</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Authorize student visitor requests and monitor check-ins & check-outs</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Authorize student visitor requests and monitor check-ins & check-outs</p>
                         </div>
                     </div>
 
@@ -967,13 +979,13 @@
 
                 <!-- ADMIN MODULE 8: STAFF MANAGEMENT -->
                 <div id="view-admin-staff" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-user-shield text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-user-shield text-white"></i>
                                 <span>Hostel Staff Directory & Duty Roaster</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Wardens, maintenance technicians, mess managers, and counsellors</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Wardens, maintenance technicians, mess managers, and counsellors</p>
                         </div>
                     </div>
 
@@ -984,13 +996,13 @@
 
                 <!-- ADMIN MODULE 9: MAINTENANCE HUB -->
                 <div id="view-admin-maintenance" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-screwdriver-wrench text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-screwdriver-wrench text-[#0284c7]"></i>
                                 <span>Technician Work Orders & SLAs</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Dedicated dispatch queue for electrical, plumbing, HVAC, and carpentry repairs</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Dedicated dispatch queue for electrical, plumbing, HVAC, and carpentry repairs</p>
                         </div>
                     </div>
 
@@ -1001,13 +1013,13 @@
 
                 <!-- ADMIN MODULE 10: FINANCE & LEDGER -->
                 <div id="view-admin-finance" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-coins text-[#faedcd]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-coins text-[#0284c7]"></i>
                                 <span>Hostel Financial Overview & Revenue</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Track term collection rates, outstanding arrears, and payment transactions</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Track term collection rates, outstanding arrears, and payment transactions</p>
                         </div>
                     </div>
 
@@ -1015,8 +1027,8 @@
                         <div class="skeleton-shimmer h-28 rounded-2xl"></div>
                     </div>
 
-                    <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20">
-                        <h3 class="text-sm font-bold text-[#fefae0] mb-3">Recent Fee Payments</h3>
+                    <div class="forest-card p-5 rounded-2xl border border-[#bae6fd]/20">
+                        <h3 class="text-sm font-bold text-[#0f172a] mb-3">Recent Fee Payments</h3>
                         <div id="adminRecentPaymentsTable" class="space-y-2">
                             <!-- Populated by JS -->
                         </div>
@@ -1025,13 +1037,13 @@
 
                 <!-- ADMIN MODULE 11: ANNOUNCEMENTS MANAGEMENT -->
                 <div id="view-admin-announcements" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-bullhorn text-[#faedcd]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-bullhorn text-[#0284c7]"></i>
                                 <span>Hostel Broadcasts & Announcements</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Publish bulletins, emergency circulars, and notices for all residents</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Publish bulletins, emergency circulars, and notices for all residents</p>
                         </div>
                         <button onclick="app.openModal('publishAnnouncementModal')" class="px-4 py-2.5 rounded-xl btn-forest-primary text-xs font-semibold flex items-center gap-2">
                             <i class="fa-solid fa-plus"></i> Publish Announcement
@@ -1045,19 +1057,19 @@
 
                 <!-- ADMIN MODULE 12: ANALYTICS (POWERED BY GEMA-4) -->
                 <div id="view-admin-analytics" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#52b788]/20 text-[#52b788] border border-[#52b788]/40 text-[10px] font-bold uppercase tracking-wider mb-1">
+                            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0284c7]/20 text-[#0284c7] border border-[#bae6fd]/40 text-[10px] font-bold uppercase tracking-wider mb-1">
                                 <i class="fa-solid fa-microchip"></i> Powered by GEMA-4 Open-Source Model
                             </div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-chart-pie text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-[#0284c7]"></i>
                                 <span>GEMA-4 Intelligence Hub & Live Telemetry</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Real-time SQLite analytics, NLP complaint triage, and predictive occupancy forecasting</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Real-time SQLite analytics, NLP complaint triage, and predictive occupancy forecasting</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs px-3 py-1 rounded-full bg-[#1b4332] text-[#faedcd] border border-[#52b788]/30 font-mono text-[11px]">
+                            <span class="text-xs px-3 py-1 rounded-full bg-[#0284c7] text-white border border-[#bae6fd]/30 font-mono text-[11px]">
                                 Model: GEMA-4-Hostel-7B (Apache 2.0)
                             </span>
                         </div>
@@ -1066,12 +1078,12 @@
                     <!-- GEMA-4 Highlights Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- 1. Real Complaints by Category -->
-                        <div class="forest-card p-6 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="forest-card p-6 rounded-2xl border border-[#bae6fd]/20 space-y-3">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-bold text-[#fefae0] flex items-center gap-2">
-                                    <i class="fa-solid fa-pie-chart text-[#52b788]"></i> Live Complaints Breakdown
+                                <h3 class="text-sm font-bold text-[#0f172a] flex items-center gap-2">
+                                    <i class="fa-solid fa-pie-chart text-[#0284c7]"></i> Live Complaints Breakdown
                                 </h3>
-                                <span class="text-[10px] text-[#8fb89e]">Computed from SQLite</span>
+                                <span class="text-[10px] text-[#64748b]">Computed from SQLite</span>
                             </div>
                             <div id="gema4CategoryChartContainer" class="space-y-3 text-xs pt-1">
                                 <div class="skeleton-shimmer h-24 rounded-xl"></div>
@@ -1079,12 +1091,12 @@
                         </div>
 
                         <!-- 2. Real Block Occupancy -->
-                        <div class="forest-card p-6 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="forest-card p-6 rounded-2xl border border-[#bae6fd]/20 space-y-3">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-bold text-[#fefae0] flex items-center gap-2">
-                                    <i class="fa-solid fa-hotel text-[#faedcd]"></i> Block Occupancy Levels
+                                <h3 class="text-sm font-bold text-[#0f172a] flex items-center gap-2">
+                                    <i class="fa-solid fa-hotel text-[#0284c7]"></i> Block Occupancy Levels
                                 </h3>
-                                <span class="text-[10px] text-[#8fb89e]">Live Room Ledger</span>
+                                <span class="text-[10px] text-[#64748b]">Live Room Ledger</span>
                             </div>
                             <div id="gema4OccupancyChartContainer" class="space-y-3 text-xs pt-1">
                                 <div class="skeleton-shimmer h-24 rounded-xl"></div>
@@ -1092,12 +1104,12 @@
                         </div>
 
                         <!-- 3. GEMA-4 Food Sentiment & Nutrition Index -->
-                        <div class="forest-card p-6 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="forest-card p-6 rounded-2xl border border-[#bae6fd]/20 space-y-3">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-bold text-[#fefae0] flex items-center gap-2">
-                                    <i class="fa-solid fa-brain text-[#52b788]"></i> GEMA-4 Dining Sentiment NLP
+                                <h3 class="text-sm font-bold text-[#0f172a] flex items-center gap-2">
+                                    <i class="fa-solid fa-brain text-[#0284c7]"></i> GEMA-4 Dining Sentiment NLP
                                 </h3>
-                                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-bold">NLP Live</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-sky-300 font-bold">NLP Live</span>
                             </div>
                             <div id="gema4SentimentContainer" class="space-y-2 text-xs">
                                 <div class="skeleton-shimmer h-20 rounded-xl"></div>
@@ -1105,12 +1117,12 @@
                         </div>
 
                         <!-- 4. GEMA-4 7-Day Predictive Occupancy -->
-                        <div class="forest-card p-6 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="forest-card p-6 rounded-2xl border border-[#bae6fd]/20 space-y-3">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-bold text-[#fefae0] flex items-center gap-2">
-                                    <i class="fa-solid fa-chart-column text-[#faedcd]"></i> GEMA-4 Predictive Weekly Trends
+                                <h3 class="text-sm font-bold text-[#0f172a] flex items-center gap-2">
+                                    <i class="fa-solid fa-chart-column text-[#0284c7]"></i> GEMA-4 Predictive Weekly Trends
                                 </h3>
-                                <span class="text-[10px] text-[#8fb89e]">Weekend Outflux Model</span>
+                                <span class="text-[10px] text-[#64748b]">Weekend Outflux Model</span>
                             </div>
                             <div id="gema4ForecastContainer" class="flex items-end justify-between h-40 pt-6 px-2">
                                 <div class="skeleton-shimmer h-28 w-full rounded-xl"></div>
@@ -1121,37 +1133,37 @@
 
                 <!-- ADMIN MODULE 13: SETTINGS -->
                 <div id="view-admin-settings" class="subview-panel hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#bae6fd]/20">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#fefae0] font-serif-title flex items-center gap-2">
-                                <i class="fa-solid fa-sliders text-[#52b788]"></i>
+                            <h2 class="text-2xl font-extrabold text-[#0f172a] font-serif-title flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-[#0284c7]"></i>
                                 <span>Hostel Policies & System Configurations</span>
                             </h2>
-                            <p class="text-xs text-[#8fb89e] mt-0.5">Curfew timings, emergency phone contacts, laundry allowance, and gate rules</p>
+                            <p class="text-xs text-[#64748b] mt-0.5">Curfew timings, emergency phone contacts, laundry allowance, and gate rules</p>
                         </div>
                     </div>
 
-                    <form id="adminSettingsForm" onsubmit="app.handleSaveSettings(event)" class="forest-card p-6 rounded-2xl border border-[#52b788]/20 space-y-4">
+                    <form id="adminSettingsForm" onsubmit="app.handleSaveSettings(event)" class="forest-card p-6 rounded-2xl border border-[#bae6fd]/20 space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Hostel Curfew Time</label>
-                                <input type="time" id="settingCurfewTime" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2.5 text-xs text-[#fefae0]">
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Hostel Curfew Time</label>
+                                <input type="time" id="settingCurfewTime" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2.5 text-xs text-[#0f172a]">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Visitor Entry Cutoff Time</label>
-                                <input type="time" id="settingVisitorCutoff" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2.5 text-xs text-[#fefae0]">
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Visitor Entry Cutoff Time</label>
+                                <input type="time" id="settingVisitorCutoff" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2.5 text-xs text-[#0f172a]">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Maintenance SLA (Target Hours)</label>
-                                <input type="number" id="settingMaintenanceSLA" min="1" max="72" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2.5 text-xs text-[#fefae0]">
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Maintenance SLA (Target Hours)</label>
+                                <input type="number" id="settingMaintenanceSLA" min="1" max="72" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2.5 text-xs text-[#0f172a]">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Max Laundry Loads / Week</label>
-                                <input type="number" id="settingLaundryAllowance" min="1" max="10" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2.5 text-xs text-[#fefae0]">
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Max Laundry Loads / Week</label>
+                                <input type="number" id="settingLaundryAllowance" min="1" max="10" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2.5 text-xs text-[#0f172a]">
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Emergency Security Hotline Number</label>
-                                <input type="text" id="settingEmergencyPhone" class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl p-2.5 text-xs text-[#fefae0]">
+                                <label class="block text-xs font-semibold text-[#64748b] mb-1">Emergency Security Hotline Number</label>
+                                <input type="text" id="settingEmergencyPhone" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/20 rounded-xl p-2.5 text-xs text-[#0f172a]">
                             </div>
                         </div>
                         <div class="flex justify-end pt-2">
@@ -1164,9 +1176,9 @@
 
                 <!-- LEGACY / EXTRA: FACILITY BOOKINGS (FOR BACKWARD COMPATIBILITY) -->
                 <div id="view-facilities" class="subview-panel hidden space-y-4">
-                    <div class="flex items-center justify-between pb-3 border-b border-[#52b788]/20">
-                        <h2 class="text-xl font-bold text-[#fefae0] flex items-center gap-2">
-                            <i class="fa-solid fa-volleyball text-[#52b788]"></i> Campus Facilities
+                    <div class="flex items-center justify-between pb-3 border-b border-[#bae6fd]/20">
+                        <h2 class="text-xl font-bold text-[#0f172a] flex items-center gap-2">
+                            <i class="fa-solid fa-volleyball text-[#0284c7]"></i> Campus Facilities
                         </h2>
                         <button onclick="app.openModal('bookFacilityModal')" class="px-3.5 py-1.5 rounded-xl btn-forest-primary text-xs font-semibold">
                             Book Facility
@@ -1187,47 +1199,47 @@
 
     <!-- 1. STUDENT LOGIN MODAL -->
     <div id="studentLoginModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-md w-full p-6 sm:p-8 border border-[#52b788]/40 shadow-2xl relative space-y-5">
-            <button onclick="app.closeModal('studentLoginModal')" class="absolute top-5 right-5 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-md w-full p-6 sm:p-8 border border-[#bae6fd]/40 shadow-2xl relative space-y-5">
+            <button onclick="app.closeModal('studentLoginModal')" class="absolute top-5 right-5 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
             <div class="text-center space-y-1">
-                <div class="w-12 h-12 rounded-2xl bg-[#52b788]/20 border border-[#52b788]/40 flex items-center justify-center text-[#52b788] text-xl mx-auto shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-[#0284c7]/20 border border-[#bae6fd]/40 flex items-center justify-center text-white text-xl mx-auto shadow-md">
                     <i class="fa-solid fa-graduation-cap"></i>
                 </div>
-                <h3 class="text-xl font-extrabold text-[#fefae0] font-serif-title mt-2">Student Resident Login</h3>
-                <p class="text-xs text-[#8fb89e]">Enter your College ID & secure password to access your resident portal</p>
+                <h3 class="text-xl font-extrabold text-[#0f172a] font-serif-title mt-2">Student Resident Login</h3>
+                <p class="text-xs text-[#64748b]">Enter your College ID & secure password to access your resident portal</p>
             </div>
 
             <!-- Demo Quick Fill Pill -->
-            <div class="p-2.5 rounded-xl bg-[#143528]/80 border border-[#52b788]/20 flex items-center justify-between text-xs">
-                <span class="text-[#8fb89e] font-mono">Demo: NST2026-042</span>
-                <button type="button" onclick="app.fillStudentDemo()" class="text-[11px] font-bold text-[#52b788] hover:underline">
+            <div class="p-2.5 rounded-xl bg-[#f0f9ff]/80 border border-[#bae6fd]/20 flex items-center justify-between text-xs">
+                <span class="text-[#64748b] font-mono">Demo: NST2026-042</span>
+                <button type="button" onclick="app.fillStudentDemo()" class="text-[11px] font-bold text-[#0284c7] hover:underline">
                     Auto-Fill
                 </button>
             </div>
 
             <form id="studentLoginForm" onsubmit="app.handleStudentLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-[#8fb89e] mb-1">College ID / Username</label>
+                    <label class="block text-xs font-semibold text-[#64748b] mb-1">College ID / Username</label>
                     <div class="relative">
-                        <i class="fa-solid fa-id-card absolute left-3.5 top-3 text-[#8fb89e]"></i>
-                        <input type="text" id="studentLoginInput" required placeholder="e.g. NST2026-042 or student1" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl pl-10 pr-3 py-2.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                        <i class="fa-solid fa-id-card absolute left-3.5 top-3 text-[#64748b]"></i>
+                        <input type="text" id="studentLoginInput" required placeholder="e.g. NST2026-042 or student1" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl pl-10 pr-3 py-2.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd]">
                     </div>
                 </div>
 
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="text-xs font-semibold text-[#8fb89e]">Password</label>
-                        <button type="button" onclick="app.openModal('forgotPasswordModal')" class="text-[11px] text-[#faedcd] hover:underline">
+                        <label class="text-xs font-semibold text-[#64748b]">Password</label>
+                        <button type="button" onclick="app.openModal('forgotPasswordModal')" class="text-[11px] text-[#0284c7] hover:underline">
                             Forgot password?
                         </button>
                     </div>
                     <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3.5 top-3 text-[#8fb89e]"></i>
-                        <input type="password" id="studentPasswordInput" required placeholder="Enter resident password" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl pl-10 pr-10 py-2.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
-                        <button type="button" id="studentTogglePassword" onclick="app.togglePasswordVisibility('studentPasswordInput', 'studentPasswordToggleIcon')" class="absolute right-3.5 top-3 text-[#8fb89e] hover:text-[#fefae0]">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-3 text-[#64748b]"></i>
+                        <input type="password" id="studentPasswordInput" required placeholder="Enter resident password" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl pl-10 pr-10 py-2.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#bae6fd]">
+                        <button type="button" id="studentTogglePassword" onclick="app.togglePasswordVisibility('studentPasswordInput', 'studentPasswordToggleIcon')" class="absolute right-3.5 top-3 text-[#64748b] hover:text-[#0f172a]">
                             <i id="studentPasswordToggleIcon" class="fa-solid fa-eye"></i>
                         </button>
                     </div>
@@ -1238,9 +1250,9 @@
                 </button>
             </form>
 
-            <div class="text-center text-xs text-[#8fb89e] pt-2 border-t border-[#52b788]/20">
+            <div class="text-center text-xs text-[#64748b] pt-2 border-t border-[#bae6fd]/20">
                 New to the hostel? 
-                <button onclick="app.switchModal('studentLoginModal', 'registerModal')" id="studentRegisterBtn" class="font-bold text-[#52b788] hover:underline">
+                <button onclick="app.switchModal('studentLoginModal', 'registerModal')" id="studentRegisterBtn" class="font-bold text-[#0284c7] hover:underline">
                     Register Account
                 </button>
             </div>
@@ -1251,45 +1263,45 @@
     <!-- 2. ADMIN & STAFF LOGIN MODAL -->
     <div id="adminLoginModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
         <div class="forest-card rounded-3xl max-w-md w-full p-6 sm:p-8 border border-[#faedcd]/40 shadow-2xl relative space-y-5">
-            <button onclick="app.closeModal('adminLoginModal')" class="absolute top-5 right-5 text-[#8fb89e] hover:text-[#fefae0]">
+            <button onclick="app.closeModal('adminLoginModal')" class="absolute top-5 right-5 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
             <div class="text-center space-y-1">
-                <div class="w-12 h-12 rounded-2xl bg-[#faedcd]/20 border border-[#faedcd]/40 flex items-center justify-center text-[#faedcd] text-xl mx-auto shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-[#faedcd]/20 border border-[#faedcd]/40 flex items-center justify-center text-white text-xl mx-auto shadow-md">
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
-                <h3 class="text-xl font-extrabold text-[#fefae0] font-serif-title mt-2">Staff & Warden Console</h3>
-                <p class="text-xs text-[#8fb89e]">Protected console for hostel administrators, wardens & staff</p>
+                <h3 class="text-xl font-extrabold text-[#0f172a] font-serif-title mt-2">Staff & Warden Console</h3>
+                <p class="text-xs text-[#64748b]">Protected console for hostel administrators, wardens & staff</p>
             </div>
 
             <!-- Demo Quick Fill Roles -->
-            <div class="p-2.5 rounded-xl bg-[#143528]/80 border border-[#52b788]/20 text-xs space-y-1.5">
-                <div class="text-[10px] text-[#8fb89e] font-bold uppercase">Quick Demo Staff Logins:</div>
+            <div class="p-2.5 rounded-xl bg-[#f0f9ff]/80 border border-[#bae6fd]/20 text-xs space-y-1.5">
+                <div class="text-[10px] text-[#64748b] font-bold uppercase">Quick Demo Staff Logins:</div>
                 <div class="flex flex-wrap gap-1.5">
-                    <button type="button" onclick="app.fillAdminDemo('admin')" class="px-2 py-0.5 rounded bg-[#2d6a4f] text-[11px] font-semibold text-[#fefae0]">Admin</button>
-                    <button type="button" onclick="app.fillAdminDemo('warden')" class="px-2 py-0.5 rounded bg-[#2d6a4f] text-[11px] font-semibold text-[#fefae0]">Warden</button>
-                    <button type="button" onclick="app.fillAdminDemo('mess_manager')" class="px-2 py-0.5 rounded bg-[#2d6a4f] text-[11px] font-semibold text-[#fefae0]">Mess</button>
-                    <button type="button" onclick="app.fillAdminDemo('maintenance')" class="px-2 py-0.5 rounded bg-[#2d6a4f] text-[11px] font-semibold text-[#fefae0]">Maint</button>
-                    <button type="button" onclick="app.fillAdminDemo('counsellor')" class="px-2 py-0.5 rounded bg-[#2d6a4f] text-[11px] font-semibold text-[#fefae0]">Counsellor</button>
+                    <button type="button" onclick="app.fillAdminDemo('admin')" class="px-2 py-0.5 rounded bg-[#0ea5e9] text-[11px] font-semibold text-white">Admin</button>
+                    <button type="button" onclick="app.fillAdminDemo('warden')" class="px-2 py-0.5 rounded bg-[#0ea5e9] text-[11px] font-semibold text-white">Warden</button>
+                    <button type="button" onclick="app.fillAdminDemo('mess_manager')" class="px-2 py-0.5 rounded bg-[#0ea5e9] text-[11px] font-semibold text-white">Mess</button>
+                    <button type="button" onclick="app.fillAdminDemo('maintenance')" class="px-2 py-0.5 rounded bg-[#0ea5e9] text-[11px] font-semibold text-white">Maint</button>
+                    <button type="button" onclick="app.fillAdminDemo('counsellor')" class="px-2 py-0.5 rounded bg-[#0ea5e9] text-[11px] font-semibold text-white">Counsellor</button>
                 </div>
             </div>
 
             <form id="adminLoginForm" onsubmit="app.handleAdminLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Admin / Staff ID or Username</label>
+                    <label class="block text-xs font-semibold text-[#64748b] mb-1">Admin / Staff ID or Username</label>
                     <div class="relative">
-                        <i class="fa-solid fa-id-badge absolute left-3.5 top-3 text-[#8fb89e]"></i>
-                        <input type="text" id="adminLoginInput" required placeholder="e.g. ADMIN-001 or admin1" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl pl-10 pr-3 py-2.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#faedcd]">
+                        <i class="fa-solid fa-id-badge absolute left-3.5 top-3 text-[#64748b]"></i>
+                        <input type="text" id="adminLoginInput" required placeholder="e.g. ADMIN-001 or admin1" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl pl-10 pr-3 py-2.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#faedcd]">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Password</label>
+                    <label class="block text-xs font-semibold text-[#64748b] mb-1">Password</label>
                     <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3.5 top-3 text-[#8fb89e]"></i>
-                        <input type="password" id="adminPasswordInput" required placeholder="Enter administrative password" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl pl-10 pr-10 py-2.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#faedcd]">
-                        <button type="button" id="adminTogglePassword" onclick="app.togglePasswordVisibility('adminPasswordInput', 'adminPasswordToggleIcon')" class="absolute right-3.5 top-3 text-[#8fb89e] hover:text-[#fefae0]">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-3 text-[#64748b]"></i>
+                        <input type="password" id="adminPasswordInput" required placeholder="Enter administrative password" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl pl-10 pr-10 py-2.5 text-xs text-[#0f172a] focus:outline-none focus:border-[#faedcd]">
+                        <button type="button" id="adminTogglePassword" onclick="app.togglePasswordVisibility('adminPasswordInput', 'adminPasswordToggleIcon')" class="absolute right-3.5 top-3 text-[#64748b] hover:text-[#0f172a]">
                             <i id="adminPasswordToggleIcon" class="fa-solid fa-eye"></i>
                         </button>
                     </div>
@@ -1305,16 +1317,16 @@
 
     <!-- 3. FORGOT PASSWORD MODAL -->
     <div id="forgotPasswordModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/30 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('forgotPasswordModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/30 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('forgotPasswordModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div class="space-y-1">
-                <h3 class="text-lg font-bold text-[#fefae0]">Password Recovery</h3>
-                <p class="text-xs text-[#8fb89e]">Enter your College ID or registered email to receive a password reset link.</p>
+                <h3 class="text-lg font-bold text-[#0f172a]">Password Recovery</h3>
+                <p class="text-xs text-[#64748b]">Enter your College ID or registered email to receive a password reset link.</p>
             </div>
             <form onsubmit="app.handleForgotPassword(event)" class="space-y-3">
-                <input type="text" id="forgotPasswordInput" required placeholder="College ID or registered email" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2.5 text-xs text-[#fefae0]">
+                <input type="text" id="forgotPasswordInput" required placeholder="College ID or registered email" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2.5 text-xs text-[#0f172a]">
                 <button type="submit" class="w-full py-2.5 rounded-xl btn-forest-primary text-xs font-semibold">
                     Send Recovery Code
                 </button>
@@ -1325,14 +1337,14 @@
 
     <!-- 4. STUDENT REGISTRATION MODAL -->
     <div id="registerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-[#52b788]/40 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
-            <button onclick="app.closeModal('registerModal')" class="absolute top-5 right-5 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-[#bae6fd]/40 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="app.closeModal('registerModal')" class="absolute top-5 right-5 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
             <div class="space-y-1">
-                <h3 class="text-xl font-bold text-[#fefae0] font-serif-title">Hostel Admission & Registration</h3>
-                <p class="text-xs text-[#8fb89e]">Applications require Chief Warden approval before account activation.</p>
+                <h3 class="text-xl font-bold text-[#0f172a] font-serif-title">Hostel Admission & Registration</h3>
+                <p class="text-xs text-[#64748b]">Applications require Chief Warden approval before account activation.</p>
             </div>
 
             <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-200 flex items-start gap-2">
@@ -1343,36 +1355,36 @@
             <form id="studentRegistrationForm" onsubmit="app.handleStudentRegister(event)" class="space-y-3">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Full Legal Name *</label>
-                        <input type="text" id="regFullName" required placeholder="e.g. Rohini Sen" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs font-semibold text-[#64748b] mb-1">Full Legal Name *</label>
+                        <input type="text" id="regFullName" required placeholder="e.g. Rohini Sen" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-[#8fb89e] mb-1">College ID *</label>
-                        <input type="text" id="regCollegeId" required placeholder="e.g. NST2026-199" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs font-semibold text-[#64748b] mb-1">College ID *</label>
+                        <input type="text" id="regCollegeId" required placeholder="e.g. NST2026-199" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Desired Username *</label>
-                        <input type="text" id="regUsername" required placeholder="e.g. rohini_s" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs font-semibold text-[#64748b] mb-1">Desired Username *</label>
+                        <input type="text" id="regUsername" required placeholder="e.g. rohini_s" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Email Address *</label>
-                        <input type="email" id="regEmail" required placeholder="student@campus.edu" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs font-semibold text-[#64748b] mb-1">Email Address *</label>
+                        <input type="email" id="regEmail" required placeholder="student@campus.edu" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Phone Number *</label>
-                        <input type="tel" id="regPhone" required placeholder="+91 98765-43210" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs font-semibold text-[#64748b] mb-1">Phone Number *</label>
+                        <input type="tel" id="regPhone" required placeholder="+91 98765-43210" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Guardian Name *</label>
-                        <input type="text" id="regGuardianName" required placeholder="Parent / Guardian" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs font-semibold text-[#64748b] mb-1">Guardian Name *</label>
+                        <input type="text" id="regGuardianName" required placeholder="Parent / Guardian" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Guardian Phone *</label>
-                        <input type="tel" id="regGuardianPhone" required placeholder="+91 91234-56789" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs font-semibold text-[#64748b] mb-1">Guardian Phone *</label>
+                        <input type="tel" id="regGuardianPhone" required placeholder="+91 91234-56789" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-[#8fb89e] mb-1">Account Password *</label>
-                        <input type="password" id="regPassword" required placeholder="Create a strong password" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs font-semibold text-[#64748b] mb-1">Account Password *</label>
+                        <input type="password" id="regPassword" required placeholder="Create a strong password" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                 </div>
 
@@ -1386,22 +1398,22 @@
 
     <!-- 5. SUBMIT COMPLAINT MODAL -->
     <div id="submitComplaintModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-md w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('submitComplaintModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-md w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('submitComplaintModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-white">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-bold text-[#fefae0]">Lodge Maintenance Ticket</h3>
-                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#52b788]/20 text-[#52b788] font-mono font-bold">Gemma-4 Triage</span>
+                <h3 class="text-lg font-bold text-[#0f172a]">Lodge Maintenance Ticket</h3>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#0284c7]/20 text-[#0284c7] font-mono font-bold">Gemma-4 Triage</span>
             </div>
 
             <!-- Gemma-4 AI Auto-Fill / Polish Banner -->
-            <div class="p-2.5 rounded-xl bg-[#143528]/80 border border-[#52b788]/30 flex items-center justify-between text-xs">
-                <div class="flex items-center gap-1.5 text-[#52b788] font-bold">
-                    <i class="fa-solid fa-sparkles text-[#faedcd]"></i>
+            <div class="p-2.5 rounded-xl bg-[#f0f9ff]/80 border border-[#bae6fd]/30 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-1.5 text-[#0284c7] font-bold">
+                    <i class="fa-solid fa-sparkles text-[#0284c7]"></i>
                     <span>Gemma-4 AI Drafter</span>
                 </div>
-                <button type="button" onclick="app.aiAssistComplaintPrompt()" class="px-2.5 py-1 rounded-lg bg-[#2d6a4f] hover:bg-[#40916c] text-[11px] font-semibold text-[#fefae0] transition flex items-center gap-1">
+                <button type="button" onclick="app.aiAssistComplaintPrompt()" class="px-2.5 py-1 rounded-lg bg-[#0ea5e9] hover:bg-[#38bdf8] text-[11px] font-semibold text-white transition flex items-center gap-1">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Polish with Gemma-4
                 </button>
             </div>
@@ -1409,8 +1421,8 @@
             <form onsubmit="app.handleCreateComplaint(event)" class="space-y-3">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Category *</label>
-                        <select id="complaintCategory" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Category *</label>
+                        <select id="complaintCategory" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                             <option value="Electrical">Electrical</option>
                             <option value="Plumbing">Plumbing</option>
                             <option value="Carpentry">Carpentry</option>
@@ -1421,8 +1433,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Urgency *</label>
-                        <select id="complaintUrgency" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Urgency *</label>
+                        <select id="complaintUrgency" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                             <option value="Low">Low</option>
                             <option value="Medium" selected>Medium</option>
                             <option value="High">High</option>
@@ -1431,16 +1443,16 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Room / Location *</label>
-                    <input type="text" id="complaintRoomNumber" required placeholder="e.g. A-204" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Room / Location *</label>
+                    <input type="text" id="complaintRoomNumber" required placeholder="e.g. A-204" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Complaint Title *</label>
-                    <input type="text" id="complaintTitle" required placeholder="Brief summary of the issue" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Complaint Title *</label>
+                    <input type="text" id="complaintTitle" required placeholder="Brief summary of the issue" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Issue Description *</label>
-                    <textarea id="complaintDescription" required rows="3" placeholder="Explain details so staff can prepare proper tools" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]"></textarea>
+                    <label class="block text-xs text-[#64748b] mb-1">Issue Description *</label>
+                    <textarea id="complaintDescription" required rows="3" placeholder="Explain details so staff can prepare proper tools" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]"></textarea>
                 </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl btn-forest-primary text-xs font-semibold">
                     Submit Ticket
@@ -1452,16 +1464,16 @@
 
     <!-- 6. ASSIGN STAFF MODAL (WARDEN / ADMIN) -->
     <div id="assignStaffModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('assignStaffModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('assignStaffModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Assign Maintenance Technician</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Assign Maintenance Technician</h3>
             <input type="hidden" id="assignComplaintId">
             <div class="space-y-3">
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Available Technicians</label>
-                    <select id="assignStaffSelect" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Available Technicians</label>
+                    <select id="assignStaffSelect" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <!-- Populated by JS -->
                     </select>
                 </div>
@@ -1475,33 +1487,33 @@
 
     <!-- 7. APPLY LEAVE MODAL -->
     <div id="applyLeaveModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-md w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('applyLeaveModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-md w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('applyLeaveModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-lg font-bold text-[#fefae0]">Apply for Leave / Out-Pass</h3>
+            <h3 class="text-lg font-bold text-[#0f172a]">Apply for Leave / Out-Pass</h3>
             <form onsubmit="app.handleApplyLeave(event)" class="space-y-3">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Start Date *</label>
-                        <input type="date" id="leaveStartDate" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Start Date *</label>
+                        <input type="date" id="leaveStartDate" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">End Date *</label>
-                        <input type="date" id="leaveEndDate" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">End Date *</label>
+                        <input type="date" id="leaveEndDate" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Reason for Leave *</label>
-                    <input type="text" id="leaveReason" required placeholder="e.g. Family festival, medical visit" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Reason for Leave *</label>
+                    <input type="text" id="leaveReason" required placeholder="e.g. Family festival, medical visit" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Destination Address *</label>
-                    <input type="text" id="leaveDestination" required placeholder="Hometown address / Hotel" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Destination Address *</label>
+                    <input type="text" id="leaveDestination" required placeholder="Hometown address / Hotel" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Parent / Emergency Contact *</label>
-                    <input type="tel" id="leaveEmergencyContact" required placeholder="+91 98765-43210" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Parent / Emergency Contact *</label>
+                    <input type="tel" id="leaveEmergencyContact" required placeholder="+91 98765-43210" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl btn-forest-primary text-xs font-semibold">
                     Submit Leave Request
@@ -1513,15 +1525,15 @@
 
     <!-- 8. RATE MESS FOOD MODAL -->
     <div id="submitMessFeedbackModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('submitMessFeedbackModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('submitMessFeedbackModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Rate Today's Food</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Rate Today's Food</h3>
             <form onsubmit="app.handleMessFeedback(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Meal *</label>
-                    <select id="feedbackMealType" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Meal *</label>
+                    <select id="feedbackMealType" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <option value="Breakfast">Breakfast</option>
                         <option value="Lunch">Lunch</option>
                         <option value="Snacks">Snacks</option>
@@ -1529,8 +1541,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Rating (1 to 5) *</label>
-                    <select id="feedbackRating" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Rating (1 to 5) *</label>
+                    <select id="feedbackRating" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
                         <option value="4">⭐⭐⭐⭐ 4 - Good</option>
                         <option value="3">⭐⭐⭐ 3 - Average</option>
@@ -1539,8 +1551,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Comments / Suggestions</label>
-                    <textarea id="feedbackComment" rows="2" placeholder="Tell the mess manager how to improve" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]"></textarea>
+                    <label class="block text-xs text-[#64748b] mb-1">Comments / Suggestions</label>
+                    <textarea id="feedbackComment" rows="2" placeholder="Tell the mess manager how to improve" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]"></textarea>
                 </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl btn-cream-accent text-xs font-semibold">
                     Submit Review
@@ -1552,19 +1564,19 @@
 
     <!-- 9. REQUEST LAUNDRY MODAL -->
     <div id="requestLaundryModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('requestLaundryModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('requestLaundryModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Request Express Laundry</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Request Express Laundry</h3>
             <form onsubmit="app.handleRequestLaundry(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Number of Items *</label>
-                    <input type="number" id="laundryItemCount" required min="1" max="25" value="5" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Number of Items *</label>
+                    <input type="number" id="laundryItemCount" required min="1" max="25" value="5" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Service Type *</label>
-                    <select id="laundryServiceType" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Service Type *</label>
+                    <select id="laundryServiceType" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <option value="Regular Wash & Fold">Regular Wash & Fold</option>
                         <option value="Express 6-Hour Wash">Express 6-Hour Wash</option>
                         <option value="Dry Cleaning">Dry Cleaning</option>
@@ -1572,8 +1584,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Special Instructions</label>
-                    <input type="text" id="laundrySpecialNotes" placeholder="e.g. Delicates in separate pouch" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Special Instructions</label>
+                    <input type="text" id="laundrySpecialNotes" placeholder="e.g. Delicates in separate pouch" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl btn-forest-primary text-xs font-semibold">
                     Submit Laundry Request
@@ -1585,23 +1597,23 @@
 
     <!-- 10. REQUEST CLEANING MODAL -->
     <div id="requestCleaningModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('requestCleaningModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('requestCleaningModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Schedule Room Housekeeping</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Schedule Room Housekeeping</h3>
             <form onsubmit="app.handleRequestCleaning(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Preferred Time Slot *</label>
-                    <select id="cleaningSlot" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Preferred Time Slot *</label>
+                    <select id="cleaningSlot" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <option value="Morning (09:00 - 11:00)">Morning (09:00 - 11:00)</option>
                         <option value="Afternoon (14:00 - 16:00)">Afternoon (14:00 - 16:00)</option>
                         <option value="Evening (17:00 - 18:30)">Evening (17:00 - 18:30)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Cleaning Focus Areas</label>
-                    <input type="text" id="cleaningFocus" placeholder="e.g. Deep bathroom scrubbing & balcony" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Cleaning Focus Areas</label>
+                    <input type="text" id="cleaningFocus" placeholder="e.g. Deep bathroom scrubbing & balcony" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl btn-forest-primary text-xs font-semibold">
                     Book Cleaning Slot
@@ -1613,24 +1625,24 @@
 
     <!-- 11. REQUEST VISITOR PASS MODAL -->
     <div id="requestVisitorModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('requestVisitorModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('requestVisitorModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Pre-Register Visitor Pass</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Pre-Register Visitor Pass</h3>
             <form onsubmit="app.handleRequestVisitor(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Visitor Full Name *</label>
-                    <input type="text" id="visitorName" required placeholder="e.g. Ramesh Sharma" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Visitor Full Name *</label>
+                    <input type="text" id="visitorName" required placeholder="e.g. Ramesh Sharma" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Visitor Contact Phone *</label>
-                    <input type="tel" id="visitorPhone" required placeholder="+91 98765-43210" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Visitor Contact Phone *</label>
+                    <input type="tel" id="visitorPhone" required placeholder="+91 98765-43210" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Relationship *</label>
-                        <select id="visitorRelation" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Relationship *</label>
+                        <select id="visitorRelation" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                             <option value="Parent">Parent</option>
                             <option value="Sibling">Sibling</option>
                             <option value="Guardian">Guardian</option>
@@ -1639,13 +1651,13 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Visit Date *</label>
-                        <input type="date" id="visitorDate" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Visit Date *</label>
+                        <input type="date" id="visitorDate" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Visit Purpose</label>
-                    <input type="text" id="visitorPurpose" placeholder="e.g. Delivering luggage, semester visit" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Visit Purpose</label>
+                    <input type="text" id="visitorPurpose" placeholder="e.g. Delivering luggage, semester visit" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl btn-forest-primary text-xs font-semibold">
                     Generate Visitor Pass
@@ -1657,15 +1669,15 @@
 
     <!-- 12. CREATE COMMUNITY POST MODAL -->
     <div id="createCommunityPostModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('createCommunityPostModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('createCommunityPostModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Post to Community Hub</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Post to Community Hub</h3>
             <form onsubmit="app.handleCreateCommunityPost(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Channel / Topic *</label>
-                    <select id="commCategory" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Channel / Topic *</label>
+                    <select id="commCategory" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <option value="General">💬 General Discussion</option>
                         <option value="Study Circles">📚 Study Circles & Peer Tutoring</option>
                         <option value="Lost & Found">🔍 Lost & Found</option>
@@ -1673,8 +1685,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Post Content *</label>
-                    <textarea id="commContent" required rows="3" placeholder="Share updates, notices, or ask hostel peers" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]"></textarea>
+                    <label class="block text-xs text-[#64748b] mb-1">Post Content *</label>
+                    <textarea id="commContent" required rows="3" placeholder="Share updates, notices, or ask hostel peers" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]"></textarea>
                 </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl btn-forest-primary text-xs font-semibold">
                     Publish Post
@@ -1699,12 +1711,12 @@
             <form onsubmit="app.handleBookWellness(event)" class="space-y-3">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Preferred Date *</label>
-                        <input type="date" id="wellnessDate" required class="w-full bg-[#143528] border border-purple-500/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Preferred Date *</label>
+                        <input type="date" id="wellnessDate" required class="w-full bg-[#f0f9ff] border border-purple-500/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Time Slot *</label>
-                        <select id="wellnessSlot" required class="w-full bg-[#143528] border border-purple-500/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Time Slot *</label>
+                        <select id="wellnessSlot" required class="w-full bg-[#f0f9ff] border border-purple-500/30 rounded-xl p-2 text-xs text-[#0f172a]">
                             <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
                             <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
                             <option value="04:30 PM - 05:30 PM">04:30 PM - 05:30 PM</option>
@@ -1712,8 +1724,8 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Confidential Note / Discussion Focus</label>
-                    <textarea id="wellnessNotes" rows="2" placeholder="Private note for counsellor" class="w-full bg-[#143528] border border-purple-500/30 rounded-xl p-2 text-xs text-[#fefae0]"></textarea>
+                    <label class="block text-xs text-[#64748b] mb-1">Confidential Note / Discussion Focus</label>
+                    <textarea id="wellnessNotes" rows="2" placeholder="Private note for counsellor" class="w-full bg-[#f0f9ff] border border-purple-500/30 rounded-xl p-2 text-xs text-[#0f172a]"></textarea>
                 </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold shadow-lg">
                     Confirm Confidential Appointment
@@ -1725,20 +1737,20 @@
 
     <!-- 14. PUBLISH ANNOUNCEMENT MODAL (ADMIN) -->
     <div id="publishAnnouncementModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-md w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('publishAnnouncementModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-md w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('publishAnnouncementModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Publish Campus Announcement</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Publish Campus Announcement</h3>
             <form onsubmit="app.handlePublishAnnouncement(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Title *</label>
-                    <input type="text" id="announcementTitle" required placeholder="e.g. Scheduled Water Maintenance on Thursday" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Title *</label>
+                    <input type="text" id="announcementTitle" required placeholder="e.g. Scheduled Water Maintenance on Thursday" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Category *</label>
-                        <select id="announcementCategory" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Category *</label>
+                        <select id="announcementCategory" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                             <option value="General">General</option>
                             <option value="Maintenance">Maintenance</option>
                             <option value="Mess">Mess</option>
@@ -1747,16 +1759,16 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Priority *</label>
-                        <select id="announcementPriority" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Priority *</label>
+                        <select id="announcementPriority" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                             <option value="Normal">Normal</option>
                             <option value="Urgent">Urgent</option>
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Content / Announcement Body *</label>
-                    <textarea id="announcementContent" required rows="3" placeholder="Full circular details for students" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]"></textarea>
+                    <label class="block text-xs text-[#64748b] mb-1">Content / Announcement Body *</label>
+                    <textarea id="announcementContent" required rows="3" placeholder="Full circular details for students" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]"></textarea>
                 </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl btn-forest-primary text-xs font-semibold">
                     Publish Bulletin
@@ -1768,32 +1780,32 @@
 
     <!-- 15. ADD ROOM MODAL (ADMIN) -->
     <div id="addRoomModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('addRoomModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('addRoomModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Add New Hostel Room</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Add New Hostel Room</h3>
             <form onsubmit="app.handleCreateRoom(event)" class="space-y-3">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Room Number *</label>
-                        <input type="text" id="addRoomNumber" required placeholder="e.g. C-405" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Room Number *</label>
+                        <input type="text" id="addRoomNumber" required placeholder="e.g. C-405" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Block *</label>
-                        <select id="addRoomBlock" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Block *</label>
+                        <select id="addRoomBlock" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                             <option value="A">Block A</option>
                             <option value="B">Block B</option>
                             <option value="C">Block C</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Floor *</label>
-                        <input type="number" id="addRoomFloor" required min="1" max="10" value="2" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Floor *</label>
+                        <input type="number" id="addRoomFloor" required min="1" max="10" value="2" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                     </div>
                     <div>
-                        <label class="block text-xs text-[#8fb89e] mb-1">Capacity (Beds) *</label>
-                        <select id="addRoomCapacity" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                        <label class="block text-xs text-[#64748b] mb-1">Capacity (Beds) *</label>
+                        <select id="addRoomCapacity" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                             <option value="1">1 (Single)</option>
                             <option value="2" selected>2 (Double)</option>
                             <option value="3">3 (Triple)</option>
@@ -1801,8 +1813,8 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Room Type</label>
-                    <select id="addRoomType" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Room Type</label>
+                    <select id="addRoomType" class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <option value="Double Non-AC">Double Non-AC</option>
                         <option value="Double AC Premium">Double AC Premium</option>
                         <option value="Single AC Deluxe">Single AC Deluxe</option>
@@ -1818,27 +1830,27 @@
 
     <!-- 16. ALLOCATE BED MODAL (ADMIN) -->
     <div id="allocateBedModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('allocateBedModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('allocateBedModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Allocate Bed to Student</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Allocate Bed to Student</h3>
             <form onsubmit="app.handleAllocateBed(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Select Student *</label>
-                    <select id="allocateStudentSelect" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Select Student *</label>
+                    <select id="allocateStudentSelect" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <!-- Populated by JS -->
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Select Target Room *</label>
-                    <select id="allocateRoomSelect" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Select Target Room *</label>
+                    <select id="allocateRoomSelect" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <!-- Populated by JS -->
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Bed Identifier *</label>
-                    <select id="allocateBedSelect" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Bed Identifier *</label>
+                    <select id="allocateBedSelect" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <option value="Bed A">Bed A (Window side)</option>
                         <option value="Bed B">Bed B (Aisle side)</option>
                         <option value="Bed C">Bed C (Door side)</option>
@@ -1854,15 +1866,15 @@
 
     <!-- 17. BOOK FACILITY MODAL -->
     <div id="bookFacilityModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop-blur">
-        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#52b788]/40 shadow-2xl relative space-y-4">
-            <button onclick="app.closeModal('bookFacilityModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-3xl max-w-sm w-full p-6 border border-[#bae6fd]/40 shadow-2xl relative space-y-4">
+            <button onclick="app.closeModal('bookFacilityModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-base font-bold text-[#fefae0]">Book Hostel Facility</h3>
+            <h3 class="text-base font-bold text-[#0f172a]">Book Hostel Facility</h3>
             <form onsubmit="app.handleBookFacility(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Facility *</label>
-                    <select id="bookFacilitySelect" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Facility *</label>
+                    <select id="bookFacilitySelect" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <option value="Badminton Court">Badminton Court</option>
                         <option value="Table Tennis Arena">Table Tennis Arena</option>
                         <option value="Music & Jam Room">Music & Jam Room</option>
@@ -1870,12 +1882,12 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Booking Date *</label>
-                    <input type="date" id="bookFacilityDate" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Booking Date *</label>
+                    <input type="date" id="bookFacilityDate" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                 </div>
                 <div>
-                    <label class="block text-xs text-[#8fb89e] mb-1">Time Slot *</label>
-                    <select id="bookFacilitySlot" required class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl p-2 text-xs text-[#fefae0]">
+                    <label class="block text-xs text-[#64748b] mb-1">Time Slot *</label>
+                    <select id="bookFacilitySlot" required class="w-full bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl p-2 text-xs text-[#0f172a]">
                         <option value="06:00 PM - 07:00 PM">06:00 PM - 07:00 PM</option>
                         <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM</option>
                         <option value="08:00 PM - 09:00 PM">08:00 PM - 09:00 PM</option>
@@ -1892,25 +1904,25 @@
     <!-- MOBILE QR CODE ACCESS MODAL                -->
     <!-- ========================================== -->
     <div id="mobileQrModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="forest-card rounded-2xl max-w-sm w-full p-6 space-y-4 border border-[#52b788]/40 shadow-2xl relative text-center">
-            <button onclick="app.closeModal('mobileQrModal')" class="absolute top-4 right-4 text-[#8fb89e] hover:text-[#fefae0]">
+        <div class="forest-card rounded-2xl max-w-sm w-full p-6 space-y-4 border border-[#bae6fd]/40 shadow-2xl relative text-center">
+            <button onclick="app.closeModal('mobileQrModal')" class="absolute top-4 right-4 text-[#64748b] hover:text-[#0f172a]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <div class="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-[#1b4332] to-[#52b788] flex items-center justify-center text-[#faedcd] text-xl shadow-lg border border-[#52b788]/30">
+            <div class="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-[#0284c7] to-[#38bdf8] flex items-center justify-center text-white text-xl shadow-lg border border-[#bae6fd]/30">
                 <i class="fa-solid fa-mobile-screen-button"></i>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-[#fefae0]">Open on Your Mobile Phone</h3>
-                <p class="text-xs text-[#8fb89e] mt-1">Connect your phone to the same Wi-Fi and scan this QR code:</p>
+                <h3 class="text-lg font-bold text-[#0f172a]">Open on Your Mobile Phone</h3>
+                <p class="text-xs text-[#64748b] mt-1">Connect your phone to the same Wi-Fi and scan this QR code:</p>
             </div>
             <div class="p-3 bg-white rounded-2xl inline-block shadow-inner mx-auto border-4 border-[#2d6a4f]/30">
                 <img src="/static/img/mobile_qr.svg" alt="Mobile Access QR Code" class="w-48 h-48 mx-auto">
             </div>
-            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/30 text-xs space-y-1">
-                <div class="text-[10px] text-[#8fb89e] uppercase font-bold tracking-wider">Local Network IP</div>
-                <div class="font-mono text-[#52b788] font-bold text-sm select-all">http://10.100.49.92:5050</div>
+            <div class="p-3 rounded-xl bg-[#ffffff] border border-[#bae6fd]/30 text-xs space-y-1">
+                <div class="text-[10px] text-[#64748b] uppercase font-bold tracking-wider">Local Network IP</div>
+                <div class="font-mono text-[#0284c7] font-bold text-sm select-all">http://10.100.49.92:5050</div>
             </div>
-            <p class="text-[11px] text-[#8fb89e]">
+            <p class="text-[11px] text-[#64748b]">
                 ✨ Fully responsive with sticky bottom navigation & Gemma-4 companion drawer!
             </p>
         </div>
@@ -1919,27 +1931,27 @@
     <!-- ========================================== -->
     <!-- MOBILE BOTTOM NAVIGATION BAR (md:hidden)  -->
     <!-- ========================================== -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0f281e]/95 backdrop-blur-lg border-t border-[#52b788]/20 flex items-center justify-around py-2 px-2 text-[10px] text-[#8fb89e] shadow-2xl">
-        <button onclick="app.mobileNavTo('home')" class="flex flex-col items-center gap-1 hover:text-[#52b788] transition px-2 py-1">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#ffffff]/95 backdrop-blur-lg border-t border-[#bae6fd]/20 flex items-center justify-around py-2 px-2 text-[10px] text-[#64748b] shadow-2xl">
+        <button onclick="app.mobileNavTo('home')" class="flex flex-col items-center gap-1 hover:text-[#0284c7] transition px-2 py-1">
             <i class="fa-solid fa-house text-base"></i>
             <span>Home</span>
         </button>
-        <button onclick="app.mobileNavTo('complaints')" class="flex flex-col items-center gap-1 hover:text-[#52b788] transition px-2 py-1">
+        <button onclick="app.mobileNavTo('complaints')" class="flex flex-col items-center gap-1 hover:text-[#0284c7] transition px-2 py-1">
             <i class="fa-solid fa-wrench text-base"></i>
             <span>Tickets</span>
         </button>
         <!-- Center Gemma-4 AI Hub Button -->
         <button onclick="app.toggleGema4Chat()" class="flex flex-col items-center -mt-6 transition group">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#1b4332] via-[#2d6a4f] to-[#52b788] flex items-center justify-center text-[#faedcd] text-xl shadow-lg shadow-[#52b788]/30 border-2 border-[#52b788] group-hover:scale-110 active:scale-95 transition">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#0284c7] via-[#0ea5e9] to-[#38bdf8] flex items-center justify-center text-white text-xl shadow-lg shadow-[#0ea5e9]/30 border-2 border-[#bae6fd] group-hover:scale-110 active:scale-95 transition">
                 <i class="fa-solid fa-sparkles animate-pulse"></i>
             </div>
-            <span class="font-bold text-[#52b788] text-[10px] mt-0.5">Gemma-4</span>
+            <span class="font-bold text-[#0284c7] text-[10px] mt-0.5">Gemma-4</span>
         </button>
-        <button onclick="app.mobileNavTo('mess')" class="flex flex-col items-center gap-1 hover:text-[#52b788] transition px-2 py-1">
+        <button onclick="app.mobileNavTo('mess')" class="flex flex-col items-center gap-1 hover:text-[#0284c7] transition px-2 py-1">
             <i class="fa-solid fa-utensils text-base"></i>
             <span>Mess</span>
         </button>
-        <button onclick="app.mobileNavTo('leaves')" class="flex flex-col items-center gap-1 hover:text-[#52b788] transition px-2 py-1">
+        <button onclick="app.mobileNavTo('leaves')" class="flex flex-col items-center gap-1 hover:text-[#0284c7] transition px-2 py-1">
             <i class="fa-solid fa-passport text-base"></i>
             <span>Out-Pass</span>
         </button>
@@ -1948,51 +1960,51 @@
     <!-- ========================================== -->
     <!-- FLOATING GEMMA-4 AI BUTTON (DESKTOP & MOB) -->
     <!-- ========================================== -->
-    <button id="gema4FloatingBtn" onclick="app.toggleGema4Chat()" class="fixed z-40 bottom-20 md:bottom-6 right-4 md:right-6 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#1b4332] via-[#2d6a4f] to-[#52b788] border border-[#52b788]/50 shadow-2xl shadow-[#52b788]/30 text-[#fefae0] text-xs font-bold flex items-center gap-2 hover:scale-105 active:scale-95 transition group" title="Open Gemma-4 AI Assistant">
+    <button id="gema4FloatingBtn" onclick="app.toggleGema4Chat()" class="fixed z-40 bottom-20 md:bottom-6 right-4 md:right-6 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#38bdf8] border border-[#bae6fd]/50 shadow-2xl shadow-[#0ea5e9]/30 text-white text-xs font-bold flex items-center gap-2 hover:scale-105 active:scale-95 transition group" title="Open Gemma-4 AI Assistant">
         <span class="w-2.5 h-2.5 rounded-full bg-[#faedcd] animate-ping"></span>
-        <i class="fa-solid fa-sparkles text-[#faedcd] text-sm"></i>
+        <i class="fa-solid fa-sparkles text-white text-sm"></i>
         <span>Gemma-4 AI</span>
-        <span class="hidden lg:inline text-[9px] px-1.5 py-0.5 rounded bg-black/30 text-[#8fb89e] font-mono">Open-Source</span>
+        <span class="hidden lg:inline text-[9px] px-1.5 py-0.5 rounded bg-black/30 text-[#64748b] font-mono">Open-Source</span>
     </button>
 
     <!-- ========================================== -->
     <!-- GEMMA-4 CONVERSATIONAL AI DRAWER / MODAL   -->
     <!-- ========================================== -->
-    <div id="gema4ChatModal" class="fixed inset-x-0 bottom-0 sm:inset-auto sm:right-6 sm:bottom-6 z-50 hidden flex flex-col sm:w-[400px] h-[85vh] sm:h-[560px] forest-card rounded-t-3xl sm:rounded-3xl border border-[#52b788]/40 shadow-2xl backdrop-blur-xl transition-all duration-300">
+    <div id="gema4ChatModal" class="fixed inset-x-0 bottom-0 sm:inset-auto sm:right-6 sm:bottom-6 z-50 hidden flex flex-col sm:w-[400px] h-[85vh] sm:h-[560px] forest-card rounded-t-3xl sm:rounded-3xl border border-[#bae6fd]/40 shadow-2xl backdrop-blur-xl transition-all duration-300">
         
         <!-- Header -->
-        <div class="p-3.5 sm:p-4 border-b border-[#52b788]/20 flex items-center justify-between bg-[#0f281e]/90 rounded-t-3xl">
+        <div class="p-3.5 sm:p-4 border-b border-[#bae6fd]/20 flex items-center justify-between bg-[#ffffff]/90 rounded-t-3xl">
             <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1b4332] to-[#52b788] flex items-center justify-center text-[#faedcd] text-sm shadow border border-[#52b788]/40">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0284c7] to-[#38bdf8] flex items-center justify-center text-white text-sm shadow border border-[#bae6fd]/40">
                     <i class="fa-solid fa-sparkles"></i>
                 </div>
                 <div>
                     <div class="flex items-center gap-1.5">
-                        <span class="font-bold text-sm text-[#fefae0]">Gemma-4 AI Companion</span>
+                        <span class="font-bold text-sm text-[#0f172a]">Gemma-4 AI Companion</span>
                         <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">Local</span>
                     </div>
-                    <p class="text-[10px] text-[#8fb89e] leading-tight">Campus Housing & Policy Intelligence</p>
+                    <p class="text-[10px] text-[#64748b] leading-tight">Campus Housing & Policy Intelligence</p>
                 </div>
             </div>
             <div class="flex items-center gap-1">
-                <button onclick="app.toggleGema4Chat()" class="w-7 h-7 rounded-lg hover:bg-[#143528] flex items-center justify-center text-[#8fb89e] hover:text-[#fefae0]">
+                <button onclick="app.toggleGema4Chat()" class="w-7 h-7 rounded-lg hover:bg-[#f0f9ff] flex items-center justify-center text-[#64748b] hover:text-[#0f172a]">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
         </div>
 
         <!-- Quick Chips Bar (Horizontal Scrollable) -->
-        <div class="p-2 border-b border-[#52b788]/10 bg-[#0a1711]/50 flex gap-1.5 overflow-x-auto text-[11px] scrollbar-none">
-            <button onclick="app.sendGema4QuickPrompt('What is the hostel curfew and gate time?')" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] whitespace-nowrap transition">
+        <div class="p-2 border-b border-[#bae6fd]/10 bg-[#f8fafc]/50 flex gap-1.5 overflow-x-auto text-[11px] scrollbar-none">
+            <button onclick="app.sendGema4QuickPrompt('What is the hostel curfew and gate time?')" class="px-2.5 py-1 rounded-lg bg-[#f0f9ff] hover:bg-[#0284c7] text-[#64748b] hover:text-white whitespace-nowrap transition">
                 🌙 Curfew & Rules
             </button>
-            <button onclick="app.sendGema4QuickPrompt('What are the meal timings and menu?')" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] whitespace-nowrap transition">
+            <button onclick="app.sendGema4QuickPrompt('What are the meal timings and menu?')" class="px-2.5 py-1 rounded-lg bg-[#f0f9ff] hover:bg-[#0284c7] text-[#64748b] hover:text-white whitespace-nowrap transition">
                 🍽️ Mess Menu
             </button>
-            <button onclick="app.sendGema4QuickPrompt('How do I apply for leave out-pass?')" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] whitespace-nowrap transition">
+            <button onclick="app.sendGema4QuickPrompt('How do I apply for leave out-pass?')" class="px-2.5 py-1 rounded-lg bg-[#f0f9ff] hover:bg-[#0284c7] text-[#64748b] hover:text-white whitespace-nowrap transition">
                 🎒 Leave Pass
             </button>
-            <button onclick="app.sendGema4QuickPrompt('What are the emergency contact numbers?')" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] whitespace-nowrap transition">
+            <button onclick="app.sendGema4QuickPrompt('What are the emergency contact numbers?')" class="px-2.5 py-1 rounded-lg bg-[#f0f9ff] hover:bg-[#0284c7] text-[#64748b] hover:text-white whitespace-nowrap transition">
                 🚨 Emergency
             </button>
         </div>
@@ -2001,19 +2013,19 @@
         <div id="gema4MessagesContainer" class="flex-1 p-3.5 space-y-3 overflow-y-auto text-xs scrollbar-none">
             <!-- Initial AI Greeting Bubble -->
             <div class="flex items-start gap-2.5">
-                <div class="w-6 h-6 rounded-lg bg-[#1b4332] flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
+                <div class="w-6 h-6 rounded-lg bg-[#0284c7] flex items-center justify-center text-[#0284c7] text-xs flex-shrink-0 mt-0.5">
                     <i class="fa-solid fa-sparkles"></i>
                 </div>
-                <div class="p-3 rounded-2xl rounded-tl-sm bg-[#0f281e] border border-[#52b788]/20 text-[#fefae0] leading-relaxed max-w-[85%] shadow-sm">
-                    <p class="font-semibold text-[#52b788] text-[11px] mb-1">Gemma-4 On-Device Intelligence</p>
+                <div class="p-3 rounded-2xl rounded-tl-sm bg-[#ffffff] border border-[#bae6fd]/20 text-[#0f172a] leading-relaxed max-w-[85%] shadow-sm">
+                    <p class="font-semibold text-[#0284c7] text-[11px] mb-1">Gemma-4 On-Device Intelligence</p>
                     Hello! I'm Gemma-4, your open-source hostel assistant. How can I help you today? You can ask about curfew rules, mess dining, maintenance repairs, or campus emergency hotlines.
                 </div>
             </div>
         </div>
 
         <!-- Input Box -->
-        <form id="gema4ChatForm" onsubmit="app.handleGema4ChatSubmit(event)" class="p-3 border-t border-[#52b788]/20 bg-[#0f281e]/90 flex items-center gap-2">
-            <input type="text" id="gema4ChatInput" placeholder="Ask Gemma-4 anything..." autocomplete="off" class="flex-1 bg-[#143528] border border-[#52b788]/30 rounded-xl px-3.5 py-2.5 text-xs text-[#fefae0] placeholder-[#8fb89e]/60 focus:outline-none focus:border-[#52b788]">
+        <form id="gema4ChatForm" onsubmit="app.handleGema4ChatSubmit(event)" class="p-3 border-t border-[#bae6fd]/20 bg-[#ffffff]/90 flex items-center gap-2">
+            <input type="text" id="gema4ChatInput" placeholder="Ask Gemma-4 anything..." autocomplete="off" class="flex-1 bg-[#f0f9ff] border border-[#bae6fd]/30 rounded-xl px-3.5 py-2.5 text-xs text-[#0f172a] placeholder-[#8fb89e]/60 focus:outline-none focus:border-[#bae6fd]">
             <button type="submit" id="gema4SendBtn" class="w-9 h-9 rounded-xl btn-forest-primary flex items-center justify-center text-sm shadow-md flex-shrink-0">
                 <i class="fa-solid fa-paper-plane"></i>
             </button>

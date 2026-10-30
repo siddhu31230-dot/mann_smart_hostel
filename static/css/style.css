@@ -1,67 +1,63 @@
-/* MANN 2.0 - Premium Forest Green & Cream Design System */
+/* MANN 2.0 - Pure White & Sky Blue Design System */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-    /* Forest Green Palette */
-    --forest-950: #08140e;
-    --forest-900: #0f281e;
-    --forest-850: #143528;
-    --forest-800: #1b4332;
-    --forest-700: #245842;
-    --forest-600: #2d6a4f;
-    --forest-500: #40916c;
-    --forest-400: #52b788;
-    --forest-300: #74c69d;
-    --forest-200: #95d5b2;
-    --forest-100: #d8f3dc;
+    /* Primary: White Palette */
+    --white: #ffffff;
+    --canvas-bg: #f8fafc;
+    --canvas-subtle: #f1f5f9;
+    --canvas-border: #e2e8f0;
 
-    /* Cream & Warm Ivory Palette */
-    --cream-50: #fdfbf7;
-    --cream-100: #fefae0;
-    --cream-200: #faedcd;
-    --cream-300: #f7e6be;
-    --cream-400: #e9d8a6;
-    --cream-500: #d4a373;
-    --cream-gold: #c59b27;
+    /* Secondary: Sky Blue Palette */
+    --sky-50: #f0f9ff;
+    --sky-100: #e0f2fe;
+    --sky-200: #bae6fd;
+    --sky-300: #7dd3fc;
+    --sky-400: #38bdf8;
+    --sky-500: #0ea5e9;
+    --sky-600: #0284c7;
+    --sky-700: #0369a1;
+    --sky-800: #075985;
+    --sky-900: #0c4a6e;
 
-    /* Theme Tokens (Default: Dark Forest) */
-    --bg-primary: #0a1711;
-    --bg-secondary: #0f281e;
-    --bg-surface: #143528;
-    --bg-card: rgba(20, 53, 40, 0.7);
-    --bg-card-hover: rgba(27, 67, 50, 0.85);
-    --border-color: rgba(82, 183, 136, 0.2);
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --text-primary: #fefae0;
-    --text-secondary: #d8f3dc;
-    --text-muted: #8fb89e;
-    --accent-emerald: #52b788;
-    --accent-gold: #d4af37;
-    --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 0 20px rgba(82, 183, 136, 0.15);
+    /* Semantic Theme Tokens (Default: Clean White & Sky Blue) */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --bg-surface: #f0f9ff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8fafc;
+    --border-color: rgba(14, 165, 233, 0.2);
+    --border-subtle: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --accent-sky: #0284c7;
+    --accent-sky-light: #38bdf8;
+    --shadow-soft: 0 10px 25px -5px rgba(14, 165, 233, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+    --shadow-glow: 0 0 25px rgba(14, 165, 233, 0.15);
 }
 
-/* Light Theme Variables */
-body.light-theme {
-    --bg-primary: #f7f4ea;
-    --bg-secondary: #fefae0;
-    --bg-surface: #ffffff;
-    --bg-card: rgba(255, 255, 255, 0.9);
-    --bg-card-hover: #ffffff;
-    --border-color: rgba(45, 106, 79, 0.2);
-    --border-subtle: rgba(45, 106, 79, 0.1);
-    --text-primary: #0f281e;
-    --text-secondary: #1b4332;
-    --text-muted: #4a6b5a;
-    --accent-emerald: #2d6a4f;
-    --accent-gold: #b08968;
-    --shadow-soft: 0 10px 30px -5px rgba(27, 67, 50, 0.08);
-    --shadow-glow: 0 0 20px rgba(45, 106, 79, 0.08);
+/* Dark Mode Theme Tokens (Preserved for Night/Dark Toggle) */
+body.dark-theme, .dark body {
+    --bg-primary: #0b1329;
+    --bg-secondary: #0f172a;
+    --bg-surface: #1e293b;
+    --bg-card: #0f172a;
+    --bg-card-hover: #1e293b;
+    --border-color: rgba(56, 189, 248, 0.2);
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --text-primary: #f8fafc;
+    --text-secondary: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent-sky: #38bdf8;
+    --accent-sky-light: #7dd3fc;
+    --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 20px rgba(56, 189, 248, 0.15);
 }
 
 body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    background-color: var(--bg-primary);
+    background-color: var(--bg-secondary);
     color: var(--text-primary);
     transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     -webkit-font-smoothing: antialiased;
@@ -75,59 +71,67 @@ body {
     font-family: 'JetBrains Mono', monospace;
 }
 
-/* Glassmorphism & Forest Card */
+/* Glassmorphism & Clean Card */
 .forest-card {
-    background: var(--bg-card);
+    background: #ffffff !important;
     backdrop-filter: blur(16px);
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(14, 165, 233, 0.18) !important;
     border-radius: 16px;
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 4px 20px -2px rgba(14, 165, 233, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--text-primary);
 }
 
 .forest-card-hover:hover {
     transform: translateY(-3px);
-    border-color: var(--accent-emerald);
-    box-shadow: var(--shadow-glow), var(--shadow-soft);
+    border-color: var(--accent-sky) !important;
+    box-shadow: 0 10px 25px -3px rgba(14, 165, 233, 0.18), 0 4px 10px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Animated Gradient Header Banner */
 .forest-gradient-hero {
-    background: radial-gradient(circle at 10% 20%, rgba(45, 106, 79, 0.4) 0%, rgba(15, 40, 30, 0.95) 70%, var(--bg-primary) 100%);
+    background: radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.1) 0%, rgba(224, 242, 254, 0.4) 60%, #ffffff 100%) !important;
 }
 
-.light-theme .forest-gradient-hero {
-    background: radial-gradient(circle at 10% 20%, rgba(216, 243, 220, 0.8) 0%, rgba(254, 250, 224, 0.95) 70%, var(--bg-primary) 100%);
-}
-
-/* Buttons & Micro-interactions */
+/* Primary Sky Blue Buttons */
 .btn-forest-primary {
-    background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
-    color: #fefae0;
-    border: 1px solid rgba(116, 198, 157, 0.4);
-    box-shadow: 0 4px 14px rgba(45, 106, 79, 0.35);
+    background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(56, 189, 248, 0.4) !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-forest-primary:hover {
-    background: linear-gradient(135deg, #40916c 0%, #2d6a4f 100%);
+    background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%) !important;
+    color: #ffffff !important;
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(82, 183, 136, 0.45);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.45) !important;
 }
 
+.btn-forest-primary * {
+    color: #ffffff !important;
+}
+
+/* Secondary White/Sky Accent Buttons */
 .btn-cream-accent {
-    background: linear-gradient(135deg, #faedcd 0%, #fefae0 100%);
-    color: #0f281e;
+    background: #ffffff !important;
+    color: #0284c7 !important;
     font-weight: 700;
-    border: 1px solid rgba(212, 163, 115, 0.4);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(14, 165, 233, 0.3) !important;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.1) !important;
     transition: all 0.2s ease;
 }
 
 .btn-cream-accent:hover {
-    background: #ffffff;
+    background: #f0f9ff !important;
+    color: #0369a1 !important;
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(212, 163, 115, 0.3);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.2) !important;
+}
+
+.btn-cream-accent * {
+    color: #0284c7 !important;
 }
 
 /* Smooth Tab & View Transition Animations */
@@ -148,40 +152,40 @@ body {
 
 /* Sidebar Navigation Items */
 .nav-link-active {
-    background: linear-gradient(90deg, rgba(82, 183, 136, 0.2) 0%, rgba(82, 183, 136, 0.05) 100%);
-    border-left: 3px solid var(--accent-emerald);
-    color: var(--accent-emerald) !important;
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.12) 0%, rgba(14, 165, 233, 0.02) 100%) !important;
+    border-left: 3px solid #0284c7 !important;
+    color: #0284c7 !important;
     font-weight: 700;
 }
 
 /* Badges */
 .badge-forest-green {
-    background-color: rgba(82, 183, 136, 0.15);
-    color: var(--accent-emerald);
-    border: 1px solid rgba(82, 183, 136, 0.35);
+    background-color: rgba(14, 165, 233, 0.1) !important;
+    color: #0284c7 !important;
+    border: 1px solid rgba(14, 165, 233, 0.3) !important;
 }
 
 .badge-cream-gold {
-    background-color: rgba(212, 163, 115, 0.15);
-    color: #e9c46a;
-    border: 1px solid rgba(212, 163, 115, 0.35);
+    background-color: rgba(2, 132, 199, 0.08) !important;
+    color: #0369a1 !important;
+    border: 1px solid rgba(2, 132, 199, 0.2) !important;
 }
 
 .badge-urgent-fire {
-    background-color: rgba(230, 57, 70, 0.15);
-    color: #ff6b6b;
-    border: 1px solid rgba(230, 57, 70, 0.4);
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    color: #dc2626 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
     animation: gentle-glow 2s infinite;
 }
 
 @keyframes gentle-glow {
-    0%, 100% { box-shadow: 0 0 0 rgba(230, 57, 70, 0); }
-    50% { box-shadow: 0 0 10px rgba(230, 57, 70, 0.35); }
+    0%, 100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
+    50% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.25); }
 }
 
 /* Modal Backdrops */
 .modal-backdrop-blur {
-    background-color: rgba(8, 20, 14, 0.75);
+    background-color: rgba(15, 23, 42, 0.65) !important;
     backdrop-filter: blur(8px);
 }
 
@@ -203,7 +207,7 @@ body {
 
 /* Skeletons Loader */
 .skeleton-shimmer {
-    background: linear-gradient(90deg, rgba(82, 183, 136, 0.05) 25%, rgba(82, 183, 136, 0.15) 50%, rgba(82, 183, 136, 0.05) 75%);
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.05) 25%, rgba(14, 165, 233, 0.15) 50%, rgba(14, 165, 233, 0.05) 75%) !important;
     background-size: 200% 100%;
     animation: shimmer 1.8s infinite;
     border-radius: 8px;
@@ -214,6 +218,22 @@ body {
     100% { background-position: 200% 0; }
 }
 
+/* Form Inputs Styling */
+input, select, textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: rgba(14, 165, 233, 0.25) !important;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2) !important;
+}
+
+input::placeholder, textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 6px;
@@ -221,14 +241,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-primary);
+    background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--forest-700);
+    background: #bae6fd;
     border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--forest-500);
+    background: #38bdf8;
 }
