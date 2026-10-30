@@ -7,15 +7,32 @@ predictive occupancy forecasting, interactive mobile/web companion chat,
 and automated campus administrative intelligence.
 """
 
+import os
 import json
 import re
 from datetime import datetime, date
 import requests
 
-# Model identification
-GEMA4_MODEL_IDENTIFIER = "GEMA-4-Hostel-7B-OpenSource-v2.0"
-GEMA4_MODEL_FAMILY = "Gemma-4 Open Architecture (Apache 2.0 Licensed)"
-GEMA4_QUANTIZATION = "INT8 / FP16 On-Premise Campus Inference"
+# Automatically load .env configuration if present
+_env_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(_env_path):
+    try:
+        with open(_env_path, 'r', encoding='utf-8') as _f:
+            for _line in _f:
+                _line = _line.strip()
+                if _line and not _line.startswith('#') and '=' in _line:
+                    _k, _v = _line.split('=', 1)
+                    os.environ.setdefault(_k.strip(), _v.strip())
+    except Exception:
+        pass
+
+# Model identification (Official Google AI Studio Gemma-4 Model)
+GEMA4_MODEL_IDENTIFIER = "GEMA-4-26B-IT (gemma-4-26b-a4b-it via Google AI Studio)"
+GEMA4_STUDIO_MODEL = os.environ.get("GEMMA4_MODEL", "gemma-4-26b-a4b-it")
+GEMA4_MODEL_FAMILY = "Gemma-4 Open Architecture (Apache 2.0 Licensed, Google AI Studio)"
+GEMA4_QUANTIZATION = "Google AI Studio Cloud TPU / On-Premise Fallback"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
+GEMMA4_STUDIO_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMA4_STUDIO_MODEL}:generateContent"
 OLLAMA_API_URL = "http://127.0.0.1:11434/api/generate"
 
 class GEMA4IntelligenceEngine:
@@ -26,17 +43,20 @@ class GEMA4IntelligenceEngine:
     """
     def __init__(self):
         self.model_name = GEMA4_MODEL_IDENTIFIER
+        self.studio_model = GEMA4_STUDIO_MODEL
         self.family = GEMA4_MODEL_FAMILY
-        self.status = "ONLINE (Accelerated Local Inference)"
-        self.version = "4.2.0-CampusHostel"
+        self.api_key = GEMINI_API_KEY
+        self.status = "ONLINE (Google AI Studio Gemma-4 Engine)"
+        self.version = "4.2.0-GoogleStudio"
         self.ollama_available = False
 
     def get_model_specs(self):
         return {
             "model_name": self.model_name,
+            "studio_model": self.studio_model,
             "architecture": self.family,
             "license": "Open Source (Apache 2.0 / Open Weights)",
-            "inference_mode": "Local On-Campus Node / Mobile Compatible",
+            "inference_mode": "Official Google AI Studio API (gemma-4-26b-a4b-it) / Local Node",
             "status": self.status,
             "active_tasks": [
                 "Interactive Resident Assistant (Mobile & Desktop)",
@@ -56,17 +76,27 @@ class GEMA4IntelligenceEngine:
         prompt = (user_message or "").strip()
         lower_prompt = prompt.lower()
 
-        # 1. Try Ollama local daemon if available
+        # 1. Primary: Official Google AI Studio Gemma-4 Engine
+        studio_response = self._query_google_studio_gemma4(prompt, user_role, user_name)
+        if studio_response:
+            return {
+                "model": self.studio_model,
+                "engine": f"Google AI Studio / {self.studio_model} (Gemma-4)",
+                "response": studio_response,
+                "timestamp": datetime.now().strftime("%H:%M")
+            }
+
+        # 2. Secondary: Ollama local daemon if available
         ollama_response = self._try_ollama_query(prompt, user_role)
         if ollama_response:
             return {
-                "model": self.model_name,
+                "model": self.studio_model,
                 "engine": "Ollama / Gemma-4 Local Engine",
                 "response": ollama_response,
                 "timestamp": datetime.now().strftime("%H:%M")
             }
 
-        # 2. Intelligent, context-aware Gemma-4 on-device response matrix
+        # 3. Intelligent, context-aware Gemma-4 on-device response matrix (offline / sandboxed)
         if any(w in lower_prompt for w in ['curfew', 'timing', 'gate close', 'in time', 'out time', 'late']):
             reply = (
                 "🌙 **Hostel Curfew & Gate Policy (Gemma-4 Knowledge)**\n\n"
@@ -157,29 +187,38 @@ class GEMA4IntelligenceEngine:
         title = text[:50].capitalize() if text else "Maintenance Request"
         description = text
 
-        if any(w in lower for w in ['spark', 'shock', 'switch', 'light', 'fan', 'wire', 'socket', 'bulb', 'ac', 'current']):
-            category = "Electrical"
-            title = "Electrical Fixture Issue"
-            if any(w in lower for w in ['spark', 'shock', 'smoke', 'fire']):
-                urgency = "Emergency"
-                title = "Hazard: Electrical Short-Circuit / Sparking"
-            elif any(w in lower for w in ['fan', 'sound', 'noise']):
-                title = "Ceiling Fan Vibration / Regulator Issue"
-        elif any(w in lower for w in ['water', 'tap', 'leak', 'flush', 'basin', 'pipe', 'clog', 'drain']):
-            category = "Plumbing"
-            title = "Plumbing Pipeline / Tap Leakage"
-            if any(w in lower for w in ['flood', 'burst', 'overflow']):
-                urgency = "High"
-                title = "Urgent: Water Overflow / Pipe Leak"
-        elif any(w in lower for w in ['door', 'lock', 'window', 'cupboard', 'bed', 'chair', 'table']):
-            category = "Carpentry"
-            title = "Door Lock / Furniture Repair"
-        elif any(w in lower for w in ['wifi', 'wi-fi', 'internet', 'lan', 'network', 'speed']):
-            category = "Internet / Wi-Fi"
-            title = "Corridor Wi-Fi Signal / Access Point Drop"
+        # 1. Try Live Gemma-4 Draft from Google AI Studio
+        studio_draft = self._query_google_studio_draft(text)
+        if studio_draft and isinstance(studio_draft, dict) and studio_draft.get('category'):
+            category = studio_draft.get('category', 'General')
+            urgency = studio_draft.get('urgency', 'Medium')
+            title = studio_draft.get('title', text[:50].capitalize())
+            description = studio_draft.get('description', text)
+        else:
+            # 2. Local zero-latency rule & NLP fallback
+            if any(w in lower for w in ['spark', 'shock', 'switch', 'light', 'fan', 'wire', 'socket', 'bulb', 'ac', 'current']):
+                category = "Electrical"
+                title = "Electrical Fixture Issue"
+                if any(w in lower for w in ['spark', 'shock', 'smoke', 'fire']):
+                    urgency = "Emergency"
+                    title = "Hazard: Electrical Short-Circuit / Sparking"
+                elif any(w in lower for w in ['fan', 'sound', 'noise']):
+                    title = "Ceiling Fan Vibration / Regulator Issue"
+            elif any(w in lower for w in ['water', 'tap', 'leak', 'flush', 'basin', 'pipe', 'clog', 'drain']):
+                category = "Plumbing"
+                title = "Plumbing Pipeline / Tap Leakage"
+                if any(w in lower for w in ['flood', 'burst', 'overflow']):
+                    urgency = "High"
+                    title = "Urgent: Water Overflow / Pipe Leak"
+            elif any(w in lower for w in ['door', 'lock', 'window', 'cupboard', 'bed', 'chair', 'table']):
+                category = "Carpentry"
+                title = "Door Lock / Furniture Repair"
+            elif any(w in lower for w in ['wifi', 'wi-fi', 'internet', 'lan', 'network', 'speed']):
+                category = "Internet / Wi-Fi"
+                title = "Corridor Wi-Fi Signal / Access Point Drop"
 
-        if len(description) < 15:
-            description = f"{text}. Please inspect and rectify the issue as soon as possible."
+            if len(description) < 15:
+                description = f"{text}. Please inspect and rectify the issue as soon as possible."
 
         return {
             "model": self.model_name,
@@ -292,6 +331,95 @@ class GEMA4IntelligenceEngine:
             "turnaround_efficiency": "97.4%",
             "recommended_capacity_action": "Optimal bed allocation balance across blocks A, B and C."
         }
+
+    def _query_google_studio_gemma4(self, prompt, user_role="student", user_name="Resident"):
+        """
+        Queries official Gemma-4 model on Google AI Studio via Generative Language API.
+        Extracts pure response text excluding thought reasoning chains.
+        """
+        if not self.api_key:
+            return None
+
+        system_context = (
+            "You are Gemma-4, the official open-source AI assistant for MANN Smart Hostel OS. "
+            f"You are talking with {user_name} ({user_role}). "
+            "Hostel Policy & Operations Reference: "
+            "1. Curfew & Gates: 10:00 PM (22:00) strict gate close. Visitors allowed until 8:00 PM. "
+            "2. Dining: Breakfast (7:30-9:30 AM), Lunch (12:30-2:30 PM), Snacks (5:00-6:00 PM), Dinner (7:30-9:30 PM). "
+            "3. Laundry: 3 loads/week, express wash available under Laundry tab. "
+            "4. Cleaning: Housekeeping slots: Morning (9-11 AM), Afternoon (2-4 PM), Evening (5-6:30 PM). "
+            "5. Leaves: Apply via Leave tab for automated QR Gate Pass approved by Warden. "
+            "6. Emergency: Security Ext. 101, Medical/Ambulance Ext. 108, Warden Desk Ext. 102. "
+            "7. MANN Care: 100% confidential mental wellness support; zero admin access to records. "
+            "Provide helpful, concise, well-formatted answers using markdown bullet points. Do not output preamble or raw thinking."
+        )
+
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": f"{system_context}\n\nResident Query: {prompt}\n\nPlease respond concisely in 2 to 4 sentences:"
+                        }
+                    ]
+                }
+            ],
+            "generationConfig": {
+                "temperature": 0.2,
+                "maxOutputTokens": 2048
+            }
+        }
+
+        try:
+            url = f"{GEMMA4_STUDIO_URL}?key={self.api_key}"
+            res = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=35)
+            if res.status_code == 200:
+                data = res.json()
+                candidates = data.get("candidates", [])
+                if candidates:
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    # Strictly filter out internal thought/reasoning chains
+                    text_parts = [p.get("text", "") for p in parts if not p.get("thought") and p.get("text")]
+                    if text_parts:
+                        reply = "".join(text_parts).strip()
+                        if reply:
+                            return reply
+        except Exception:
+            pass
+        return None
+
+    def _query_google_studio_draft(self, text):
+        """Uses Gemma-4 on Google AI Studio to structure a maintenance ticket."""
+        if not self.api_key:
+            return None
+        prompt = (
+            "You are Gemma-4 for MANN Smart Hostel OS. Parse this maintenance complaint and return ONLY a valid JSON object with: "
+            "category (one of: Electrical, Plumbing, Carpentry, Internet / Wi-Fi, General), "
+            "urgency (one of: Emergency, High, Medium, Low), "
+            "title (concise 4-8 word title), "
+            "description (well-phrased 1-2 sentence description).\n\n"
+            f"Input text: \"{text}\"\n\nJSON:"
+        )
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"temperature": 0.1, "maxOutputTokens": 1500}
+        }
+        try:
+            url = f"{GEMMA4_STUDIO_URL}?key={self.api_key}"
+            res = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=30)
+            if res.status_code == 200:
+                data = res.json()
+                candidates = data.get("candidates", [])
+                if candidates:
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    text_parts = [p.get("text", "") for p in parts if not p.get("thought") and p.get("text")]
+                    raw_json = "".join(text_parts).strip()
+                    m = re.search(r'\{.*\}', raw_json, re.DOTALL)
+                    if m:
+                        return json.loads(m.group(0))
+        except Exception:
+            pass
+        return None
 
     def _try_ollama_query(self, prompt, user_role):
         """Attempts fast local query to Ollama daemon if running."""
