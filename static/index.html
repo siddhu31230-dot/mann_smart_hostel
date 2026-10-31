@@ -99,7 +99,7 @@
 
                     <!-- Unauthenticated Buttons (Landing Mode) -->
                     <div id="unauthHeaderActions" class="flex items-center gap-1 sm:gap-2">
-                        <button onclick="app.openStudentLoginModal()" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-[#52b788]/30 bg-[#52b788]/70 hover:bg-[#2d6a4f] text-xs font-semibold text-white transition flex items-center gap-1 shadow-sm">
+                        <button onclick="app.openStudentLoginModal()" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-[#52b788]/30 bg-[#1b4332]/90 hover:bg-[#2d6a4f] text-xs font-semibold text-[#fefae0] transition flex items-center gap-1 shadow-sm">
                             <i class="fa-solid fa-graduation-cap text-[#52b788]"></i>
                             <span class="hidden sm:inline">Student Login</span>
                             <span class="sm:hidden">Student</span>
@@ -114,13 +114,13 @@
                     <!-- Authenticated Profile Dropdown & Logout -->
                     <div id="authHeaderActions" class="hidden flex items-center gap-3">
                         <div id="userInfoBadge" class="flex items-center gap-2.5 text-right">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#52b788] to-[#52b788] flex items-center justify-center text-xs font-bold text-white border border-[#52b788]/50 shadow-inner" id="userAvatarText">ST</div>
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#2d6a4f] to-[#1b4332] flex items-center justify-center text-xs font-bold text-white border border-[#52b788]/50 shadow-inner" id="userAvatarText">ST</div>
                             <div class="hidden sm:block">
                                 <div id="userFullName" class="text-xs font-bold text-[#fefae0] leading-none">Aarav Sharma</div>
                                 <div id="userRoleBadge" class="text-[10px] font-mono text-[#52b788] uppercase mt-0.5">STUDENT</div>
                             </div>
                         </div>
-                        <button onclick="app.logout()" class="px-3 py-1.5 rounded-xl border border-[#52b788]/20 bg-[#143528]/80 hover:bg-[#52b788] text-xs font-semibold text-white transition flex items-center gap-1.5">
+                        <button onclick="app.logout()" class="px-3 py-1.5 rounded-xl border border-[#52b788]/20 bg-[#143528]/80 hover:bg-[#1b4332] text-xs font-semibold text-[#fefae0] transition flex items-center gap-1.5">
                             <i class="fa-solid fa-arrow-right-from-bracket text-red-400"></i>
                             <span class="hidden sm:inline">Logout</span>
                         </button>
@@ -305,7 +305,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                         <!-- Student Card -->
-                        <div class="p-4 rounded-xl bg-[#ffffff]/80 border border-[#52b788]/20 space-y-2">
+                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
                                     <i class="fa-solid fa-graduation-cap"></i> Demo Student Resident
@@ -322,7 +322,7 @@
                         </div>
 
                         <!-- Admin Card -->
-                        <div class="p-4 rounded-xl bg-[#ffffff]/80 border border-[#52b788]/20 space-y-2">
+                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
                                     <i class="fa-solid fa-user-shield"></i> Demo Administrator
@@ -342,7 +342,7 @@
             </div>
 
             <!-- Campus Emergency Strip -->
-            <footer class="mt-auto border-t border-[#52b788]/20 bg-[#ffffff] py-6">
+            <footer class="mt-auto border-t border-[#52b788]/20 bg-[#0f281e] py-6">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#8fb89e]">
                     <div class="flex items-center gap-2">
                         <span class="font-bold text-[#fefae0]">MANN Smart Hostel OS 2.0</span>
@@ -366,7 +366,7 @@
             <!-- SIDEBAR NAVIGATION -->
             <aside id="sidebarNav" class="w-full md:w-64 flex-shrink-0 space-y-2">
                 <!-- User Profile & Context Card -->
-                <div class="p-4 rounded-2xl bg-[#ffffff]/90 border border-[#52b788]/20 shadow-md">
+                <div class="p-4 rounded-2xl bg-[#0f281e] border border-[#52b788]/30 shadow-md">
                     <div class="text-[10px] font-bold text-[#8fb89e] uppercase tracking-wider mb-1">Active Portal</div>
                     <div id="sidebarPortalName" class="font-extrabold text-[#fefae0] text-base font-serif-title">Student Portal</div>
                     <div id="sidebarUserSubtext" class="text-xs text-[#52b788] font-mono mt-0.5">Room A-204 · Bed A</div>
@@ -378,7 +378,7 @@
                 </nav>
 
                 <!-- Confidentiality Privacy Vault Notice (Always visible when in MANN Care or Student mode) -->
-                <div id="wellnessPrivacyNotice" class="p-3.5 rounded-2xl bg-sky-50/80 border-sky-200 border border-[#52b788]/30 text-xs">
+                <div id="wellnessPrivacyNotice" class="p-3.5 rounded-2xl bg-[#0f281e]/90 border border-[#52b788]/30 text-xs">
                     <div class="flex items-center gap-2 text-[#52b788] font-bold mb-1">
                         <i class="fa-solid fa-user-shield"></i>
                         <span>Confidentiality Seal</span>
@@ -451,7 +451,7 @@
                     </div>
 
                     <!-- Search & Filters -->
-                    <div class="flex flex-wrap items-center gap-3 bg-[#ffffff]/80 p-3 rounded-2xl border border-[#52b788]/20 text-xs">
+                    <div class="flex flex-wrap items-center gap-3 bg-[#0f281e]/90 p-3 rounded-2xl border border-[#52b788]/25 text-xs">
                         <div class="flex-1 min-w-[200px] relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-[#8fb89e]"></i>
                             <input type="text" id="complaintSearchInput" placeholder="Search complaints by ID, title, room..." class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
@@ -540,7 +540,7 @@
                     </div>
 
                     <!-- Search & Filter -->
-                    <div class="flex flex-wrap items-center gap-3 bg-[#ffffff]/80 p-3 rounded-2xl border border-[#52b788]/20 text-xs">
+                    <div class="flex flex-wrap items-center gap-3 bg-[#0f281e]/90 p-3 rounded-2xl border border-[#52b788]/25 text-xs">
                         <div class="flex-1 min-w-[200px] relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-[#8fb89e]"></i>
                             <input type="text" id="leaveSearchInput" placeholder="Search leave by ID, reason, destination..." class="w-full bg-[#143528] border border-[#52b788]/20 rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
@@ -907,7 +907,7 @@
                     </div>
 
                     <!-- Room Block & Occupancy Filters -->
-                    <div class="flex flex-wrap items-center gap-3 bg-[#ffffff]/80 p-3 rounded-2xl border border-[#52b788]/20 text-xs">
+                    <div class="flex flex-wrap items-center gap-3 bg-[#0f281e]/90 p-3 rounded-2xl border border-[#52b788]/25 text-xs">
                         <select id="roomBlockFilter" class="bg-[#143528] border border-[#52b788]/20 rounded-xl px-3 py-1.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
                             <option value="">All Blocks (A, B, C)</option>
                             <option value="A">Block A</option>
@@ -1978,7 +1978,7 @@
             <div class="p-3 bg-white rounded-2xl inline-block shadow-inner mx-auto border-4 border-[#2d6a4f]/30">
                 <img src="/static/img/mobile_qr.svg" alt="Mobile Access QR Code" class="w-48 h-48 mx-auto">
             </div>
-            <div class="p-3 rounded-xl bg-[#ffffff] border border-[#52b788]/30 text-xs space-y-1">
+            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/30 text-xs space-y-1">
                 <div class="text-[10px] text-[#8fb89e] uppercase font-bold tracking-wider">Local Network IP</div>
                 <div class="font-mono text-[#52b788] font-bold text-sm select-all">http://10.100.49.92:5050</div>
             </div>
@@ -1991,7 +1991,7 @@
     <!-- ========================================== -->
     <!-- MOBILE BOTTOM NAVIGATION BAR (md:hidden)  -->
     <!-- ========================================== -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#ffffff]/95 backdrop-blur-lg border-t border-[#52b788]/20 flex items-center justify-around py-2 px-2 text-[10px] text-[#8fb89e] shadow-2xl">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0f281e]/95 backdrop-blur-lg border-t border-[#52b788]/20 flex items-center justify-around py-2 px-2 text-[10px] text-[#8fb89e] shadow-2xl">
         <button onclick="app.mobileNavTo('home')" class="flex flex-col items-center gap-1 hover:text-[#52b788] transition px-2 py-1">
             <i class="fa-solid fa-house text-base"></i>
             <span>Home</span>
@@ -2033,7 +2033,7 @@
     <div id="gema4ChatModal" class="fixed inset-x-0 bottom-0 sm:inset-auto sm:right-6 sm:bottom-6 z-50 hidden flex flex-col sm:w-[400px] h-[85vh] sm:h-[560px] forest-card rounded-t-3xl sm:rounded-3xl border border-[#52b788]/40 shadow-2xl backdrop-blur-xl transition-all duration-300">
         
         <!-- Header -->
-        <div class="p-3.5 sm:p-4 border-b border-[#52b788]/20 flex items-center justify-between bg-[#ffffff]/90 rounded-t-3xl">
+        <div class="p-3.5 sm:p-4 border-b border-[#52b788]/20 flex items-center justify-between bg-[#0f281e]/95 rounded-t-3xl">
             <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#52b788] to-[#74c69d] flex items-center justify-center text-white text-sm shadow border border-[#52b788]/40">
                     <i class="fa-solid fa-sparkles"></i>
@@ -2073,10 +2073,10 @@
         <div id="gema4MessagesContainer" class="flex-1 p-3.5 space-y-3 overflow-y-auto text-xs scrollbar-none">
             <!-- Initial AI Greeting Bubble -->
             <div class="flex items-start gap-2.5">
-                <div class="w-6 h-6 rounded-lg bg-[#52b788] flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
+                <div class="w-6 h-6 rounded-lg bg-[#52b788]/20 border border-[#52b788]/40 flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
                     <i class="fa-solid fa-sparkles"></i>
                 </div>
-                <div class="p-3 rounded-2xl rounded-tl-sm bg-[#ffffff] border border-[#52b788]/20 text-[#fefae0] leading-relaxed max-w-[85%] shadow-sm">
+                <div class="p-3 rounded-2xl rounded-tl-sm bg-[#143528] border border-[#52b788]/30 text-[#fefae0] leading-relaxed max-w-[85%] shadow-sm">
                     <p class="font-semibold text-[#52b788] text-[11px] mb-1">Gemma-4 On-Device Intelligence</p>
                     Hello! I'm Gemma-4, your open-source hostel assistant. How can I help you today? You can ask about curfew rules, mess dining, maintenance repairs, or campus emergency hotlines.
                 </div>
@@ -2084,7 +2084,7 @@
         </div>
 
         <!-- Input Box -->
-        <form id="gema4ChatForm" onsubmit="app.handleGemma4ChatSubmit(event)" class="p-3 border-t border-[#52b788]/20 bg-[#ffffff]/90 flex items-center gap-2">
+        <form id="gema4ChatForm" onsubmit="app.handleGemma4ChatSubmit(event)" class="p-3 border-t border-[#52b788]/20 bg-[#0f281e]/95 flex items-center gap-2">
             <input type="text" id="gema4ChatInput" placeholder="Ask Gemma-4 anything..." autocomplete="off" class="flex-1 bg-[#143528] border border-[#52b788]/30 rounded-xl px-3.5 py-2.5 text-xs text-[#fefae0] placeholder-[#8fb89e]/60 focus:outline-none focus:border-[#52b788]">
             <button type="submit" id="gema4SendBtn" class="w-9 h-9 rounded-xl btn-forest-primary flex items-center justify-center text-sm shadow-md flex-shrink-0">
                 <i class="fa-solid fa-paper-plane"></i>

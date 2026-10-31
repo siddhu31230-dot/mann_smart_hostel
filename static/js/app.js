@@ -112,7 +112,7 @@ const app = {
 
             studentItems.forEach(item => {
                 const btn = document.createElement('button');
-                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#52b788] text-[#8fb89e] hover:text-[#52b788]`;
+                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]`;
                 btn.dataset.tab = item.id;
                 btn.onclick = () => this.navigateToStudentSubTab(item.id);
                 btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center ${item.special || 'text-[#52b788]'}"></i> <span>${item.label}</span>`;
@@ -142,7 +142,7 @@ const app = {
 
             adminItems.forEach(item => {
                 const btn = document.createElement('button');
-                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#52b788] text-[#8fb89e] hover:text-[#52b788]`;
+                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]`;
                 btn.dataset.tab = item.id;
                 btn.onclick = () => this.navigateToAdminSubTab(item.id);
                 btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center text-[#52b788]"></i> <span>${item.label}</span>`;
@@ -184,9 +184,9 @@ const app = {
         // Update active class on sidebar
         document.querySelectorAll('#navItemsList button').forEach(btn => {
             if (btn.dataset.tab === tabId) {
-                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#2d6a4f] text-[#fefae0] shadow-md border border-[#52b788]/30';
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#2d6a4f] text-[#fefae0] font-bold shadow-md border border-[#52b788]/40';
             } else {
-                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#52b788] text-[#8fb89e] hover:text-[#52b788]';
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]';
             }
         });
 
@@ -216,9 +216,9 @@ const app = {
         // Update active class on sidebar
         document.querySelectorAll('#navItemsList button').forEach(btn => {
             if (btn.dataset.tab === tabId) {
-                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#2d6a4f] text-[#fefae0] shadow-md border border-[#52b788]/30';
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#2d6a4f] text-[#fefae0] font-bold shadow-md border border-[#52b788]/40';
             } else {
-                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#52b788] text-[#8fb89e] hover:text-[#52b788]';
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]';
             }
         });
 
@@ -289,7 +289,7 @@ const app = {
                 if (btn.dataset.role === user.role) {
                     btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-bold bg-[#52b788] text-[#08140e] shadow-sm';
                 } else {
-                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f] text-[#8fb89e]';
+                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f] text-[#8fb89e] hover:text-[#fefae0]';
                 }
             });
 
@@ -533,7 +533,7 @@ const app = {
             const roommatesList = (data.roommates || []).map(r => `
                 <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-full bg-[#52b788] text-[#52b788] flex items-center justify-center font-bold text-[11px] border border-[#52b788]/40">
+                        <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#2d6a4f] to-[#52b788] text-[#fefae0] flex items-center justify-center font-bold text-[11px] border border-[#52b788]/40 shadow-sm">
                             ${r.bed_identifier.slice(-1)}
                         </div>
                         <div>
@@ -692,7 +692,7 @@ const app = {
                                 ` : ''}
 
                                 ${isStaff ? `
-                                    <button onclick="app.openAssignModal(${c.id})" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#52b788] text-xs font-semibold text-white border border-[#52b788]/30">
+                                    <button onclick="app.openAssignModal(${c.id})" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#2d6a4f] text-xs font-semibold text-[#fefae0] border border-[#52b788]/40">
                                         Assign Staff
                                     </button>
                                     <button onclick="app.updateComplaintProgress(${c.id}, 'Work in Progress')" class="px-2.5 py-1 rounded-lg bg-[#2d6a4f] hover:bg-[#74c69d] text-xs font-semibold text-white">
@@ -1976,7 +1976,7 @@ const app = {
             c.innerHTML = staff.map(s => `
                 <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 space-y-2 text-xs">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-[#52b788] text-[#52b788] flex items-center justify-center font-bold text-xs border border-[#52b788]/30">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#2d6a4f] to-[#52b788] text-[#fefae0] flex items-center justify-center font-bold text-xs border border-[#52b788]/40 shadow-sm">
                             ${s.full_name.substring(0, 2).toUpperCase()}
                         </div>
                         <div>
@@ -2319,7 +2319,7 @@ const app = {
         loadingBubble.className = 'flex items-start gap-2.5';
         loadingBubble.id = 'gema4ThinkingBubble';
         loadingBubble.innerHTML = `
-            <div class="w-6 h-6 rounded-lg bg-[#52b788] flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
+            <div class="w-6 h-6 rounded-lg bg-[#52b788]/20 border border-[#52b788]/40 flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
                 <i class="fa-solid fa-sparkles animate-spin"></i>
             </div>
             <div class="p-3 rounded-2xl rounded-tl-sm bg-[#0f281e] border border-[#52b788]/20 text-[#8fb89e] text-xs">
@@ -2347,7 +2347,7 @@ const app = {
                 .replace(/\n/g, '<br>');
 
             aiBubble.innerHTML = `
-                <div class="w-6 h-6 rounded-lg bg-[#52b788] flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
+                <div class="w-6 h-6 rounded-lg bg-[#52b788]/20 border border-[#52b788]/40 flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
                     <i class="fa-solid fa-sparkles"></i>
                 </div>
                 <div class="p-3 rounded-2xl rounded-tl-sm bg-[#0f281e] border border-[#52b788]/20 text-[#fefae0] leading-relaxed max-w-[85%] shadow-sm">
