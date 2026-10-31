@@ -1,6 +1,20 @@
-# MANN Smart Hostel OS
+# MANN 2.0 (New-Tons) — Smart Hostel OS & Private Wellness Sanctuary
 
-An enterprise campus residential administration platform engineered with a clean full-stack architecture, featuring real-time role-based access control (RBAC), SQLite ACID data persistence, strict confidential wellness data isolation, and a comprehensive automated QA test suite.
+### 🏆 SMRU HACK DAY · HYDERABAD — Official Submission
+| Submission Field | Specification Details |
+| :--- | :--- |
+| **Track** | **Track 2 — Open Source AI (Google Gemma 4)** |
+| **Problem Statement** | **Problem Statement #9: Private Wellness Check-In for Hostel Students** |
+| **Open-Source Model** | **Google Gemma 4 (`gemma-4-26b-a4b-it`)** |
+| **Model License** | **Gemma Open Model Terms of Use / License (Google)** ([Terms](https://ai.google.dev/gemma/terms)) |
+| **Project License** | **MIT License** ([LICENSE](./LICENSE)) |
+| **Public Repository** | [https://github.com/siddhu31230-dot/mann_smart_hostel](https://github.com/siddhu31230-dot/mann_smart_hostel) |
+| **Local URL** | `http://127.0.0.1:5050` |
+| **Universal Demo Vault PIN** | **`1234`** *(or tap on-screen "Reset Key")* |
+
+---
+
+An enterprise campus residential administration platform and zero-knowledge mental wellness sanctuary engineered with a clean full-stack architecture, featuring real-time role-based access control (RBAC), SQLite ACID data persistence, strict confidential wellness data isolation (Dexie.js IndexedDB + Web Crypto AES-GCM 256), on-device Gemma 4 AI intelligence, and a comprehensive automated QA test suite.
 
 ---
 
