@@ -71,7 +71,11 @@ def index():
 @app.route('/wellness')
 @app.route('/wellness/')
 def wellness_portal():
-    return send_from_directory(app.static_folder, 'wellness.html')
+    res = send_from_directory(app.static_folder, 'wellness.html')
+    res.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    res.headers['Pragma'] = 'no-cache'
+    res.headers['Expires'] = '0'
+    return res
 
 @app.route('/manifest.json')
 def web_manifest():
@@ -81,7 +85,18 @@ def web_manifest():
 def wellness_service_worker():
     res = send_from_directory(app.static_folder, 'wellness-sw.js')
     res.headers['Service-Worker-Allowed'] = '/'
+    res.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    res.headers['Pragma'] = 'no-cache'
+    res.headers['Expires'] = '0'
     return res
+
+@app.after_request
+def add_cache_control_headers(response):
+    if request.path.startswith('/static/') or request.path in ['/wellness', '/wellness/', '/wellness-sw.js', '/']:
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
 
 # --- Authentication Endpoints (MANN 2.0) ---
 

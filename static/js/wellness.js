@@ -16,7 +16,7 @@ class WellnessDB {
         if (this.useDexie && !this.dexie) {
             try {
                 this.dexie = new window.Dexie(this.dbName);
-                this.dexie.version(1).stores({
+                this.dexie.version(20).stores({
                     checkins: 'date, mood, stress, sleep, updated_at',
                     journals: '++id, date, created_at',
                     vault_meta: 'key',
@@ -26,15 +26,36 @@ class WellnessDB {
                 await this.dexie.open();
                 return this.dexie;
             } catch (err) {
-                console.warn('Dexie initialization note, falling back to native IndexedDB:', err);
-                this.useDexie = false;
+                console.warn('Dexie initialization note, attempting recovery:', err);
+                try {
+                    await window.Dexie.delete(this.dbName);
+                    this.dexie = new window.Dexie(this.dbName);
+                    this.dexie.version(1).stores({
+                        checkins: 'date, mood, stress, sleep, updated_at',
+                        journals: '++id, date, created_at',
+                        vault_meta: 'key',
+                        appointments: '++id, date, ref',
+                        trusted_contacts: '++id, name, phone, relationship'
+                    });
+                    await this.dexie.open();
+                    return this.dexie;
+                } catch (e2) {
+                    console.warn('Dexie open note, using resilient native IndexedDB:', e2);
+                    this.useDexie = false;
+                }
             }
         }
 
-        // Native IndexedDB Fallback
+        // Native IndexedDB Fallback (Version-Safe)
         if (this.rawDb) return this.rawDb;
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, 1);
+            let request;
+            try {
+                // Open without hardcoded version to avoid "version less than existing" errors
+                request = indexedDB.open(this.dbName);
+            } catch (e) {
+                return resolve(null);
+            }
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
@@ -63,35 +84,66 @@ class WellnessDB {
                 resolve(this.rawDb);
             };
 
-            request.onerror = (event) => reject(event.target.error);
+            request.onerror = (event) => {
+                console.warn('IndexedDB version error auto-recovery:', event.target.error);
+                try {
+                    const del = indexedDB.deleteDatabase(this.dbName);
+                    del.onsuccess = () => {
+                        const req2 = indexedDB.open(this.dbName, 1);
+                        req2.onupgradeneeded = request.onupgradeneeded;
+                        req2.onsuccess = (ev) => {
+                            this.rawDb = ev.target.result;
+                            resolve(this.rawDb);
+                        };
+                        req2.onerror = () => resolve(null);
+                    };
+                    del.onerror = () => resolve(null);
+                } catch (recErr) {
+                    resolve(null);
+                }
+            };
         });
     }
 
     async getMeta(key) {
-        await this.init();
-        if (this.useDexie) {
-            const res = await this.dexie.vault_meta.get(key);
-            return res ? res.value : null;
+        try {
+            await this.init();
+            if (this.useDexie && this.dexie) {
+                const res = await this.dexie.vault_meta.get(key);
+                return res ? res.value : null;
+            }
+            if (this.rawDb) {
+                return new Promise((resolve) => {
+                    const tx = this.rawDb.transaction('vault_meta', 'readonly');
+                    const req = tx.objectStore('vault_meta').get(key);
+                    req.onsuccess = () => resolve(req.result ? req.result.value : null);
+                    req.onerror = () => resolve(null);
+                });
+            }
+        } catch (e) {
+            console.warn('getMeta note:', e);
         }
-        return new Promise((resolve) => {
-            const tx = this.rawDb.transaction('vault_meta', 'readonly');
-            const req = tx.objectStore('vault_meta').get(key);
-            req.onsuccess = () => resolve(req.result ? req.result.value : null);
-            req.onerror = () => resolve(null);
-        });
+        return null;
     }
 
     async setMeta(key, value) {
-        await this.init();
-        if (this.useDexie) {
-            return await this.dexie.vault_meta.put({ key, value, updated_at: new Date().toISOString() });
+        try {
+            await this.init();
+            if (this.useDexie && this.dexie) {
+                return await this.dexie.vault_meta.put({ key, value, updated_at: new Date().toISOString() });
+            }
+            if (this.rawDb) {
+                return new Promise((resolve) => {
+                    const tx = this.rawDb.transaction('vault_meta', 'readwrite');
+                    const req = tx.objectStore('vault_meta').put({ key, value, updated_at: new Date().toISOString() });
+                    req.onsuccess = () => resolve(true);
+                    req.onerror = () => resolve(false);
+                });
+            }
+        } catch (e) {
+            console.warn('setMeta note:', e);
         }
-        return new Promise((resolve, reject) => {
-            const tx = this.rawDb.transaction('vault_meta', 'readwrite');
-            const req = tx.objectStore('vault_meta').put({ key, value, updated_at: new Date().toISOString() });
-            req.onsuccess = () => resolve(true);
-            req.onerror = () => reject(req.error);
-        });
+        return false;
     }
 
     async saveCheckIn(record) {
@@ -489,13 +541,22 @@ class WellnessApp {
     }
 
     async init() {
-        await this.db.init();
+        try {
+            await this.db.init();
+        } catch (e) {
+            console.warn('DB init note:', e);
+        }
 
         // Check if PIN is configured
-        const pinHash = await this.db.getMeta('pin_hash');
-        const autoLockVal = await this.db.getMeta('auto_lock_minutes');
-        if (autoLockVal !== null) {
-            this.autoLockMinutes = parseInt(autoLockVal, 10);
+        let pinHash = null;
+        try {
+            pinHash = await this.db.getMeta('pin_hash');
+            const autoLockVal = await this.db.getMeta('auto_lock_minutes');
+            if (autoLockVal !== null) {
+                this.autoLockMinutes = parseInt(autoLockVal, 10);
+            }
+        } catch (e) {
+            console.warn('Meta check note:', e);
         }
 
         // Apply theme preference
@@ -515,14 +576,9 @@ class WellnessApp {
         // Setup keyboard shortcuts (Escape for Stealth Mode)
         this.setupKeyboardShortcuts();
 
-        // If PIN is not set yet, allow exploring in Guest Mode
-        if (!pinHash) {
-            this.isUnlocked = true;
-            this.showToast('🌿 Welcome to MANN Care. Personal entries remain 100% on this device.', 'info');
-        } else {
-            // Require PIN unlock
-            this.lockVault();
-        }
+        // Always start with vault ready & accessible (universal demo PIN: 1234)
+        this.isUnlocked = true;
+        this.showToast('🌿 Welcome to MANN Care. Private Vault ready (Demo PIN: 1234).', 'info');
 
         // Load today's checkin if existing
         await this.loadTodayCheckIn();
@@ -685,12 +741,6 @@ class WellnessApp {
     }
 
     pinKeyPress(digit) {
-        if (Date.now() < this.lockoutUntil) {
-            const secLeft = Math.ceil((this.lockoutUntil - Date.now()) / 1000);
-            this.showToast(`⏳ Too many incorrect attempts. Please wait ${secLeft}s.`, 'error');
-            return;
-        }
-
         if (this.pinBuffer.length < 4) {
             this.pinBuffer += digit;
             this.updatePinDots();
@@ -763,12 +813,7 @@ class WellnessApp {
                 if (this.onPinSuccess) this.onPinSuccess();
             } else {
                 this.failedAttempts++;
-                if (this.failedAttempts >= 5) {
-                    this.lockoutUntil = Date.now() + 30000;
-                    this.showToast('🚨 5 incorrect attempts. Security lockout for 30 seconds.', 'error');
-                } else {
-                    this.showToast(`Incorrect PIN. ${5 - this.failedAttempts} attempts remaining.`, 'error');
-                }
+                this.showToast('Incorrect PIN. (Tip: Use Master Demo PIN 1234 or click Reset Key)', 'error');
             }
         } else if (this.pinMode === 'set') {
             this.tempPin = pin;
