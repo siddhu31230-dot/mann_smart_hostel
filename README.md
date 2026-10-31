@@ -3,12 +3,13 @@
 ### 🏆 SMRU HACK DAY · HYDERABAD — Official Submission
 | Submission Field | Specification Details |
 | :--- | :--- |
-| **Track** | **Track 2 — Open Source AI (Google Gemma 4)** |
+| **Track** | **Track 1 / Track 2 — Open Source AI (Google Gemma 4)** |
 | **Problem Statement** | **Problem Statement #9: Private Wellness Check-In for Hostel Students** |
 | **Open-Source Model** | **Google Gemma 4 (`gemma-4-26b-a4b-it`)** |
 | **Model License** | **Gemma Open Model Terms of Use / License (Google)** ([Terms](https://ai.google.dev/gemma/terms)) |
 | **Project License** | **MIT License** ([LICENSE](./LICENSE)) |
-| **Public Repository** | [https://github.com/siddhu31230-dot/mann_smart_hostel](https://github.com/siddhu31230-dot/mann_smart_hostel) |
+| **Public Repository** | [https://github.com/rayaktushti-tech/Hacktoberfest_Synqron_Track_1](https://github.com/rayaktushti-tech/Hacktoberfest_Synqron_Track_1) |
+| **Personal Mirror** | [https://github.com/siddhu31230-dot/mann_smart_hostel](https://github.com/siddhu31230-dot/mann_smart_hostel) |
 | **Local URL** | `http://127.0.0.1:5050` |
 | **Universal Demo Vault PIN** | **`1234`** *(or tap on-screen "Reset Key")* |
 
