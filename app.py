@@ -988,6 +988,27 @@ def run_gema4_triage():
     analysis = gema4.triage_complaint(title, desc, cat, urgency)
     return jsonify({'gema4_analysis': analysis, 'gemma4_analysis': analysis})
 
+@app.route('/api/wellness/gemma4-companion', methods=['POST'])
+@app.route('/api/gemma4/wellness-companion', methods=['POST'])
+def gemma4_wellness_companion():
+    """
+    Gemma-4 Safe Space Reflection Companion for confidential hostel student wellness.
+    Strictly non-diagnostic, supportive, and privacy-preserving.
+    """
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+    message = (data.get('prompt') or data.get('message') or '').strip()
+    if not message:
+        return jsonify({'error': 'Message cannot be empty', 'code': 'VALIDATION_ERROR'}), 400
+    alias = data.get('student_alias') or data.get('alias') or (user['full_name'] if user else 'Resident')
+    result = gema4.wellness_companion_chat(message, student_alias=alias)
+    # Ensure both response/reply and is_crisis/crisis_detected keys are present
+    if isinstance(result, dict):
+        result['reply'] = result.get('response', '')
+        result['crisis_detected'] = result.get('is_crisis', False)
+        result['status'] = 'success'
+    return jsonify(result)
+
 @app.route('/api/gemma4/chat', methods=['POST'])
 @app.route('/api/gema4/chat', methods=['POST'])
 def gema4_chat_endpoint():

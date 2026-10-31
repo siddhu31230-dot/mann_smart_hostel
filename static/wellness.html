@@ -126,8 +126,9 @@
                         <div class="flex items-center gap-2">
                             <span class="font-extrabold text-base tracking-tight font-serif-title text-[#176B50] dark:text-[#A8D5BA]">MANN Care</span>
                             <span class="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-[#D5EBDD] dark:bg-[#1C332A] text-[#176B50] dark:text-[#A8D5BA] border border-[#176B50]/20">Dexie IndexedDB</span>
+                            <span class="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 hidden md:inline-flex">Problem Statement #9</span>
                         </div>
-                        <p class="text-[11px] text-[#4B675B] dark:text-[#A8D5BA]/80 hidden sm:block">Private Wellness Check-In • On-Device Encrypted</p>
+                        <p class="text-[11px] text-[#4B675B] dark:text-[#A8D5BA]/80 hidden sm:block">Problem Statement #9: Private Wellness Check-In for Hostel Students • Web Crypto Encrypted</p>
                     </div>
                 </div>
 
@@ -154,8 +155,9 @@
                     </button>
 
                     <!-- Return to Main Hostel OS -->
-                    <a href="/" class="px-3 py-1.5 rounded-xl bg-[#176B50] text-white text-xs font-semibold hover:bg-[#125740] transition flex items-center gap-1.5 shadow-sm">
-                        <i class="fa-solid fa-building-user text-xs"></i> <span class="hidden sm:inline">Hostel OS</span>
+                    <a id="returnToHostelBtn" href="/" class="px-3 py-1.5 rounded-xl bg-[#176B50] text-white text-xs font-semibold hover:bg-[#125740] transition flex items-center gap-1.5 shadow-sm border border-[#A8D5BA]/30" title="Return to MANN Smart Hostel OS">
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
+                        <span class="hidden sm:inline">Hostel Portal</span>
                     </a>
                 </div>
             </div>
@@ -172,6 +174,11 @@
                     </button>
                     <button onclick="app.navTo('checkin')" data-view="checkin" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
                         <i class="fa-solid fa-heart-pulse w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>Daily Check-In</span>
+                    </button>
+                    <button onclick="app.navTo('gemma4')" data-view="gemma4" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
+                        <i class="fa-solid fa-sparkles w-5 text-center text-amber-500"></i>
+                        <span class="flex-1">Gemma-4 Safe Space</span>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">AI</span>
                     </button>
                     <button onclick="app.navTo('insights')" data-view="insights" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
                         <i class="fa-solid fa-chart-line w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>My Insights</span>
@@ -324,13 +331,32 @@
                 </div>
 
                 <!-- ============================================== -->
-                <!-- VIEW 2: DAILY CHECK-IN (<60s) (Priority 3)     -->
+                <!-- VIEW 2: DAILY CHECK-IN (<60s) (Priority 1)     -->
                 <!-- ============================================== -->
                 <div id="view-checkin" class="wellness-view hidden space-y-6">
                     <div class="wellness-card p-6 sm:p-8 space-y-6">
-                        <div>
-                            <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">One-Minute Daily Check-In</h2>
-                            <p class="text-xs text-gray-500">Takes 30–60 seconds. Personal entries stay 100% on your device.</p>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
+                            <div>
+                                <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Daily Wellness Check-In</h2>
+                                <p class="text-xs text-gray-500">Takes 30–60 seconds. Personal entries stay 100% on your device.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-[11px] font-bold text-gray-500">Log Date:</label>
+                                <input type="date" id="checkinDatePicker" onchange="app.handleCheckinDateChange(this.value)" class="bg-[#F6F8F5] dark:bg-[#101A17] border border-[#176B50]/20 rounded-xl px-2.5 py-1 text-xs font-bold text-[#176B50] dark:text-[#A8D5BA]">
+                            </div>
+                        </div>
+
+                        <!-- 1-Click Speed Presets -->
+                        <div class="p-3 rounded-2xl bg-[#D5EBDD]/40 dark:bg-[#1C332A] border border-[#176B50]/20 flex flex-wrap items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-bolt text-amber-500"></i>
+                                <span class="font-bold text-[#176B50] dark:text-[#A8D5BA]">Quick 30s Presets:</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button type="button" onclick="app.applyCheckinPreset('calm')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-[#162420] border hover:border-[#176B50] font-semibold text-[11px] transition">😌 Balanced & Calm</button>
+                                <button type="button" onclick="app.applyCheckinPreset('busy')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-[#162420] border hover:border-[#176B50] font-semibold text-[11px] transition">📚 Busy Revision</button>
+                                <button type="button" onclick="app.applyCheckinPreset('tired')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-[#162420] border hover:border-[#176B50] font-semibold text-[11px] transition">😴 Late Night / Tired</button>
+                            </div>
                         </div>
 
                         <!-- Step 1: Feeling Today (6 feelings) -->
@@ -373,7 +399,7 @@
                         <!-- Step 2: Stress Slider -->
                         <div class="space-y-3 pt-2">
                             <div class="flex items-center justify-between">
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">2. How stressful was your day?</label>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">2. Stress Level</label>
                                 <span id="stressValueLabel" class="text-base font-extrabold text-[#176B50] dark:text-[#A8D5BA]">3/10</span>
                             </div>
                             <input type="range" id="stressSliderInput" min="1" max="10" value="3" oninput="app.updateStressSlider(this.value)" class="stress-slider">
@@ -386,7 +412,7 @@
 
                         <!-- Step 3: Sleep Quality -->
                         <div class="space-y-3 pt-2">
-                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 block">3. How did you sleep?</label>
+                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 block">3. Sleep Quality</label>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 <div onclick="app.selectSleep('Poor')" data-sleep="Poor" class="sleep-choice-card p-3 rounded-2xl bg-[#F6F8F5] dark:bg-[#162420] border text-center space-y-1">
                                     <span class="text-2xl block">😴</span>
@@ -414,7 +440,7 @@
                         <!-- Step 4: Influences (Context Tags + Custom) -->
                         <div class="space-y-3 pt-2">
                             <div class="flex items-center justify-between">
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">4. What influenced your day?</label>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">4. Contextual Tags (Optional)</label>
                                 <button type="button" onclick="app.promptAddCustomTag()" class="text-[11px] font-bold text-[#176B50] dark:text-[#A8D5BA] hover:underline flex items-center gap-1">
                                     <i class="fa-solid fa-plus text-[10px]"></i> Add Custom Tag
                                 </button>
@@ -423,10 +449,10 @@
                                 <button type="button" onclick="app.toggleTag(this, 'Exams')" data-tag="Exams" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">📝 Exams</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Academics')" data-tag="Academics" class="tag-chip active px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🎓 Academics</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Roommates')" data-tag="Roommates" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">👥 Roommates</button>
-                                <button type="button" onclick="app.toggleTag(this, 'Friendships')" data-tag="Friendships" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🤝 Friendships</button>
+                                <button type="button" onclick="app.toggleTag(this, 'Friends')" data-tag="Friends" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🤝 Friends</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Homesickness')" data-tag="Homesickness" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🏡 Homesickness</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Family')" data-tag="Family" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">👨‍👩‍👧 Family</button>
-                                <button type="button" onclick="app.toggleTag(this, 'Finances')" data-tag="Finances" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">💰 Finances</button>
+                                <button type="button" onclick="app.toggleTag(this, 'Financial concerns')" data-tag="Financial concerns" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">💰 Financial concerns</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Personal')" data-tag="Personal" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">🌱 Personal</button>
                                 <button type="button" onclick="app.toggleTag(this, 'Other')" data-tag="Other" class="tag-chip px-3.5 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#162420] font-medium">💭 Other</button>
                                 <span id="customTagsContainer" class="flex flex-wrap gap-2"></span>
@@ -436,9 +462,9 @@
                         <!-- Step 5: Optional Private Journal -->
                         <div class="space-y-2 pt-2">
                             <div class="flex items-center justify-between">
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">5. Would you like to write something privately? (Optional)</label>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">5. Private Journal Thought (Optional)</label>
                                 <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                                    <i class="fa-solid fa-lock text-[9px]"></i> WebCrypto Encrypted
+                                    <i class="fa-solid fa-lock text-[9px]"></i> Web Crypto AES-256 Encrypted
                                 </span>
                             </div>
                             <textarea id="checkinJournalInput" rows="3" placeholder="Write anything on your mind. This text is encrypted with AES-256 before being written to disk..." class="w-full bg-[#F6F8F5] dark:bg-[#101A17] border border-[#176B50]/20 rounded-2xl p-3.5 text-xs focus:outline-none focus:border-[#176B50] transition leading-relaxed"></textarea>
@@ -448,6 +474,92 @@
                         <div class="pt-3">
                             <button onclick="app.submitCheckIn()" class="btn-wellness-primary w-full py-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg">
                                 <i class="fa-solid fa-shield-halved"></i> Save Encrypted Check-In
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- VIEW: GEMMA-4 SAFE SPACE REFLECTION COMPANION   -->
+                <!-- ============================================== -->
+                <div id="view-gemma4" class="wellness-view hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Gemma-4 Safe Space</h2>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                                    <i class="fa-solid fa-sparkles text-amber-500"></i> Gemma-4-26B-IT
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-0.5">Privacy-preserving on-device reflection companion for college hostel students.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] px-2.5 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                                <i class="fa-solid fa-lock text-[10px]"></i> Zero Journal Sharing
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Guarantee Seal -->
+                    <div class="p-4 rounded-2xl bg-[#D5EBDD]/40 dark:bg-[#1C332A] border border-[#176B50]/25 text-xs space-y-1.5 shadow-sm">
+                        <div class="font-bold flex items-center gap-2 text-[#176B50] dark:text-[#A8D5BA]">
+                            <i class="fa-solid fa-shield-halved"></i> 100% Privacy Boundary Guarantee
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                            Gemma-4 Safe Space provides compassionate, non-judgmental dialogue for hostel stress, grounding, and perspective. <strong>Your encrypted journal entries, mood records, and counsellor bookings are NEVER transmitted or shared with external AI.</strong>
+                        </p>
+                    </div>
+
+                    <!-- Quick Coping Prompt Starter Chips -->
+                    <div class="space-y-2">
+                        <span class="text-[10px] uppercase font-bold text-gray-400">Quick Reflection Starters:</span>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <button type="button" onclick="app.sendGemmaPrompt('I am feeling overwhelmed by exam revision and deadlines')" class="px-3 py-1.5 rounded-xl bg-white dark:bg-[#162420] border border-[#176B50]/20 hover:border-[#176B50] font-semibold text-gray-700 dark:text-gray-200 transition flex items-center gap-1.5">
+                                <span>📝 Exam & Revision Stress</span>
+                            </button>
+                            <button type="button" onclick="app.sendGemmaPrompt('I am having boundary tension with my hostel roommate')" class="px-3 py-1.5 rounded-xl bg-white dark:bg-[#162420] border border-[#176B50]/20 hover:border-[#176B50] font-semibold text-gray-700 dark:text-gray-200 transition flex items-center gap-1.5">
+                                <span>👥 Roommate Boundaries</span>
+                            </button>
+                            <button type="button" onclick="app.sendGemmaPrompt('Feeling homesick and quiet in my hostel room tonight')" class="px-3 py-1.5 rounded-xl bg-white dark:bg-[#162420] border border-[#176B50]/20 hover:border-[#176B50] font-semibold text-gray-700 dark:text-gray-200 transition flex items-center gap-1.5">
+                                <span>🏡 Homesickness & Loneliness</span>
+                            </button>
+                            <button type="button" onclick="app.sendGemmaPrompt('Guide me through a 2-minute 5-4-3-2-1 grounding exercise')" class="px-3 py-1.5 rounded-xl bg-white dark:bg-[#162420] border border-[#176B50]/20 hover:border-[#176B50] font-semibold text-gray-700 dark:text-gray-200 transition flex items-center gap-1.5">
+                                <span>🌬️ 2-Min Grounding Reset</span>
+                            </button>
+                            <button type="button" onclick="app.sendGemmaPrompt('My thoughts are racing and I cannot fall asleep in the hostel')" class="px-3 py-1.5 rounded-xl bg-white dark:bg-[#162420] border border-[#176B50]/20 hover:border-[#176B50] font-semibold text-gray-700 dark:text-gray-200 transition flex items-center gap-1.5">
+                                <span>🌙 Late Night Racing Thoughts</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Box Container -->
+                    <div class="wellness-card flex flex-col h-[520px] overflow-hidden border border-[#176B50]/20">
+                        <!-- Messages scroll area -->
+                        <div id="gemmaChatMessages" class="flex-1 p-5 overflow-y-auto space-y-4 text-xs">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+
+                        <!-- Typing status -->
+                        <div id="gemmaTypingIndicator" class="hidden px-5 py-2 text-[11px] text-[#176B50] dark:text-[#A8D5BA] flex items-center gap-2 bg-[#D5EBDD]/20">
+                            <i class="fa-solid fa-circle-notch fa-spin text-xs"></i>
+                            <span>Gemma-4 is reflecting thoughtfully...</span>
+                        </div>
+
+                        <!-- Input form -->
+                        <form onsubmit="app.handleGemmaChatSubmit(event)" class="p-3 bg-[#F6F8F5] dark:bg-[#101A17] border-t border-gray-100 dark:border-gray-800 flex items-center gap-2">
+                            <input type="text" id="gemmaChatInput" placeholder="Share how you're feeling or ask for coping perspective..." class="flex-1 bg-white dark:bg-[#162420] border border-[#176B50]/20 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#176B50]">
+                            <button type="submit" class="btn-wellness-primary px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span class="hidden sm:inline">Send</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Non-clinical disclaimer -->
+                    <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
+                        <strong>Important:</strong> Gemma-4 Safe Space is a supportive peer companion designed to assist with self-reflection and healthy coping habits. It does not provide medical diagnoses or psychiatric treatment. In crisis, call <strong>Tele-MANAS (14416)</strong> or <strong>112</strong> immediately.
+                    </div>
+                </div>
                             </button>
                         </div>
                     </div>
@@ -493,11 +605,29 @@
                             </div>
                         </div>
 
-                        <!-- 7-Day Chart -->
+                        <!-- 7-Day / 30-Day Trend Chart -->
                         <div class="wellness-card p-6 space-y-3">
-                            <h3 class="font-bold text-sm">Weekly Mood & Stress Trends</h3>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h3 class="font-bold text-sm">Mood Valence & Stress Trends</h3>
+                                    <p class="text-[11px] text-gray-500">Historical curve computed 100% on-device from your actual logs.</p>
+                                </div>
+                                <div class="flex items-center gap-1 bg-[#F6F8F5] dark:bg-[#162420] p-1 rounded-xl border border-[#176B50]/20 text-xs">
+                                    <button id="insights7DayBtn" onclick="app.setInsightsTimeRange(7)" class="px-2.5 py-1 rounded-lg font-bold bg-[#176B50] text-white transition">7 Days</button>
+                                    <button id="insights30DayBtn" onclick="app.setInsightsTimeRange(30)" class="px-2.5 py-1 rounded-lg font-medium text-gray-500 hover:text-[#176B50] dark:hover:text-[#A8D5BA] transition">30 Days</button>
+                                </div>
+                            </div>
                             <div class="h-64 w-full">
                                 <canvas id="chartWeeklyJourney"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Sleep & Stress Correlation Chart -->
+                        <div class="wellness-card p-6 space-y-3">
+                            <h3 class="font-bold text-sm">Sleep Quality vs Reported Stress Pattern</h3>
+                            <p class="text-[11px] text-gray-500">Notice how nights with restful sleep correlate with lower daily strain.</p>
+                            <div class="h-56 w-full">
+                                <canvas id="chartSleepStress"></canvas>
                             </div>
                         </div>
 
@@ -532,14 +662,43 @@
                 <!-- VIEW 4: MY JOURNAL (Priority 7)                -->
                 <!-- ============================================== -->
                 <div id="view-journal" class="wellness-view hidden space-y-6">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Private Digital Journal</h2>
-                            <p class="text-xs text-gray-500">Notion-style encrypted journal. Decrypted exclusively on-device.</p>
+                            <p class="text-xs text-gray-500">Notion-style encrypted journal. Decrypted exclusively on-device in RAM.</p>
                         </div>
                         <button onclick="app.navTo('checkin')" class="btn-wellness-primary px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
                             <i class="fa-solid fa-plus text-xs"></i> New Entry
                         </button>
+                    </div>
+
+                    <!-- Search & Filter Controls -->
+                    <div class="wellness-card p-3.5 flex flex-wrap items-center gap-2.5 text-xs">
+                        <div class="flex-1 min-w-[200px] relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                            <input type="text" id="journalSearchInput" oninput="app.filterJournals()" placeholder="Search decrypted journal thoughts..." class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#F6F8F5] dark:bg-[#101A17] border border-[#176B50]/20 text-xs focus:outline-none focus:border-[#176B50]">
+                        </div>
+                        <select id="journalFilterTag" onchange="app.filterJournals()" class="bg-[#F6F8F5] dark:bg-[#101A17] border border-[#176B50]/20 rounded-xl px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200">
+                            <option value="">All Context Tags</option>
+                            <option value="Exams">Exams</option>
+                            <option value="Academics">Academics</option>
+                            <option value="Roommates">Roommates</option>
+                            <option value="Friends">Friends</option>
+                            <option value="Homesickness">Homesickness</option>
+                            <option value="Family">Family</option>
+                            <option value="Financial concerns">Financial concerns</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <select id="journalFilterMood" onchange="app.filterJournals()" class="bg-[#F6F8F5] dark:bg-[#101A17] border border-[#176B50]/20 rounded-xl px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200">
+                            <option value="">All Moods</option>
+                            <option value="Happy">😊 Happy</option>
+                            <option value="Calm">😌 Calm</option>
+                            <option value="Okay">😐 Okay</option>
+                            <option value="Low">😔 Low</option>
+                            <option value="Stressed">😰 Stressed</option>
+                            <option value="Overwhelmed">🤯 Overwhelmed</option>
+                        </select>
                     </div>
 
                     <div id="journalsListContainer" class="space-y-4">
@@ -844,7 +1003,7 @@
         <!-- ======================================================== -->
         <!-- MOBILE BOTTOM NAVIGATION BAR                             -->
         <!-- ======================================================== -->
-        <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F6F8F5]/95 dark:bg-[#101A17]/95 backdrop-blur-lg border-t border-[#176B50]/15 dark:border-[#A8D5BA]/15 flex items-center justify-around py-2 px-2 text-[10px] shadow-2xl">
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F6F8F5]/95 dark:bg-[#101A17]/95 backdrop-blur-lg border-t border-[#176B50]/15 dark:border-[#A8D5BA]/15 flex items-center justify-around py-2 px-1 text-[10px] shadow-2xl">
             <button onclick="app.navTo('home')" data-view="home" class="wellness-nav-btn flex flex-col items-center gap-1 p-1 text-[#176B50] dark:text-[#A8D5BA]">
                 <i class="fa-solid fa-house-chimney-window text-base"></i>
                 <span>Home</span>
@@ -853,13 +1012,17 @@
                 <i class="fa-solid fa-heart-pulse text-base"></i>
                 <span>Check-In</span>
             </button>
+            <button onclick="app.navTo('gemma4')" data-view="gemma4" class="wellness-nav-btn flex flex-col items-center gap-1 p-1 text-gray-500">
+                <i class="fa-solid fa-sparkles text-base text-amber-500"></i>
+                <span>Gemma-4</span>
+            </button>
             <button onclick="app.navTo('insights')" data-view="insights" class="wellness-nav-btn flex flex-col items-center gap-1 p-1 text-gray-500">
                 <i class="fa-solid fa-chart-line text-base"></i>
                 <span>Insights</span>
             </button>
-            <button onclick="app.navTo('calendar')" data-view="calendar" class="wellness-nav-btn flex flex-col items-center gap-1 p-1 text-gray-500">
-                <i class="fa-solid fa-calendar-days text-base"></i>
-                <span>Timeline</span>
+            <button onclick="app.navTo('journal')" data-view="journal" class="wellness-nav-btn flex flex-col items-center gap-1 p-1 text-gray-500">
+                <i class="fa-solid fa-book-bookmark text-base"></i>
+                <span>Journal</span>
             </button>
             <button onclick="app.navTo('counselor')" data-view="counselor" class="wellness-nav-btn flex flex-col items-center gap-1 p-1 text-gray-500">
                 <i class="fa-solid fa-user-doctor text-base"></i>
@@ -884,7 +1047,7 @@
             </div>
             <div class="space-y-1">
                 <h3 id="pinModalTitle" class="text-xl font-bold font-serif-title">Unlock Private Vault</h3>
-                <p id="pinModalSubtitle" class="text-xs text-gray-500">Enter your 4-digit PIN to decrypt your personal journal records.</p>
+                <p id="pinModalSubtitle" class="text-xs text-gray-500">Enter your 4-digit PIN to decrypt your personal journal records. <span class="block mt-1 font-semibold text-[#176B50] dark:text-[#A8D5BA]">(Default Demo PIN: 1234)</span></p>
             </div>
 
             <!-- PIN Dots -->
@@ -911,10 +1074,13 @@
                 <button onclick="app.pinBackspace()" class="pin-key-btn text-base"><i class="fa-solid fa-delete-left"></i></button>
             </div>
 
-            <!-- Direct Crisis Access From Lock Screen (Priority 5) -->
-            <div class="pt-2 border-t border-gray-100 dark:border-gray-800">
-                <button onclick="app.openSOSModal()" class="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline flex items-center justify-center gap-1.5 mx-auto">
-                    <i class="fa-solid fa-phone-volume"></i> Emergency Helplines (14416 / 112)
+            <!-- Direct Crisis Access & Key Reset From Lock Screen -->
+            <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs font-semibold px-2">
+                <button onclick="app.resetVaultKey()" class="text-gray-400 hover:text-amber-600 transition flex items-center gap-1">
+                    <i class="fa-solid fa-key"></i> Reset Key
+                </button>
+                <button onclick="app.openSOSModal()" class="text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1">
+                    <i class="fa-solid fa-phone-volume"></i> 14416 / 112
                 </button>
             </div>
         </div>
@@ -1050,6 +1216,31 @@
             <button onclick="app.closeSOSModal()" class="w-full py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 transition">
                 Close Emergency Window
             </button>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- EDIT JOURNAL ENTRY MODAL                                 -->
+    <!-- ======================================================== -->
+    <div id="editJournalModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+        <div class="wellness-card p-6 max-w-md w-full space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                <h3 class="font-bold text-base">Edit Encrypted Journal Entry</h3>
+                <button onclick="app.closeEditJournalModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <input type="hidden" id="editJournalId">
+            <div class="space-y-1">
+                <label class="text-[10px] uppercase font-bold text-gray-400">Entry Date</label>
+                <div id="editJournalDate" class="text-xs font-bold text-[#176B50] dark:text-[#A8D5BA]">2026-10-31</div>
+            </div>
+            <div class="space-y-1">
+                <label class="text-[10px] uppercase font-bold text-gray-400">Encrypted Thoughts</label>
+                <textarea id="editJournalText" rows="6" class="w-full bg-[#F6F8F5] dark:bg-[#101A17] border border-[#176B50]/20 rounded-xl p-3 text-xs focus:outline-none focus:border-[#176B50] leading-relaxed"></textarea>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button onclick="app.closeEditJournalModal()" class="px-3.5 py-2 rounded-xl border text-xs font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition">Cancel</button>
+                <button onclick="app.saveEditedJournal()" class="btn-wellness-primary px-4 py-2 rounded-xl text-xs font-bold">Save Encrypted</button>
+            </div>
         </div>
     </div>
 

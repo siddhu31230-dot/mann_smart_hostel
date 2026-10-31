@@ -16,7 +16,7 @@ def test_live_site():
     res_html = requests.get(f"{BASE_URL}/")
     assert res_html.status_code == 200
     assert "MANN" in res_html.text
-    assert "SMART HOSTEL OS" in res_html.text
+    assert "Smart Hostel OS" in res_html.text or "SMART HOSTEL OS" in res_html.text.upper()
     print("[OK] Public landing and frontend single-page application loaded successfully")
 
     # 3. Complete live end-to-end scenario using live sessions

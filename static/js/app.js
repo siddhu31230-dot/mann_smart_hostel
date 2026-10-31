@@ -52,7 +52,7 @@ const app = {
         const willBeDark = !isCurrentlyDark;
         this.applyTheme(willBeDark);
         localStorage.setItem('mann_theme', willBeDark ? 'dark' : 'light');
-        this.showToast(willBeDark ? '🌙 🌙 Switched to Dark Theme (Midnight & Dusty Aqua)' : '☀️ ☀️ Switched to Light Theme (Pure White & Seafoam)', 'info');
+        this.showToast(willBeDark ? '🌙 Switched to Dark Forest Theme' : '☀️ Switched to Light Cream Theme', 'info');
     },
 
     applyTheme(isDark) {
@@ -112,10 +112,10 @@ const app = {
 
             studentItems.forEach(item => {
                 const btn = document.createElement('button');
-                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#0d9488] text-[#5c7c77] hover:text-[#0d9488]`;
+                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#52b788] text-[#8fb89e] hover:text-[#52b788]`;
                 btn.dataset.tab = item.id;
                 btn.onclick = () => this.navigateToStudentSubTab(item.id);
-                btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center ${item.special || 'text-[#0d9488]'}"></i> <span>${item.label}</span>`;
+                btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center ${item.special || 'text-[#52b788]'}"></i> <span>${item.label}</span>`;
                 navList.appendChild(btn);
             });
 
@@ -142,10 +142,10 @@ const app = {
 
             adminItems.forEach(item => {
                 const btn = document.createElement('button');
-                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#0d9488] text-[#5c7c77] hover:text-[#0d9488]`;
+                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#52b788] text-[#8fb89e] hover:text-[#52b788]`;
                 btn.dataset.tab = item.id;
                 btn.onclick = () => this.navigateToAdminSubTab(item.id);
-                btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center text-[#0d9488]"></i> <span>${item.label}</span>`;
+                btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center text-[#52b788]"></i> <span>${item.label}</span>`;
                 navList.appendChild(btn);
             });
 
@@ -184,9 +184,9 @@ const app = {
         // Update active class on sidebar
         document.querySelectorAll('#navItemsList button').forEach(btn => {
             if (btn.dataset.tab === tabId) {
-                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#14b8a6] text-[#132220] shadow-md border border-[#99f6e0]/30';
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#2d6a4f] text-[#fefae0] shadow-md border border-[#52b788]/30';
             } else {
-                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#0d9488] text-[#5c7c77] hover:text-[#0d9488]';
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#52b788] text-[#8fb89e] hover:text-[#52b788]';
             }
         });
 
@@ -216,9 +216,9 @@ const app = {
         // Update active class on sidebar
         document.querySelectorAll('#navItemsList button').forEach(btn => {
             if (btn.dataset.tab === tabId) {
-                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#14b8a6] text-[#132220] shadow-md border border-[#99f6e0]/30';
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition bg-[#2d6a4f] text-[#fefae0] shadow-md border border-[#52b788]/30';
             } else {
-                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#0d9488] text-[#5c7c77] hover:text-[#0d9488]';
+                btn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#52b788] text-[#8fb89e] hover:text-[#52b788]';
             }
         });
 
@@ -287,9 +287,9 @@ const app = {
             // Highlight quick-role buttons in header
             document.querySelectorAll('.role-btn').forEach(btn => {
                 if (btn.dataset.role === user.role) {
-                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-bold bg-[#0d9488] text-[#08140e] shadow-sm';
+                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-bold bg-[#52b788] text-[#08140e] shadow-sm';
                 } else {
-                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#14b8a6] text-[#5c7c77]';
+                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f] text-[#8fb89e]';
                 }
             });
 
@@ -382,6 +382,25 @@ const app = {
         } catch (e) {}
         this.setUser(null);
         this.showToast('Logged out securely', 'info');
+    },
+
+    openWellnessInApp() {
+        if (!this.currentUser) {
+            this.quickSwitch('student').then(() => {
+                this.navigateToStudentSubTab('mann-care');
+            }).catch(() => {
+                window.location.href = '/wellness';
+            });
+            return;
+        }
+
+        if (this.currentUser.role === 'student') {
+            this.navigateTo('workspace');
+            this.navigateToStudentSubTab('mann-care');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            window.open('/wellness', '_blank');
+        }
     },
 
     async handleStudentRegister(e) {
@@ -503,65 +522,65 @@ const app = {
             if (!room) {
                 c.innerHTML = `
                     <div class="forest-card p-8 rounded-3xl text-center space-y-3">
-                        <i class="fa-solid fa-bed text-4xl text-[#5c7c77]"></i>
-                        <h3 class="text-base font-bold text-[#132220]">No Room Allocated</h3>
-                        <p class="text-xs text-[#5c7c77]">Your room assignment is currently being processed by hostel administration.</p>
+                        <i class="fa-solid fa-bed text-4xl text-[#8fb89e]"></i>
+                        <h3 class="text-base font-bold text-[#fefae0]">No Room Allocated</h3>
+                        <p class="text-xs text-[#8fb89e]">Your room assignment is currently being processed by hostel administration.</p>
                     </div>
                 `;
                 return;
             }
 
             const roommatesList = (data.roommates || []).map(r => `
-                <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#ffffff]/80 border border-[#99f6e0]/20">
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-full bg-[#0d9488] text-[#0d9488] flex items-center justify-center font-bold text-[11px] border border-[#99f6e0]/40">
+                        <div class="w-7 h-7 rounded-full bg-[#52b788] text-[#52b788] flex items-center justify-center font-bold text-[11px] border border-[#52b788]/40">
                             ${r.bed_identifier.slice(-1)}
                         </div>
                         <div>
-                            <div class="text-xs font-bold text-[#132220]">${r.full_name}</div>
-                            <div class="text-[10px] text-[#5c7c77]">${r.college_id}</div>
+                            <div class="text-xs font-bold text-[#fefae0]">${r.full_name}</div>
+                            <div class="text-[10px] text-[#8fb89e]">${r.college_id}</div>
                         </div>
                     </div>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-[#f0fdf9] text-[#0d9488] border border-[#99f6e0]/30">${r.bed_identifier}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-[#143528] text-[#52b788] border border-[#52b788]/30">${r.bed_identifier}</span>
                 </div>
             `).join('');
 
             c.innerHTML = `
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 forest-card p-6 rounded-3xl border border-[#99f6e0]/30 space-y-4">
-                        <div class="flex items-center justify-between pb-3 border-b border-[#99f6e0]/20">
+                    <div class="lg:col-span-2 forest-card p-6 rounded-3xl border border-[#52b788]/30 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-[#52b788]/20">
                             <div>
-                                <span class="text-[11px] font-bold text-[#0d9488] uppercase tracking-wider">${room.room_type}</span>
-                                <h3 class="text-2xl font-extrabold text-[#132220] font-serif-title mt-0.5">Room ${room.room_number}</h3>
+                                <span class="text-[11px] font-bold text-[#52b788] uppercase tracking-wider">${room.room_type}</span>
+                                <h3 class="text-2xl font-extrabold text-[#fefae0] font-serif-title mt-0.5">Room ${room.room_number}</h3>
                             </div>
-                            <span class="text-xs px-3 py-1 rounded-full bg-[#0d9488]/20 text-[#0d9488] border border-[#99f6e0]/40 font-bold">
+                            <span class="text-xs px-3 py-1 rounded-full bg-[#52b788]/20 text-[#52b788] border border-[#52b788]/40 font-bold">
                                 Assigned Bed: ${data.my_bed}
                             </span>
                         </div>
 
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                            <div class="p-3 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20">
-                                <span class="text-[#5c7c77] text-[10px]">Hostel Block</span>
-                                <div class="font-bold text-[#132220] text-sm mt-0.5">Block ${room.block}</div>
+                            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                                <span class="text-[#8fb89e] text-[10px]">Hostel Block</span>
+                                <div class="font-bold text-[#fefae0] text-sm mt-0.5">Block ${room.block}</div>
                             </div>
-                            <div class="p-3 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20">
-                                <span class="text-[#5c7c77] text-[10px]">Floor</span>
-                                <div class="font-bold text-[#132220] text-sm mt-0.5">${room.floor}nd Floor</div>
+                            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                                <span class="text-[#8fb89e] text-[10px]">Floor</span>
+                                <div class="font-bold text-[#fefae0] text-sm mt-0.5">${room.floor}nd Floor</div>
                             </div>
-                            <div class="p-3 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20">
-                                <span class="text-[#5c7c77] text-[10px]">Capacity</span>
-                                <div class="font-bold text-[#132220] text-sm mt-0.5">${room.capacity} Residents</div>
+                            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                                <span class="text-[#8fb89e] text-[10px]">Capacity</span>
+                                <div class="font-bold text-[#fefae0] text-sm mt-0.5">${room.capacity} Residents</div>
                             </div>
-                            <div class="p-3 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20">
-                                <span class="text-[#5c7c77] text-[10px]">Occupancy</span>
-                                <div class="font-bold text-[#0d9488] text-sm mt-0.5">${room.occupied} / ${room.capacity} Beds</div>
+                            <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                                <span class="text-[#8fb89e] text-[10px]">Occupancy</span>
+                                <div class="font-bold text-[#52b788] text-sm mt-0.5">${room.occupied} / ${room.capacity} Beds</div>
                             </div>
                         </div>
 
                         <div class="space-y-2 pt-2">
-                            <h4 class="text-xs font-bold text-[#132220] uppercase tracking-wider">Roommates Directory</h4>
+                            <h4 class="text-xs font-bold text-[#fefae0] uppercase tracking-wider">Roommates Directory</h4>
                             <div class="space-y-2">
-                                ${roommatesList || '<p class="text-xs text-[#5c7c77]">No roommates assigned yet.</p>'}
+                                ${roommatesList || '<p class="text-xs text-[#8fb89e]">No roommates assigned yet.</p>'}
                             </div>
                         </div>
                     </div>
@@ -569,20 +588,20 @@ const app = {
                     <!-- Digital Room Pass & Wi-Fi -->
                     <div class="space-y-4">
                         <div class="forest-card p-6 rounded-3xl border border-[#faedcd]/30 text-center space-y-3">
-                            <span class="text-[10px] font-bold text-[#0d9488] uppercase tracking-widest">NFC / QR Room Pass</span>
+                            <span class="text-[10px] font-bold text-[#52b788] uppercase tracking-widest">NFC / QR Room Pass</span>
                             <div class="w-32 h-32 mx-auto bg-white p-2 rounded-2xl flex items-center justify-center shadow-lg">
                                 <i class="fa-solid fa-qrcode text-7xl text-slate-900"></i>
                             </div>
-                            <div class="text-xs font-mono text-[#132220] font-bold">KEYPASS-${room.room_number}-${data.my_bed.replace(' ', '')}</div>
-                            <p class="text-[10px] text-[#5c7c77]">Scan at your hostel corridor electronic reader</p>
+                            <div class="text-xs font-mono text-[#fefae0] font-bold">KEYPASS-${room.room_number}-${data.my_bed.replace(' ', '')}</div>
+                            <p class="text-[10px] text-[#8fb89e]">Scan at your hostel corridor electronic reader</p>
                         </div>
 
-                        <div class="forest-card p-4 rounded-2xl border border-[#99f6e0]/20 text-xs space-y-1.5">
-                            <div class="font-bold text-[#132220] flex items-center gap-2">
-                                <i class="fa-solid fa-wifi text-[#0d9488]"></i> High-Speed Mesh Wi-Fi
+                        <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 text-xs space-y-1.5">
+                            <div class="font-bold text-[#fefae0] flex items-center gap-2">
+                                <i class="fa-solid fa-wifi text-[#52b788]"></i> High-Speed Mesh Wi-Fi
                             </div>
-                            <div class="text-[#5c7c77]">SSID: <span class="text-[#132220] font-mono">MANN-Hostel-Block${room.block}</span></div>
-                            <div class="text-[#5c7c77]">Passcode: <span class="text-[#132220] font-mono">Hostel@Secure2026</span></div>
+                            <div class="text-[#8fb89e]">SSID: <span class="text-[#fefae0] font-mono">MANN-Hostel-Block${room.block}</span></div>
+                            <div class="text-[#8fb89e]">Passcode: <span class="text-[#fefae0] font-mono">Hostel@Secure2026</span></div>
                         </div>
                     </div>
                 </div>
@@ -622,10 +641,10 @@ const app = {
 
             if (complaints.length === 0) {
                 targetContainer.innerHTML = `
-                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#99f6e0]/20">
-                        <i class="fa-solid fa-circle-check text-3xl text-[#0d9488]"></i>
-                        <h4 class="text-sm font-bold text-[#132220]">No Complaints Found</h4>
-                        <p class="text-xs text-[#5c7c77]">Everything is running smoothly or matches your filter criteria.</p>
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-circle-check text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Complaints Found</h4>
+                        <p class="text-xs text-[#8fb89e]">Everything is running smoothly or matches your filter criteria.</p>
                     </div>
                 `;
                 return;
@@ -636,7 +655,7 @@ const app = {
                     ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' 
                     : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
 
-                let statusBadge = 'bg-[#0d9488] text-[#5c7c77] border border-[#99f6e0]/20';
+                let statusBadge = 'bg-[#52b788] text-[#8fb89e] border border-[#52b788]/20';
                 if (c.status === 'Resolved') statusBadge = 'bg-blue-500/20 text-blue-300 border border-blue-500/30';
                 if (c.status === 'Closed') statusBadge = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
                 if (c.status === 'Work in Progress') statusBadge = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
@@ -644,25 +663,25 @@ const app = {
                 const isStaff = this.currentUser && this.currentUser.role !== 'student';
 
                 return `
-                    <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/20 space-y-3">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#99f6e0]/20">
+                    <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#52b788]/20">
                             <div class="flex items-center gap-2.5">
-                                <span class="font-mono text-xs font-bold text-[#0d9488]">#${c.id}</span>
+                                <span class="font-mono text-xs font-bold text-[#52b788]">#${c.id}</span>
                                 <span class="text-xs px-2.5 py-0.5 rounded-full ${urgencyBadge} font-bold">${c.urgency}</span>
                                 <span class="text-xs px-2.5 py-0.5 rounded-full ${statusBadge} font-bold">${c.status}</span>
-                                <span class="text-xs text-[#5c7c77]">• ${c.category}</span>
+                                <span class="text-xs text-[#8fb89e]">• ${c.category}</span>
                             </div>
-                            <span class="text-[11px] text-[#5c7c77] font-mono">Location: Room ${c.room_number}</span>
+                            <span class="text-[11px] text-[#8fb89e] font-mono">Location: Room ${c.room_number}</span>
                         </div>
 
                         <div>
-                            <h4 class="text-sm font-bold text-[#132220]">${c.title}</h4>
-                            <p class="text-xs text-[#5c7c77] mt-1">${c.description}</p>
+                            <h4 class="text-sm font-bold text-[#fefae0]">${c.title}</h4>
+                            <p class="text-xs text-[#8fb89e] mt-1">${c.description}</p>
                         </div>
 
-                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs text-[#5c7c77] border-t border-[#99f6e0]/10">
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs text-[#8fb89e] border-t border-[#52b788]/10">
                             <div>
-                                Assigned Tech: <span class="text-[#132220] font-semibold">${c.assigned_to_name || 'Unassigned'}</span>
+                                Assigned Tech: <span class="text-[#fefae0] font-semibold">${c.assigned_to_name || 'Unassigned'}</span>
                             </div>
 
                             <div class="flex items-center gap-2">
@@ -673,10 +692,10 @@ const app = {
                                 ` : ''}
 
                                 ${isStaff ? `
-                                    <button onclick="app.openAssignModal(${c.id})" class="px-2.5 py-1 rounded-lg bg-[#f0fdf9] hover:bg-[#0d9488] text-xs font-semibold text-white border border-[#99f6e0]/30">
+                                    <button onclick="app.openAssignModal(${c.id})" class="px-2.5 py-1 rounded-lg bg-[#143528] hover:bg-[#52b788] text-xs font-semibold text-white border border-[#52b788]/30">
                                         Assign Staff
                                     </button>
-                                    <button onclick="app.updateComplaintProgress(${c.id}, 'Work in Progress')" class="px-2.5 py-1 rounded-lg bg-[#14b8a6] hover:bg-[#5eead4] text-xs font-semibold text-white">
+                                    <button onclick="app.updateComplaintProgress(${c.id}, 'Work in Progress')" class="px-2.5 py-1 rounded-lg bg-[#2d6a4f] hover:bg-[#74c69d] text-xs font-semibold text-white">
                                         Mark In-Progress
                                     </button>
                                     <button onclick="app.updateComplaintProgress(${c.id}, 'Resolved')" class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white">
@@ -815,10 +834,10 @@ const app = {
 
             if (leaves.length === 0) {
                 targetContainer.innerHTML = `
-                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#99f6e0]/20">
-                        <i class="fa-solid fa-passport text-3xl text-[#0d9488]"></i>
-                        <h4 class="text-sm font-bold text-[#132220]">No Leave Records Found</h4>
-                        <p class="text-xs text-[#5c7c77]">No leave requests match your criteria.</p>
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-passport text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Leave Records Found</h4>
+                        <p class="text-xs text-[#8fb89e]">No leave requests match your criteria.</p>
                     </div>
                 `;
                 return;
@@ -832,33 +851,33 @@ const app = {
                 if (l.status === 'Rejected') badgeClass = 'bg-rose-500/20 text-rose-300 border border-rose-500/30';
 
                 return `
-                    <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/20 space-y-3">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#99f6e0]/20">
+                    <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#52b788]/20">
                             <div class="flex items-center gap-2">
-                                <span class="font-mono text-xs font-bold text-[#0d9488]">PASS #${l.id}</span>
+                                <span class="font-mono text-xs font-bold text-[#52b788]">PASS #${l.id}</span>
                                 <span class="text-xs px-2.5 py-0.5 rounded-full ${badgeClass} font-bold">${l.status}</span>
-                                ${isStaff ? `<span class="text-xs text-[#132220] font-bold">• ${l.student_name || 'Student'} (${l.college_id || 'ID'})</span>` : ''}
+                                ${isStaff ? `<span class="text-xs text-[#fefae0] font-bold">• ${l.student_name || 'Student'} (${l.college_id || 'ID'})</span>` : ''}
                             </div>
-                            <span class="text-xs text-[#5c7c77] font-mono">${l.start_date} → ${l.end_date}</span>
+                            <span class="text-xs text-[#8fb89e] font-mono">${l.start_date} → ${l.end_date}</span>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                             <div>
-                                <span class="text-[#5c7c77]">Reason:</span>
-                                <div class="font-semibold text-[#132220] mt-0.5">${l.reason}</div>
+                                <span class="text-[#8fb89e]">Reason:</span>
+                                <div class="font-semibold text-[#fefae0] mt-0.5">${l.reason}</div>
                             </div>
                             <div>
-                                <span class="text-[#5c7c77]">Destination:</span>
-                                <div class="font-semibold text-[#132220] mt-0.5">${l.destination}</div>
+                                <span class="text-[#8fb89e]">Destination:</span>
+                                <div class="font-semibold text-[#fefae0] mt-0.5">${l.destination}</div>
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs border-t border-[#99f6e0]/10 text-[#5c7c77]">
-                            <div>Emergency Contact: <span class="text-[#132220] font-mono">${l.emergency_contact}</span></div>
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs border-t border-[#52b788]/10 text-[#8fb89e]">
+                            <div>Emergency Contact: <span class="text-[#fefae0] font-mono">${l.emergency_contact}</span></div>
 
                             <div class="flex items-center gap-2">
                                 ${l.status === 'Approved' ? `
-                                    <span class="text-xs font-bold text-[#0d9488] flex items-center gap-1">
+                                    <span class="text-xs font-bold text-[#52b788] flex items-center gap-1">
                                         <i class="fa-solid fa-qrcode"></i> Digital Gate Pass Active
                                     </span>
                                 ` : ''}
@@ -937,7 +956,7 @@ const app = {
         const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         if (pillsContainer) {
             pillsContainer.innerHTML = days.map(d => `
-                <button onclick="app.setMessDay('${d}')" class="px-3.5 py-1 rounded-xl text-xs font-semibold whitespace-nowrap transition ${d === this.currentMessDay ? 'bg-[#0d9488] text-[#08140e] font-bold' : 'bg-[#f0fdf9] text-[#5c7c77] hover:text-[#132220]'}">
+                <button onclick="app.setMessDay('${d}')" class="px-3.5 py-1 rounded-xl text-xs font-semibold whitespace-nowrap transition ${d === this.currentMessDay ? 'bg-[#52b788] text-[#08140e] font-bold' : 'bg-[#143528] text-[#8fb89e] hover:text-[#fefae0]'}">
                     ${d}
                 </button>
             `).join('');
@@ -950,36 +969,36 @@ const app = {
             const dayMenu = menus.find(m => m.day_of_week === this.currentMessDay) || {};
 
             c.innerHTML = `
-                <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/20 space-y-2">
-                    <div class="flex items-center justify-between pb-2 border-b border-[#99f6e0]/20">
-                        <span class="text-xs font-bold text-[#0d9488] flex items-center gap-1.5"><i class="fa-solid fa-mug-hot"></i> Breakfast</span>
-                        <span class="text-[10px] text-[#5c7c77]">07:30 - 09:30</span>
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                        <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5"><i class="fa-solid fa-mug-hot"></i> Breakfast</span>
+                        <span class="text-[10px] text-[#8fb89e]">07:30 - 09:30</span>
                     </div>
-                    <p class="text-xs text-[#132220] leading-relaxed">${dayMenu.breakfast || 'Menu unavailable'}</p>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${dayMenu.breakfast || 'Menu unavailable'}</p>
                 </div>
 
-                <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/20 space-y-2">
-                    <div class="flex items-center justify-between pb-2 border-b border-[#99f6e0]/20">
-                        <span class="text-xs font-bold text-[#0d9488] flex items-center gap-1.5"><i class="fa-solid fa-bowl-rice"></i> Lunch</span>
-                        <span class="text-[10px] text-[#5c7c77]">12:30 - 14:30</span>
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                        <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5"><i class="fa-solid fa-bowl-rice"></i> Lunch</span>
+                        <span class="text-[10px] text-[#8fb89e]">12:30 - 14:30</span>
                     </div>
-                    <p class="text-xs text-[#132220] leading-relaxed">${dayMenu.lunch || 'Menu unavailable'}</p>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${dayMenu.lunch || 'Menu unavailable'}</p>
                 </div>
 
-                <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/20 space-y-2">
-                    <div class="flex items-center justify-between pb-2 border-b border-[#99f6e0]/20">
-                        <span class="text-xs font-bold text-[#0d9488] flex items-center gap-1.5"><i class="fa-solid fa-cookie-bite"></i> Snacks</span>
-                        <span class="text-[10px] text-[#5c7c77]">17:00 - 18:00</span>
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                        <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5"><i class="fa-solid fa-cookie-bite"></i> Snacks</span>
+                        <span class="text-[10px] text-[#8fb89e]">17:00 - 18:00</span>
                     </div>
-                    <p class="text-xs text-[#132220] leading-relaxed">${dayMenu.snacks || 'Menu unavailable'}</p>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${dayMenu.snacks || 'Menu unavailable'}</p>
                 </div>
 
-                <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/20 space-y-2">
-                    <div class="flex items-center justify-between pb-2 border-b border-[#99f6e0]/20">
-                        <span class="text-xs font-bold text-[#0d9488] flex items-center gap-1.5"><i class="fa-solid fa-plate-wheat"></i> Dinner</span>
-                        <span class="text-[10px] text-[#5c7c77]">19:30 - 21:30</span>
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
+                        <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5"><i class="fa-solid fa-plate-wheat"></i> Dinner</span>
+                        <span class="text-[10px] text-[#8fb89e]">19:30 - 21:30</span>
                     </div>
-                    <p class="text-xs text-[#132220] leading-relaxed">${dayMenu.dinner || 'Menu unavailable'}</p>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${dayMenu.dinner || 'Menu unavailable'}</p>
                 </div>
             `;
         } catch (e) {
@@ -1002,18 +1021,18 @@ const app = {
             const feedbacks = data.feedback || [];
 
             if (feedbacks.length === 0) {
-                c.innerHTML = `<p class="text-xs text-[#5c7c77] col-span-2">No student reviews recorded yet.</p>`;
+                c.innerHTML = `<p class="text-xs text-[#8fb89e] col-span-2">No student reviews recorded yet.</p>`;
                 return;
             }
 
             c.innerHTML = feedbacks.slice(0, 6).map(f => `
-                <div class="p-3 rounded-xl bg-[#ffffff]/80 border border-[#99f6e0]/20 space-y-1 text-xs">
+                <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20 space-y-1 text-xs">
                     <div class="flex items-center justify-between">
-                        <span class="font-bold text-[#0d9488]">${f.meal_type}</span>
+                        <span class="font-bold text-[#52b788]">${f.meal_type}</span>
                         <span class="text-amber-400 font-bold">${'★'.repeat(f.rating)}</span>
                     </div>
-                    <p class="text-[#132220]">${f.comment || 'No written remarks'}</p>
-                    <div class="text-[10px] text-[#5c7c77] flex justify-between pt-1">
+                    <p class="text-[#fefae0]">${f.comment || 'No written remarks'}</p>
+                    <div class="text-[10px] text-[#8fb89e] flex justify-between pt-1">
                         <span>${f.student_name || 'Resident'}</span>
                         <span>${f.created_at ? f.created_at.split('T')[0] : ''}</span>
                     </div>
@@ -1105,39 +1124,39 @@ const app = {
 
             sumC.innerHTML = `
                 <div class="forest-card p-5 rounded-2xl border border-rose-500/30">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Outstanding Dues</span>
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Outstanding Dues</span>
                     <div class="text-2xl font-extrabold text-rose-400 mt-1">₹${totalDue.toLocaleString()}</div>
-                    <div class="text-[10px] text-[#5c7c77] mt-0.5">Pay before term deadline</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-0.5">Pay before term deadline</div>
                 </div>
                 <div class="forest-card p-5 rounded-2xl border border-emerald-500/30">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Total Paid</span>
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Total Paid</span>
                     <div class="text-2xl font-extrabold text-emerald-400 mt-1">₹${totalPaid.toLocaleString()}</div>
-                    <div class="text-[10px] text-[#5c7c77] mt-0.5">Verified digital payments</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-0.5">Verified digital payments</div>
                 </div>
-                <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/30">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Security Deposit</span>
-                    <div class="text-2xl font-extrabold text-[#0d9488] mt-1">₹10,000</div>
-                    <div class="text-[10px] text-[#5c7c77] mt-0.5">Refundable upon graduation</div>
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/30">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Security Deposit</span>
+                    <div class="text-2xl font-extrabold text-[#52b788] mt-1">₹10,000</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-0.5">Refundable upon graduation</div>
                 </div>
             `;
 
             invC.innerHTML = fees.map(f => `
-                <div class="p-4 rounded-xl bg-[#ffffff]/80 border border-[#99f6e0]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div class="p-4 rounded-xl bg-[#0f281e] border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-[#132220] text-sm">${f.fee_type}</span>
+                            <span class="font-bold text-[#fefae0] text-sm">${f.fee_type}</span>
                             <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${f.status === 'Paid' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${f.status}</span>
                         </div>
-                        <div class="text-[11px] text-[#5c7c77] mt-0.5">Term: ${f.term} • Due Date: ${f.due_date}</div>
+                        <div class="text-[11px] text-[#8fb89e] mt-0.5">Term: ${f.term} • Due Date: ${f.due_date}</div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="font-bold text-base text-[#132220]">₹${f.amount.toLocaleString()}</span>
+                        <span class="font-bold text-base text-[#fefae0]">₹${f.amount.toLocaleString()}</span>
                         ${f.status === 'Pending' ? `
                             <button onclick="app.payFee(${f.id})" class="px-4 py-2 rounded-xl btn-forest-primary text-xs font-bold shadow-md">
                                 Pay Online
                             </button>
                         ` : `
-                            <span class="text-xs text-[#0d9488] font-bold"><i class="fa-solid fa-check"></i> Receipt Downloaded</span>
+                            <span class="text-xs text-[#52b788] font-bold"><i class="fa-solid fa-check"></i> Receipt Downloaded</span>
                         `}
                     </div>
                 </div>
@@ -1176,10 +1195,10 @@ const app = {
 
             if (requests.length === 0) {
                 c.innerHTML = `
-                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#99f6e0]/20">
-                        <i class="fa-solid fa-shirt text-3xl text-[#0d9488]"></i>
-                        <h4 class="text-sm font-bold text-[#132220]">No Laundry Requests Active</h4>
-                        <p class="text-xs text-[#5c7c77]">Schedule your express laundry pickup anytime.</p>
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-shirt text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Laundry Requests Active</h4>
+                        <p class="text-xs text-[#8fb89e]">Schedule your express laundry pickup anytime.</p>
                     </div>
                 `;
                 return;
@@ -1188,18 +1207,18 @@ const app = {
             const isStaff = this.currentUser && this.currentUser.role !== 'student';
 
             c.innerHTML = requests.map(r => `
-                <div class="forest-card p-4 rounded-2xl border border-[#99f6e0]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-[#132220]">Bag #${r.id} (${r.item_count} items)</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#f0fdf9] text-[#0d9488] border border-[#99f6e0]/30">${r.service_type}</span>
+                            <span class="font-bold text-[#fefae0]">Bag #${r.id} (${r.item_count} items)</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#143528] text-[#52b788] border border-[#52b788]/30">${r.service_type}</span>
                             <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">${r.status}</span>
                         </div>
-                        <div class="text-[11px] text-[#5c7c77] mt-1">${r.special_notes || 'Standard wash'} • Scheduled: ${r.pickup_date || 'Today'}</div>
+                        <div class="text-[11px] text-[#8fb89e] mt-1">${r.special_notes || 'Standard wash'} • Scheduled: ${r.pickup_date || 'Today'}</div>
                     </div>
                     ${isStaff ? `
                         <div class="flex items-center gap-2">
-                            <button onclick="app.updateLaundryStatus(${r.id}, 'In Washing')" class="px-2.5 py-1 rounded bg-[#14b8a6] text-xs font-semibold text-white">In Wash</button>
+                            <button onclick="app.updateLaundryStatus(${r.id}, 'In Washing')" class="px-2.5 py-1 rounded bg-[#2d6a4f] text-xs font-semibold text-white">In Wash</button>
                             <button onclick="app.updateLaundryStatus(${r.id}, 'Ready for Pickup')" class="px-2.5 py-1 rounded bg-blue-600 text-xs font-semibold text-white">Ready</button>
                             <button onclick="app.updateLaundryStatus(${r.id}, 'Completed')" class="px-2.5 py-1 rounded bg-emerald-600 text-xs font-semibold text-white">Done</button>
                         </div>
@@ -1261,23 +1280,23 @@ const app = {
 
             if (reqs.length === 0) {
                 c.innerHTML = `
-                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#99f6e0]/20">
-                        <i class="fa-solid fa-broom text-3xl text-[#0d9488]"></i>
-                        <h4 class="text-sm font-bold text-[#132220]">No Housekeeping Scheduled</h4>
-                        <p class="text-xs text-[#5c7c77]">Schedule deep room cleaning at your convenience.</p>
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-broom text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Housekeeping Scheduled</h4>
+                        <p class="text-xs text-[#8fb89e]">Schedule deep room cleaning at your convenience.</p>
                     </div>
                 `;
                 return;
             }
 
             c.innerHTML = reqs.map(r => `
-                <div class="forest-card p-4 rounded-2xl border border-[#99f6e0]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-[#132220]">${r.preferred_slot}</span>
+                            <span class="font-bold text-[#fefae0]">${r.preferred_slot}</span>
                             <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">${r.status}</span>
                         </div>
-                        <div class="text-[11px] text-[#5c7c77] mt-1">Focus: ${r.focus_area || 'Whole Room'} • Date: ${r.request_date || 'Today'}</div>
+                        <div class="text-[11px] text-[#8fb89e] mt-1">Focus: ${r.focus_area || 'Whole Room'} • Date: ${r.request_date || 'Today'}</div>
                     </div>
                 </div>
             `).join('');
@@ -1323,10 +1342,10 @@ const app = {
 
             if (visitors.length === 0) {
                 targetContainer.innerHTML = `
-                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#99f6e0]/20">
-                        <i class="fa-solid fa-id-badge text-3xl text-[#0d9488]"></i>
-                        <h4 class="text-sm font-bold text-[#132220]">No Registered Visitors</h4>
-                        <p class="text-xs text-[#5c7c77]">Pre-register guests to ensure quick security clearance.</p>
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-id-badge text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Registered Visitors</h4>
+                        <p class="text-xs text-[#8fb89e]">Pre-register guests to ensure quick security clearance.</p>
                     </div>
                 `;
                 return;
@@ -1335,13 +1354,13 @@ const app = {
             const isStaff = this.currentUser && this.currentUser.role !== 'student';
 
             targetContainer.innerHTML = visitors.map(v => `
-                <div class="forest-card p-4 rounded-2xl border border-[#99f6e0]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-[#132220]">${v.visitor_name} (${v.relationship})</span>
+                            <span class="font-bold text-[#fefae0]">${v.visitor_name} (${v.relationship})</span>
                             <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${v.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${v.status}</span>
                         </div>
-                        <div class="text-[11px] text-[#5c7c77] mt-1">Visit Date: ${v.visit_date} • Phone: ${v.phone} • Purpose: ${v.purpose || 'General'}</div>
+                        <div class="text-[11px] text-[#8fb89e] mt-1">Visit Date: ${v.visit_date} • Phone: ${v.phone} • Purpose: ${v.purpose || 'General'}</div>
                     </div>
                     ${isStaff && v.status === 'Pending' ? `
                         <div class="flex items-center gap-2">
@@ -1349,7 +1368,7 @@ const app = {
                             <button onclick="app.reviewVisitor(${v.id}, 'Rejected')" class="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs">Deny</button>
                         </div>
                     ` : `
-                        <span class="text-xs font-mono text-[#0d9488]">PASS: VP-${v.id}90X</span>
+                        <span class="text-xs font-mono text-[#52b788]">PASS: VP-${v.id}90X</span>
                     `}
                 </div>
             `).join('');
@@ -1410,25 +1429,25 @@ const app = {
 
             if (posts.length === 0) {
                 c.innerHTML = `
-                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#99f6e0]/20">
-                        <i class="fa-solid fa-comments text-3xl text-[#0d9488]"></i>
-                        <h4 class="text-sm font-bold text-[#132220]">Community Forum Quiet</h4>
-                        <p class="text-xs text-[#5c7c77]">Start the conversation! Share study groups or hostel events.</p>
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-comments text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">Community Forum Quiet</h4>
+                        <p class="text-xs text-[#8fb89e]">Start the conversation! Share study groups or hostel events.</p>
                     </div>
                 `;
                 return;
             }
 
             c.innerHTML = posts.map(p => `
-                <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/20 space-y-2.5">
-                    <div class="flex items-center justify-between pb-2 border-b border-[#99f6e0]/20">
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-2.5">
+                    <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
                         <div class="flex items-center gap-2">
-                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#f0fdf9] text-[#0d9488] border border-[#99f6e0]/30 font-bold">${p.category}</span>
-                            <span class="text-xs font-bold text-[#132220]">• ${p.author_name || 'Resident'}</span>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#143528] text-[#52b788] border border-[#52b788]/30 font-bold">${p.category}</span>
+                            <span class="text-xs font-bold text-[#fefae0]">• ${p.author_name || 'Resident'}</span>
                         </div>
-                        <span class="text-[10px] text-[#5c7c77]">${p.created_at ? p.created_at.split('T')[0] : ''}</span>
+                        <span class="text-[10px] text-[#8fb89e]">${p.created_at ? p.created_at.split('T')[0] : ''}</span>
                     </div>
-                    <p class="text-xs text-[#132220] leading-relaxed">${p.content}</p>
+                    <p class="text-xs text-[#fefae0] leading-relaxed">${p.content}</p>
                     <div class="flex items-center justify-between pt-1 text-xs">
                         <button onclick="app.likeCommunityPost(${p.id})" class="text-rose-400 hover:text-rose-300 flex items-center gap-1 font-bold">
                             <i class="fa-solid fa-heart"></i> <span>${p.likes || 0}</span>
@@ -1487,10 +1506,10 @@ const app = {
 
             if (items.length === 0) {
                 targetContainer.innerHTML = `
-                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#99f6e0]/20">
-                        <i class="fa-solid fa-bullhorn text-3xl text-[#0d9488]"></i>
-                        <h4 class="text-sm font-bold text-[#132220]">No Bulletins Active</h4>
-                        <p class="text-xs text-[#5c7c77]">Official announcements will appear here as soon as posted.</p>
+                    <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-[#52b788]/20">
+                        <i class="fa-solid fa-bullhorn text-3xl text-[#52b788]"></i>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Bulletins Active</h4>
+                        <p class="text-xs text-[#8fb89e]">Official announcements will appear here as soon as posted.</p>
                     </div>
                 `;
                 return;
@@ -1499,17 +1518,17 @@ const app = {
             targetContainer.innerHTML = items.map(a => {
                 const isUrgent = a.priority === 'Urgent';
                 return `
-                    <div class="forest-card p-5 rounded-2xl border ${isUrgent ? 'border-rose-500/40 bg-rose-950/10' : 'border-[#99f6e0]/20'} space-y-2">
-                        <div class="flex items-center justify-between pb-2 border-b border-[#99f6e0]/20">
+                    <div class="forest-card p-5 rounded-2xl border ${isUrgent ? 'border-rose-500/40 bg-rose-950/10' : 'border-[#52b788]/20'} space-y-2">
+                        <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
                             <div class="flex items-center gap-2">
                                 ${isUrgent ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">URGENT</span>' : ''}
-                                <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#f0fdf9] text-[#0d9488] border border-[#99f6e0]/30 font-bold">${a.category}</span>
-                                <h4 class="text-sm font-bold text-[#132220]">${a.title}</h4>
+                                <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#143528] text-[#52b788] border border-[#52b788]/30 font-bold">${a.category}</span>
+                                <h4 class="text-sm font-bold text-[#fefae0]">${a.title}</h4>
                             </div>
-                            <span class="text-[10px] text-[#5c7c77]">${a.created_at ? a.created_at.split('T')[0] : ''}</span>
+                            <span class="text-[10px] text-[#8fb89e]">${a.created_at ? a.created_at.split('T')[0] : ''}</span>
                         </div>
-                        <p class="text-xs text-[#5c7c77] leading-relaxed">${a.content}</p>
-                        <div class="text-[10px] text-[#0d9488] font-semibold pt-1">
+                        <p class="text-xs text-[#8fb89e] leading-relaxed">${a.content}</p>
+                        <div class="text-[10px] text-[#52b788] font-semibold pt-1">
                             Issued by: ${a.posted_by_name || 'Chief Warden Office'}
                         </div>
                     </div>
@@ -1570,8 +1589,8 @@ const app = {
                 c.innerHTML = `
                     <div class="forest-card p-8 rounded-3xl text-center space-y-2 border border-purple-800/30">
                         <i class="fa-solid fa-hand-holding-heart text-3xl text-purple-400"></i>
-                        <h4 class="text-sm font-bold text-[#132220]">No Confidential Sessions Booked</h4>
-                        <p class="text-xs text-[#5c7c77]">Schedule a private, pressure-free session with our licensed counsellor anytime.</p>
+                        <h4 class="text-sm font-bold text-[#fefae0]">No Confidential Sessions Booked</h4>
+                        <p class="text-xs text-[#8fb89e]">Schedule a private, pressure-free session with our licensed counsellor anytime.</p>
                     </div>
                 `;
                 return;
@@ -1584,9 +1603,9 @@ const app = {
                             <span class="font-mono text-xs font-bold text-purple-400">CARE #${a.id}</span>
                             <span class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">${a.status}</span>
                         </div>
-                        <span class="text-xs text-[#5c7c77]">${a.preferred_date} • ${a.preferred_time_slot}</span>
+                        <span class="text-xs text-[#8fb89e]">${a.preferred_date} • ${a.preferred_time_slot}</span>
                     </div>
-                    <p class="text-xs text-[#132220] italic">"${a.notes || 'Confidential consultation'}"</p>
+                    <p class="text-xs text-[#fefae0] italic">"${a.notes || 'Confidential consultation'}"</p>
                     <div class="text-[10px] text-purple-300 pt-1">
                         Assigned: Campus Licensed Psychological Counsellor
                     </div>
@@ -1630,14 +1649,14 @@ const app = {
         const u = this.currentUser;
 
         c.innerHTML = `
-            <div class="forest-card p-6 rounded-3xl border border-[#99f6e0]/30 space-y-6">
-                <div class="flex items-center gap-4 pb-4 border-b border-[#99f6e0]/20">
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#0d9488] to-[#5eead4] flex items-center justify-center text-xl font-bold text-[#132220] border border-[#99f6e0]/50 shadow-md">
+            <div class="forest-card p-6 rounded-3xl border border-[#52b788]/30 space-y-6">
+                <div class="flex items-center gap-4 pb-4 border-b border-[#52b788]/20">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#52b788] to-[#74c69d] flex items-center justify-center text-xl font-bold text-[#fefae0] border border-[#52b788]/50 shadow-md">
                         ${(u.full_name || u.username).substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold text-[#132220]">${u.full_name}</h3>
-                        <div class="text-xs text-[#0d9488] font-mono mt-0.5">College ID: ${u.college_id || 'NST2026-042'}</div>
+                        <h3 class="text-xl font-bold text-[#fefae0]">${u.full_name}</h3>
+                        <div class="text-xs text-[#52b788] font-mono mt-0.5">College ID: ${u.college_id || 'NST2026-042'}</div>
                         <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold uppercase mt-1 inline-block">
                             ${u.approval_status || 'Approved Resident'}
                         </span>
@@ -1645,21 +1664,21 @@ const app = {
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    <div class="p-3.5 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20">
-                        <span class="text-[#5c7c77] text-[10px]">Email Address</span>
-                        <div class="font-bold text-[#132220] mt-0.5">${u.email || 'aarav.sharma@campus.edu'}</div>
+                    <div class="p-3.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                        <span class="text-[#8fb89e] text-[10px]">Email Address</span>
+                        <div class="font-bold text-[#fefae0] mt-0.5">${u.email || 'aarav.sharma@campus.edu'}</div>
                     </div>
-                    <div class="p-3.5 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20">
-                        <span class="text-[#5c7c77] text-[10px]">Mobile Phone</span>
-                        <div class="font-bold text-[#132220] mt-0.5">${u.phone || '+91 98765-43210'}</div>
+                    <div class="p-3.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                        <span class="text-[#8fb89e] text-[10px]">Mobile Phone</span>
+                        <div class="font-bold text-[#fefae0] mt-0.5">${u.phone || '+91 98765-43210'}</div>
                     </div>
-                    <div class="p-3.5 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20">
-                        <span class="text-[#5c7c77] text-[10px]">Guardian / Next of Kin</span>
-                        <div class="font-bold text-[#132220] mt-0.5">${u.guardian_name || 'Rajesh Sharma'}</div>
+                    <div class="p-3.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                        <span class="text-[#8fb89e] text-[10px]">Guardian / Next of Kin</span>
+                        <div class="font-bold text-[#fefae0] mt-0.5">${u.guardian_name || 'Rajesh Sharma'}</div>
                     </div>
-                    <div class="p-3.5 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20">
-                        <span class="text-[#5c7c77] text-[10px]">Guardian Phone</span>
-                        <div class="font-bold text-[#132220] mt-0.5">${u.guardian_phone || '+91 91234-56789'}</div>
+                    <div class="p-3.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20">
+                        <span class="text-[#8fb89e] text-[10px]">Guardian Phone</span>
+                        <div class="font-bold text-[#fefae0] mt-0.5">${u.guardian_phone || '+91 91234-56789'}</div>
                     </div>
                 </div>
             </div>
@@ -1679,25 +1698,25 @@ const app = {
             const m = data.metrics || {};
 
             grid.innerHTML = `
-                <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/20">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Total Students</span>
-                    <div class="text-3xl font-extrabold text-[#132220] mt-1">${m.total_students || 0}</div>
-                    <div class="text-[10px] text-[#0d9488] mt-1 font-semibold">${m.occupancy_rate || 98}% Occupancy</div>
+                <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20">
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Total Students</span>
+                    <div class="text-3xl font-extrabold text-[#fefae0] mt-1">${m.total_students || 0}</div>
+                    <div class="text-[10px] text-[#52b788] mt-1 font-semibold">${m.occupancy_rate || 98}% Occupancy</div>
                 </div>
                 <div class="forest-card p-5 rounded-2xl border border-amber-500/30">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Pending Approvals</span>
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Pending Approvals</span>
                     <div class="text-3xl font-extrabold text-amber-300 mt-1">${m.pending_approvals || 0}</div>
-                    <div class="text-[10px] text-[#5c7c77] mt-1">Student Admissions</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Student Admissions</div>
                 </div>
                 <div class="forest-card p-5 rounded-2xl border border-rose-500/30">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Open Complaints</span>
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Open Complaints</span>
                     <div class="text-3xl font-extrabold text-rose-400 mt-1">${m.open_complaints || 0}</div>
-                    <div class="text-[10px] text-[#5c7c77] mt-1">Active Work Orders</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Active Work Orders</div>
                 </div>
                 <div class="forest-card p-5 rounded-2xl border border-blue-500/30">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Pending Leaves</span>
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Pending Leaves</span>
                     <div class="text-3xl font-extrabold text-blue-300 mt-1">${m.pending_leaves || 0}</div>
-                    <div class="text-[10px] text-[#5c7c77] mt-1">Awaiting Warden Review</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Awaiting Warden Review</div>
                 </div>
             `;
         } catch (e) {}
@@ -1716,15 +1735,15 @@ const app = {
             if (badge) badge.textContent = `${students.length} Pending`;
 
             if (students.length === 0) {
-                c.innerHTML = `<p class="text-xs text-[#5c7c77]">No pending student registrations awaiting review.</p>`;
+                c.innerHTML = `<p class="text-xs text-[#8fb89e]">No pending student registrations awaiting review.</p>`;
                 return;
             }
 
             c.innerHTML = students.map(s => `
-                <div class="p-3 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div class="p-3 rounded-xl bg-[#0f281e] border border-[#52b788]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div>
-                        <div class="font-bold text-[#132220]">${s.full_name} (${s.college_id || s.username})</div>
-                        <div class="text-[11px] text-[#5c7c77]">Phone: ${s.phone || 'N/A'} • Guardian: ${s.guardian_name || 'N/A'} (${s.guardian_phone || 'N/A'})</div>
+                        <div class="font-bold text-[#fefae0]">${s.full_name} (${s.college_id || s.username})</div>
+                        <div class="text-[11px] text-[#8fb89e]">Phone: ${s.phone || 'N/A'} • Guardian: ${s.guardian_name || 'N/A'} (${s.guardian_phone || 'N/A'})</div>
                     </div>
                     <div class="flex items-center gap-2">
                         <button onclick="app.approveStudent(${s.id})" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
@@ -1779,13 +1798,13 @@ const app = {
         if (!c) return;
 
         if (students.length === 0) {
-            c.innerHTML = `<p class="text-xs text-[#5c7c77]">No students found.</p>`;
+            c.innerHTML = `<p class="text-xs text-[#8fb89e]">No students found.</p>`;
             return;
         }
 
         c.innerHTML = `
-            <table class="w-full text-left text-xs text-[#5c7c77]">
-                <thead class="text-[10px] uppercase bg-[#f0fdf9] text-[#0d9488]">
+            <table class="w-full text-left text-xs text-[#8fb89e]">
+                <thead class="text-[10px] uppercase bg-[#143528] text-[#52b788]">
                     <tr>
                         <th class="p-2.5">Name / College ID</th>
                         <th class="p-2.5">Room & Bed</th>
@@ -1794,15 +1813,15 @@ const app = {
                         <th class="p-2.5">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-[#0d9488]/10">
+                <tbody class="divide-y divide-[#52b788]/10">
                     ${students.map(s => `
-                        <tr class="hover:bg-[#f0fdf9]/50">
-                            <td class="p-2.5 font-bold text-[#132220]">${s.full_name}<br><span class="text-[10px] font-normal font-mono text-[#0d9488]">${s.college_id || s.username}</span></td>
-                            <td class="p-2.5 text-[#132220]">${s.room_number ? `${s.room_number} (${s.bed_identifier})` : '<span class="text-amber-400">Unallocated</span>'}</td>
+                        <tr class="hover:bg-[#143528]/50">
+                            <td class="p-2.5 font-bold text-[#fefae0]">${s.full_name}<br><span class="text-[10px] font-normal font-mono text-[#52b788]">${s.college_id || s.username}</span></td>
+                            <td class="p-2.5 text-[#fefae0]">${s.room_number ? `${s.room_number} (${s.bed_identifier})` : '<span class="text-amber-400">Unallocated</span>'}</td>
                             <td class="p-2.5 font-mono">${s.phone || 'N/A'}</td>
                             <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.approval_status === 'approved' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${s.approval_status || 'approved'}</span></td>
                             <td class="p-2.5">
-                                <button onclick="app.toggleStudentStatus(${s.id})" class="text-[11px] text-[#0d9488] hover:underline">
+                                <button onclick="app.toggleStudentStatus(${s.id})" class="text-[11px] text-[#52b788] hover:underline">
                                     ${s.is_active ? 'Suspend' : 'Activate'}
                                 </button>
                             </td>
@@ -1858,11 +1877,11 @@ const app = {
                 const occPct = Math.round((r.occupied / r.capacity) * 100);
 
                 return `
-                    <div class="forest-card p-5 rounded-2xl border border-[#99f6e0]/20 space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-[#99f6e0]/20">
+                    <div class="forest-card p-5 rounded-2xl border border-[#52b788]/20 space-y-3">
+                        <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/20">
                             <div>
-                                <span class="text-[10px] text-[#0d9488] uppercase font-bold">Block ${r.block} • Floor ${r.floor}</span>
-                                <h4 class="text-base font-bold text-[#132220]">Room ${r.room_number}</h4>
+                                <span class="text-[10px] text-[#52b788] uppercase font-bold">Block ${r.block} • Floor ${r.floor}</span>
+                                <h4 class="text-base font-bold text-[#fefae0]">Room ${r.room_number}</h4>
                             </div>
                             <span class="text-[10px] px-2.5 py-0.5 rounded-full font-bold ${isFull ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}">
                                 ${isFull ? 'Full' : `${r.capacity - r.occupied} Beds Free`}
@@ -1870,16 +1889,16 @@ const app = {
                         </div>
 
                         <div class="space-y-1 text-xs">
-                            <div class="flex justify-between text-[#5c7c77]">
+                            <div class="flex justify-between text-[#8fb89e]">
                                 <span>Occupancy (${r.occupied}/${r.capacity})</span>
                                 <span>${occPct}%</span>
                             </div>
-                            <div class="w-full bg-[#f0fdf9] h-2 rounded-full overflow-hidden">
-                                <div class="bg-[#0d9488] h-full" style="width: ${occPct}%"></div>
+                            <div class="w-full bg-[#143528] h-2 rounded-full overflow-hidden">
+                                <div class="bg-[#52b788] h-full" style="width: ${occPct}%"></div>
                             </div>
                         </div>
 
-                        <div class="text-[11px] text-[#5c7c77] flex justify-between pt-1">
+                        <div class="text-[11px] text-[#8fb89e] flex justify-between pt-1">
                             <span>Type: ${r.room_type || 'Standard'}</span>
                         </div>
                     </div>
@@ -1955,17 +1974,17 @@ const app = {
             const staff = data.staff || [];
 
             c.innerHTML = staff.map(s => `
-                <div class="forest-card p-4 rounded-2xl border border-[#99f6e0]/20 space-y-2 text-xs">
+                <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 space-y-2 text-xs">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-[#0d9488] text-[#0d9488] flex items-center justify-center font-bold text-xs border border-[#99f6e0]/30">
+                        <div class="w-9 h-9 rounded-xl bg-[#52b788] text-[#52b788] flex items-center justify-center font-bold text-xs border border-[#52b788]/30">
                             ${s.full_name.substring(0, 2).toUpperCase()}
                         </div>
                         <div>
-                            <div class="font-bold text-[#132220]">${s.full_name}</div>
-                            <div class="text-[10px] text-[#0d9488] uppercase font-bold">${s.role}</div>
+                            <div class="font-bold text-[#fefae0]">${s.full_name}</div>
+                            <div class="text-[10px] text-[#52b788] uppercase font-bold">${s.role}</div>
                         </div>
                     </div>
-                    <div class="text-[#5c7c77] text-[11px] pt-1">
+                    <div class="text-[#8fb89e] text-[11px] pt-1">
                         <div>Email: ${s.email}</div>
                         <div>Phone: ${s.phone || 'Ext. 104'}</div>
                     </div>
@@ -1986,32 +2005,32 @@ const app = {
 
             sumC.innerHTML = `
                 <div class="forest-card p-5 rounded-2xl border border-emerald-500/30">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Total Fees Collected</span>
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Total Fees Collected</span>
                     <div class="text-3xl font-extrabold text-emerald-400 mt-1">₹${(f.total_collected || 0).toLocaleString()}</div>
-                    <div class="text-[10px] text-[#5c7c77] mt-1">${f.collection_rate || 94}% of total term billing</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">${f.collection_rate || 94}% of total term billing</div>
                 </div>
                 <div class="forest-card p-5 rounded-2xl border border-rose-500/30">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Outstanding Receivables</span>
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Outstanding Receivables</span>
                     <div class="text-3xl font-extrabold text-rose-400 mt-1">₹${(f.total_outstanding || 0).toLocaleString()}</div>
-                    <div class="text-[10px] text-[#5c7c77] mt-1">Across all blocks</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Across all blocks</div>
                 </div>
                 <div class="forest-card p-5 rounded-2xl border border-[#faedcd]/30">
-                    <span class="text-xs text-[#5c7c77] uppercase font-bold">Maintenance Reserve</span>
-                    <div class="text-3xl font-extrabold text-[#0d9488] mt-1">₹2,45,000</div>
-                    <div class="text-[10px] text-[#5c7c77] mt-1">Allocated budget</div>
+                    <span class="text-xs text-[#8fb89e] uppercase font-bold">Maintenance Reserve</span>
+                    <div class="text-3xl font-extrabold text-[#52b788] mt-1">₹2,45,000</div>
+                    <div class="text-[10px] text-[#8fb89e] mt-1">Allocated budget</div>
                 </div>
             `;
 
             if (tbl) {
                 tbl.innerHTML = (f.recent_transactions || []).map(t => `
-                    <div class="p-2.5 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20 flex items-center justify-between text-xs">
+                    <div class="p-2.5 rounded-xl bg-[#0f281e] border border-[#52b788]/20 flex items-center justify-between text-xs">
                         <div>
-                            <span class="font-bold text-[#132220]">${t.student_name}</span>
-                            <span class="text-[#5c7c77] text-[11px]"> • ${t.fee_type}</span>
+                            <span class="font-bold text-[#fefae0]">${t.student_name}</span>
+                            <span class="text-[#8fb89e] text-[11px]"> • ${t.fee_type}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="font-bold text-emerald-400">+₹${t.amount.toLocaleString()}</span>
-                            <span class="text-[10px] text-[#5c7c77] font-mono">${t.receipt_number || 'TXN'}</span>
+                            <span class="text-[10px] text-[#8fb89e] font-mono">${t.receipt_number || 'TXN'}</span>
                         </div>
                     </div>
                 `).join('');
@@ -2084,16 +2103,16 @@ const app = {
             // 1. Live Complaints by Category
             const categories = a.complaints_by_category || [];
             if (categories.length === 0) {
-                catC.innerHTML = '<p class="text-xs text-[#5c7c77]">No complaints data in database.</p>';
+                catC.innerHTML = '<p class="text-xs text-[#8fb89e]">No complaints data in database.</p>';
             } else {
                 catC.innerHTML = categories.map(c => `
                     <div>
-                        <div class="flex justify-between text-[#5c7c77] mb-1">
-                            <span class="font-bold text-[#132220]">${c.category} (${c.percentage}%)</span>
+                        <div class="flex justify-between text-[#8fb89e] mb-1">
+                            <span class="font-bold text-[#fefae0]">${c.category} (${c.percentage}%)</span>
                             <span>${c.count} tickets</span>
                         </div>
-                        <div class="w-full bg-[#f0fdf9] h-2.5 rounded-full overflow-hidden">
-                            <div class="bg-[#0d9488] h-full rounded-full transition-all duration-500" style="width: ${c.percentage}%"></div>
+                        <div class="w-full bg-[#143528] h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-[#52b788] h-full rounded-full transition-all duration-500" style="width: ${c.percentage}%"></div>
                         </div>
                     </div>
                 `).join('');
@@ -2104,11 +2123,11 @@ const app = {
             if (occC) {
                 occC.innerHTML = blocks.map(b => `
                     <div>
-                        <div class="flex justify-between text-[#5c7c77] mb-1">
-                            <span class="font-bold text-[#0d9488]">Block ${b.block}</span>
+                        <div class="flex justify-between text-[#8fb89e] mb-1">
+                            <span class="font-bold text-[#52b788]">Block ${b.block}</span>
                             <span>${b.occupied_beds} / ${b.total_beds} beds (${b.rate}%)</span>
                         </div>
-                        <div class="w-full bg-[#f0fdf9] h-2.5 rounded-full overflow-hidden">
+                        <div class="w-full bg-[#143528] h-2.5 rounded-full overflow-hidden">
                             <div class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: ${b.rate}%"></div>
                         </div>
                     </div>
@@ -2119,14 +2138,14 @@ const app = {
             const s = a.gema4_sentiment || {};
             if (sentC) {
                 sentC.innerHTML = `
-                    <div class="p-4 rounded-xl bg-[#ffffff] border border-[#99f6e0]/20 space-y-2">
+                    <div class="p-4 rounded-xl bg-[#0f281e] border border-[#52b788]/20 space-y-2">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-[#0d9488]">Gemma-4 Sentiment Score</span>
-                            <span class="text-base font-extrabold text-[#132220]">${s.sentiment_score || 96}%</span>
+                            <span class="text-xs font-bold text-[#52b788]">Gemma-4 Sentiment Score</span>
+                            <span class="text-base font-extrabold text-[#fefae0]">${s.sentiment_score || 96}%</span>
                         </div>
-                        <div class="text-[11px] text-[#5c7c77]">Nutrition Health Index: <span class="text-[#0d9488] font-bold">${s.nutrition_health_index || 92.5}/100</span></div>
-                        <div class="text-[10px] text-[#5c7c77] pt-1">
-                            <span class="font-bold text-[#0d9488]">Gemma-4 Feedback Insights:</span> ${(s.top_applauded || []).join(', ') || 'High student satisfaction'}
+                        <div class="text-[11px] text-[#8fb89e]">Nutrition Health Index: <span class="text-[#52b788] font-bold">${s.nutrition_health_index || 92.5}/100</span></div>
+                        <div class="text-[10px] text-[#8fb89e] pt-1">
+                            <span class="font-bold text-[#52b788]">Gemma-4 Feedback Insights:</span> ${(s.top_applauded || []).join(', ') || 'High student satisfaction'}
                         </div>
                     </div>
                 `;
@@ -2137,9 +2156,9 @@ const app = {
             if (foreC) {
                 foreC.innerHTML = f.map(d => `
                     <div class="text-center space-y-1">
-                        <div class="text-[10px] font-bold text-[#0d9488]">${d.occupancy}%</div>
-                        <div class="w-8 bg-[#0d9488] rounded-t mx-auto transition-all duration-500" style="height: ${Math.min(100, Math.max(25, d.occupancy))}px"></div>
-                        <span class="text-[10px] text-[#5c7c77]">${d.day}</span>
+                        <div class="text-[10px] font-bold text-[#52b788]">${d.occupancy}%</div>
+                        <div class="w-8 bg-[#52b788] rounded-t mx-auto transition-all duration-500" style="height: ${Math.min(100, Math.max(25, d.occupancy))}px"></div>
+                        <span class="text-[10px] text-[#8fb89e]">${d.day}</span>
                     </div>
                 `).join('');
             }
@@ -2209,14 +2228,14 @@ const app = {
         if (!container) return;
 
         const toast = document.createElement('div');
-        let borderClass = 'border-[#99f6e0]/40 bg-[#ffffff] text-[#132220]';
-        let icon = '<i class="fa-solid fa-circle-info text-[#0d9488]"></i>';
+        let borderClass = 'border-[#52b788]/40 bg-[#0f281e] text-[#fefae0]';
+        let icon = '<i class="fa-solid fa-circle-info text-[#52b788]"></i>';
 
         if (type === 'success') {
-            borderClass = 'border-emerald-500/40 bg-[#ffffff] text-[#132220]';
+            borderClass = 'border-emerald-500/40 bg-[#0f281e] text-[#fefae0]';
             icon = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
         } else if (type === 'error') {
-            borderClass = 'border-rose-500/40 bg-[#ffffff] text-rose-200';
+            borderClass = 'border-rose-500/40 bg-[#0f281e] text-rose-200';
             icon = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>';
         }
 
@@ -2287,7 +2306,7 @@ const app = {
         const userBubble = document.createElement('div');
         userBubble.className = 'flex justify-end';
         userBubble.innerHTML = `
-            <div class="p-3 rounded-2xl rounded-tr-sm bg-[#14b8a6] text-white max-w-[85%] shadow-sm">
+            <div class="p-3 rounded-2xl rounded-tr-sm bg-[#2d6a4f] text-white max-w-[85%] shadow-sm">
                 ${message}
             </div>
         `;
@@ -2300,10 +2319,10 @@ const app = {
         loadingBubble.className = 'flex items-start gap-2.5';
         loadingBubble.id = 'gema4ThinkingBubble';
         loadingBubble.innerHTML = `
-            <div class="w-6 h-6 rounded-lg bg-[#0d9488] flex items-center justify-center text-[#0d9488] text-xs flex-shrink-0 mt-0.5">
+            <div class="w-6 h-6 rounded-lg bg-[#52b788] flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
                 <i class="fa-solid fa-sparkles animate-spin"></i>
             </div>
-            <div class="p-3 rounded-2xl rounded-tl-sm bg-[#ffffff] border border-[#99f6e0]/20 text-[#5c7c77] text-xs">
+            <div class="p-3 rounded-2xl rounded-tl-sm bg-[#0f281e] border border-[#52b788]/20 text-[#8fb89e] text-xs">
                 Gemma-4 is thinking...
             </div>
         `;
@@ -2328,13 +2347,13 @@ const app = {
                 .replace(/\n/g, '<br>');
 
             aiBubble.innerHTML = `
-                <div class="w-6 h-6 rounded-lg bg-[#0d9488] flex items-center justify-center text-[#0d9488] text-xs flex-shrink-0 mt-0.5">
+                <div class="w-6 h-6 rounded-lg bg-[#52b788] flex items-center justify-center text-[#52b788] text-xs flex-shrink-0 mt-0.5">
                     <i class="fa-solid fa-sparkles"></i>
                 </div>
-                <div class="p-3 rounded-2xl rounded-tl-sm bg-[#ffffff] border border-[#99f6e0]/20 text-[#132220] leading-relaxed max-w-[85%] shadow-sm">
-                    <div class="flex items-center justify-between text-[10px] text-[#0d9488] mb-1 font-mono">
+                <div class="p-3 rounded-2xl rounded-tl-sm bg-[#0f281e] border border-[#52b788]/20 text-[#fefae0] leading-relaxed max-w-[85%] shadow-sm">
+                    <div class="flex items-center justify-between text-[10px] text-[#52b788] mb-1 font-mono">
                         <span>${data.engine || 'Gemma-4'}</span>
-                        <span class="text-[#5c7c77]">${data.timestamp || ''}</span>
+                        <span class="text-[#8fb89e]">${data.timestamp || ''}</span>
                     </div>
                     <div>${replyText}</div>
                 </div>

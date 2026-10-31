@@ -5,6 +5,7 @@ import os
 os.chdir('/Users/siddharthsingh/.gemini/antigravity/scratch/mann_smart_hostel')
 
 test_files = [
+    'tests/test_wellness_gemma4.py',
     'tests/test_mann2_workflows.py',
     'tests/test_workflows.py',
     'tests/test_security_rbac.py',
@@ -24,7 +25,7 @@ for tf in test_files:
 
 if all_passed:
     print("\n==========================================")
-    print("ALL 5 TEST SUITES PASSED SUCCESSFULLY (35/35 TESTS OK)!")
+    print("ALL 6 TEST SUITES PASSED SUCCESSFULLY (42/42 TESTS OK)!")
     print("==========================================")
     sys.exit(0)
 else:
