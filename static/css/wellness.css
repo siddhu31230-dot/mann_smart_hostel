@@ -59,6 +59,27 @@ body {
     box-shadow: var(--shadow-elevated);
 }
 
+/* Visibility Utility Fallback */
+.hidden {
+    display: none !important;
+}
+
+.wellness-view {
+    min-height: 400px;
+    animation: fadeInView 0.25s ease-out;
+}
+
+@keyframes fadeInView {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Primary Button */
 .btn-wellness-primary {
     background: linear-gradient(135deg, #176B50 0%, #208F6C 100%);

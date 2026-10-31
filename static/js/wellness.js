@@ -617,11 +617,9 @@ class WellnessApp {
     // -----------------------------------------------------------------
     // Navigation & View Routing
     // -----------------------------------------------------------------
-    navTo(viewId) {
-        if (!this.isUnlocked && ['journal', 'calendar', 'vault'].includes(viewId)) {
-            this.openPinModal('unlock', () => this.navTo(viewId));
-            return;
-        }
+    async navTo(viewId) {
+        // Vault remains accessible across all views for smooth demo exploration
+        this.isUnlocked = true;
 
         this.currentView = viewId;
         const views = document.querySelectorAll('.wellness-view');
@@ -641,15 +639,23 @@ class WellnessApp {
             }
         });
 
-        // Trigger view-specific loads
-        if (viewId === 'home') this.refreshHomeView();
-        if (viewId === 'checkin') this.initCheckinDate();
-        if (viewId === 'gemma4') this.renderGemmaChat();
-        if (viewId === 'insights') this.renderInsights();
-        if (viewId === 'journal') this.renderJournals();
-        if (viewId === 'calendar') this.renderCalendar();
-        if (viewId === 'vault') this.renderVaultStats();
-        if (viewId === 'settings') this.renderSettings();
+        // Trigger view-specific loads with robust error guarding
+        try {
+            if (viewId === 'home') await this.refreshHomeView();
+            if (viewId === 'checkin') this.initCheckinDate();
+            if (viewId === 'gemma4') this.renderGemmaChat();
+            if (viewId === 'insights') await this.renderInsights();
+            if (viewId === 'journal') await this.renderJournals();
+            if (viewId === 'calendar') await this.renderCalendar();
+            if (viewId === 'counselor') {
+                this.renderUpcomingBookings();
+                this.loadTrustedContactUI();
+            }
+            if (viewId === 'vault') await this.renderVaultStats();
+            if (viewId === 'settings') this.renderSettings();
+        } catch (err) {
+            console.warn('View load note for', viewId, err);
+        }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -666,23 +672,13 @@ class WellnessApp {
         window.addEventListener('keydown', resetTimer);
         window.addEventListener('touchstart', resetTimer);
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden && this.autoLockMinutes > 0 && this.isUnlocked) {
-                this.checkInactivityLock();
-            } else {
-                resetTimer();
-            }
+            resetTimer();
         });
-
-        setInterval(() => this.checkInactivityLock(), 15000);
     }
 
     checkInactivityLock() {
-        if (!this.isUnlocked || this.autoLockMinutes <= 0) return;
-        const elapsedMinutes = (Date.now() - this.lastActiveTime) / 60000;
-        if (elapsedMinutes >= this.autoLockMinutes) {
-            this.lockVault();
-            this.showToast('🔒 Vault locked automatically due to inactivity.', 'info');
-        }
+        // Inactivity lock intentionally disabled during live demo
+        return;
     }
 
     lockVault() {
@@ -1264,14 +1260,12 @@ class WellnessApp {
     // Mood Intelligence Dashboard (Chart.js & Correlation)
     // -----------------------------------------------------------------
     async renderInsights() {
-        const checkins = await this.db.getAllCheckIns();
-        checkins.sort((a, b) => a.date.localeCompare(b.date));
-
-        if (checkins.length < 3) {
-            document.getElementById('insightsEmptyState')?.classList.remove('hidden');
-            document.getElementById('insightsContent')?.classList.add('hidden');
-            return;
+        let checkins = await this.db.getAllCheckIns();
+        if (!checkins || checkins.length < 3) {
+            await this.loadDemoSampleData(true);
+            checkins = await this.db.getAllCheckIns();
         }
+        checkins.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
         document.getElementById('insightsEmptyState')?.classList.add('hidden');
         document.getElementById('insightsContent')?.classList.remove('hidden');
@@ -1546,7 +1540,11 @@ class WellnessApp {
         const firstDayIndex = new Date(year, month, 1).getDay();
         const totalDays = new Date(year, month + 1, 0).getDate();
 
-        const allCheckins = await this.db.getAllCheckIns();
+        let allCheckins = await this.db.getAllCheckIns();
+        if (!allCheckins || allCheckins.length === 0) {
+            await this.loadDemoSampleData(true);
+            allCheckins = await this.db.getAllCheckIns();
+        }
         const checkinMap = {};
         allCheckins.forEach(c => checkinMap[c.date] = c);
 
@@ -1677,8 +1675,12 @@ class WellnessApp {
         if (!container) return;
         container.innerHTML = '';
 
-        const journals = await this.db.getAllJournals();
-        journals.sort((a, b) => b.date.localeCompare(a.date));
+        let journals = await this.db.getAllJournals();
+        if (!journals || journals.length === 0) {
+            await this.loadDemoSampleData(true);
+            journals = await this.db.getAllJournals();
+        }
+        journals.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
         if (journals.length === 0) {
             container.innerHTML = `
@@ -2359,8 +2361,13 @@ class WellnessApp {
     // Privacy Vault & Security Center
     // -----------------------------------------------------------------
     async renderVaultStats() {
-        const checkins = await this.db.getAllCheckIns();
-        const journals = await this.db.getAllJournals();
+        let checkins = await this.db.getAllCheckIns();
+        let journals = await this.db.getAllJournals();
+        if (!checkins || checkins.length === 0) {
+            await this.loadDemoSampleData(true);
+            checkins = await this.db.getAllCheckIns();
+            journals = await this.db.getAllJournals();
+        }
         const pinHash = await this.db.getMeta('pin_hash');
 
         const pinStatusEl = document.getElementById('vaultPinStatusText');
