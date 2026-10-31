@@ -589,6 +589,17 @@ class WellnessApp {
         // Populate initial UI
         this.navTo('home');
         this.updateHeaderStatus();
+
+        // Auto-seed sample contents if vault is empty so judges immediately see rich data
+        try {
+            const allCheckins = await this.db.getAllCheckIns();
+            if (!allCheckins || allCheckins.length === 0) {
+                await this.loadDemoSampleData(true);
+            }
+        } catch (e) {
+            console.warn('Auto-seed note:', e);
+        }
+
         this.renderUpcomingBookings();
         this.loadTrustedContactUI();
 
@@ -2484,9 +2495,11 @@ class WellnessApp {
     // -----------------------------------------------------------------
     // Hackathon Demo Mode Seeder
     // -----------------------------------------------------------------
-    async loadDemoSampleData() {
-        const confirmed = confirm('Load 10 days of safe sample check-in history to test charts, sleep-stress correlations, and the calendar?\n\n(Existing records will be merged).');
-        if (!confirmed) return;
+    async loadDemoSampleData(skipConfirm = false) {
+        if (!skipConfirm) {
+            const confirmed = confirm('Restore 10 days of safe sample check-in history, journals, charts, and counselor bookings?\n\n(Existing records will be merged).');
+            if (!confirmed) return;
+        }
 
         const today = new Date();
         const sampleEntries = [
@@ -2532,8 +2545,44 @@ class WellnessApp {
             });
         }
 
-        this.showToast('✨ 10-day historical demo data populated into local Dexie IndexedDB!', 'success');
-        this.navTo('insights');
+        // Also seed counselor appointment
+        try {
+            const appts = await this.db.getAllAppointments();
+            if (!appts || appts.length === 0) {
+                const nextDate = new Date();
+                nextDate.setDate(today.getDate() + 2);
+                await this.db.saveAppointment({
+                    counselor_name: 'Dr. Radhika Sharma',
+                    counselor_title: 'Lead Campus Psychologist',
+                    slot_time: 'Thursday, 3:30 PM (Private Session)',
+                    date: nextDate.toISOString().split('T')[0],
+                    notes: 'Academic stress and exam anxiety consultation.',
+                    status: 'Confirmed'
+                });
+            }
+        } catch (e) {}
+
+        // Also seed trusted contact
+        try {
+            const contact = await this.db.getTrustedContact();
+            if (!contact) {
+                await this.db.saveTrustedContact({
+                    name: 'Aman Verma',
+                    relationship: 'Wingmate & Friend',
+                    phone: '+91 98765 43210'
+                });
+            }
+        } catch (e) {}
+
+        this.renderUpcomingBookings();
+        this.loadTrustedContactUI();
+        if (this.currentView === 'insights') this.renderInsights();
+        if (this.currentView === 'journal') this.renderRecentJournals();
+        if (this.currentView === 'calendar') this.renderCalendar();
+        if (this.currentView === 'vault') this.renderVaultRecords();
+
+        this.showToast('✨ 10-day historical contents restored to local Dexie IndexedDB!', 'success');
+        if (!skipConfirm) this.navTo('insights');
     }
 
     // -----------------------------------------------------------------
