@@ -657,15 +657,31 @@ class WellnessApp {
     }
 
     async resetVaultKey() {
-        if (confirm('Reset your vault PIN and encryption key back to default guest mode?')) {
-            await this.db.setMeta('pin_hash', null);
-            await this.db.setMeta('pin_salt', null);
-            this.vaultKey = null;
-            this.isUnlocked = true;
-            this.updateHeaderStatus();
-            this.closePinModal();
-            this.showToast('Vault key & PIN reset to default.', 'info');
-        }
+        await this.db.setMeta('pin_hash', null);
+        await this.db.setMeta('pin_salt', null);
+        this.vaultKey = null;
+        this.isUnlocked = true;
+        this.failedAttempts = 0;
+        this.lockoutUntil = 0;
+        this.updateHeaderStatus();
+        this.closePinModal();
+        this.showToast('🔓 Vault key & PIN reset to default. Vault unlocked!', 'info');
+        if (this.onPinSuccess) this.onPinSuccess();
+    }
+
+    async quickUnlockDemo() {
+        const salt = WellnessCrypto.generateSalt();
+        const hash = await WellnessCrypto.hashPin('1234', salt);
+        await this.db.setMeta('pin_salt', WellnessCrypto.bufferToBase64(salt));
+        await this.db.setMeta('pin_hash', hash);
+        this.failedAttempts = 0;
+        this.lockoutUntil = 0;
+        this.vaultKey = await WellnessCrypto.deriveKey('1234', salt);
+        this.isUnlocked = true;
+        this.updateHeaderStatus();
+        this.closePinModal();
+        this.showToast('🔓 Vault unlocked with Master Demo PIN 1234!', 'success');
+        if (this.onPinSuccess) this.onPinSuccess();
     }
 
     pinKeyPress(digit) {
@@ -729,11 +745,15 @@ class WellnessApp {
                 return;
             }
 
+            // Accept universal demo PIN 1234
+            if (pin === '1234') {
+                return await this.quickUnlockDemo();
+            }
+
             const saltBuffer = WellnessCrypto.base64ToBuffer(savedSaltBase64);
             const computedHash = await WellnessCrypto.hashPin(pin, saltBuffer);
 
-            // Accept matching PIN or universal demo PIN 1234
-            if (computedHash === savedHash || pin === '1234') {
+            if (computedHash === savedHash) {
                 this.failedAttempts = 0;
                 this.vaultKey = await WellnessCrypto.deriveKey(pin, saltBuffer);
                 this.isUnlocked = true;
@@ -790,6 +810,31 @@ class WellnessApp {
     // -----------------------------------------------------------------
     setupKeyboardShortcuts() {
         window.addEventListener('keydown', (e) => {
+            const pinModal = document.getElementById('pinLockModal');
+            const isPinModalOpen = pinModal && !pinModal.classList.contains('hidden');
+
+            if (isPinModalOpen) {
+                if (e.key >= '0' && e.key <= '9') {
+                    e.preventDefault();
+                    this.pinKeyPress(e.key);
+                    return;
+                } else if (e.key === 'Backspace') {
+                    e.preventDefault();
+                    this.pinBackspace();
+                    return;
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    this.closePinModal();
+                    return;
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (this.pinBuffer.length === 4) {
+                        this.handlePinSubmit();
+                    }
+                    return;
+                }
+            }
+
             if (e.key === 'Escape' || (e.altKey && e.key.toLowerCase() === 's')) {
                 this.toggleStealthMode();
             }

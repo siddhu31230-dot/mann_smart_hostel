@@ -1074,6 +1074,11 @@
                 <button onclick="app.pinBackspace()" class="pin-key-btn text-base"><i class="fa-solid fa-delete-left"></i></button>
             </div>
 
+            <!-- Instant 1-Tap Demo Unlock -->
+            <button onclick="app.quickUnlockDemo()" class="w-full py-2.5 rounded-xl bg-[#176B50] hover:bg-[#125740] text-white text-xs font-bold shadow-md transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-lock-open"></i> Instant Demo Unlock (1234)
+            </button>
+
             <!-- Direct Crisis Access & Key Reset From Lock Screen -->
             <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs font-semibold px-2">
                 <button onclick="app.resetVaultKey()" class="text-gray-400 hover:text-amber-600 transition flex items-center gap-1">
@@ -1292,6 +1297,6 @@
     <div id="wellnessToastContainer" class="fixed top-20 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Application Script -->
-    <script src="/static/js/wellness.js"></script>
+    <script src="/static/js/wellness.js?v=2.2"></script>
 </body>
 </html>
