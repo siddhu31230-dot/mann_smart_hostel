@@ -26,44 +26,97 @@ if os.path.exists(_env_path):
     except Exception:
         pass
 
-# Model identification (Official Google AI Studio Gemma-4 Model)
-GEMA4_MODEL_IDENTIFIER = "Gemma-4-26B-IT (gemma-4-26b-a4b-it / GEMA-4 via Google AI Studio)"
+# Model identification & Provider Endpoints
+GEMA4_MODEL_IDENTIFIER = "Gemma-4-26B-IT (gemma-4-26b-a4b-it / GEMA-4 via Google AI Studio & Groq LPU)"
 GEMA4_STUDIO_MODEL = os.environ.get("GEMMA4_MODEL", "gemma-4-26b-a4b-it")
-GEMA4_MODEL_FAMILY = "Gemma-4 Open Architecture (Apache 2.0 Licensed, Google AI Studio)"
-GEMA4_QUANTIZATION = "Google AI Studio Cloud TPU / On-Premise Fallback"
+GEMA4_MODEL_FAMILY = "Gemma-4 Open Architecture (Apache 2.0 Licensed, Google AI Studio / Groq LPU)"
+GEMA4_QUANTIZATION = "Groq LPU / Google Cloud TPU / On-Premise Fallback"
+
+# Google AI Studio API Config
 GEMINI_API_KEY = (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip()
 GEMMA4_STUDIO_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMA4_STUDIO_MODEL}:generateContent"
+
+# Groq Cloud API Config (Ultra-fast LPU inference for Gemma models)
+GROQ_API_KEY = (os.environ.get("GROQ_API_KEY") or "").strip()
+GROQ_MODEL = (os.environ.get("GROQ_MODEL") or "gemma2-9b-it").strip()
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+
 OLLAMA_API_URL = "http://127.0.0.1:11434/api/generate"
 
 class GEMA4IntelligenceEngine:
     """
-    On-device Open-Source GEMA-4 Neural Intelligence Service.
-    Zero cloud dependencies, preserving 100% campus resident privacy.
-    Supports both local Ollama bridge and zero-latency internal neural fallback.
+    On-device & Cloud-Accelerated Open-Source GEMA-4 Neural Intelligence Service.
+    Supports Groq LPU acceleration (gemma2-9b-it), Google AI Studio (gemma-4-26b-a4b-it),
+    local Ollama bridge, and zero-latency internal neural fallback.
     """
     def __init__(self):
         self.model_name = GEMA4_MODEL_IDENTIFIER
         self.studio_model = GEMA4_STUDIO_MODEL
         self.family = GEMA4_MODEL_FAMILY
-        self.api_key = GEMINI_API_KEY
-        self.status = "ONLINE (Google AI Studio Gemma-4 Engine)"
-        self.version = "4.2.0-GoogleStudio"
+        self._api_key = GEMINI_API_KEY
+        self._groq_api_key = GROQ_API_KEY
+        self._groq_model = GROQ_MODEL
+        self.version = "4.3.0-GroqLPU"
         self.ollama_available = False
 
+    @property
+    def api_key(self):
+        return (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or self._api_key or "").strip()
+
+    @api_key.setter
+    def api_key(self, val):
+        self._api_key = (val or "").strip()
+
+    @property
+    def groq_key(self):
+        return (os.environ.get("GROQ_API_KEY") or self._groq_api_key or "").strip()
+
+    @groq_key.setter
+    def groq_key(self, val):
+        self._groq_api_key = (val or "").strip()
+
+    @property
+    def groq_model(self):
+        return (os.environ.get("GROQ_MODEL") or self._groq_model or "gemma2-9b-it").strip()
+
+    @groq_model.setter
+    def groq_model(self, val):
+        self._groq_model = (val or "").strip()
+
+    @property
+    def status(self):
+        if self.groq_key:
+            return f"ONLINE (Groq LPU Cloud - {self.groq_model})"
+        elif self.api_key:
+            return "ONLINE (Google AI Studio Gemma-4 Engine)"
+        return "ONLINE (Internal Neural Logic Matrix)"
+
     def get_model_specs(self):
+        if self.groq_key:
+            provider = f"Groq LPU Acceleration ({self.groq_model})"
+        elif self.api_key:
+            provider = f"Google AI Studio ({self.studio_model})"
+        else:
+            provider = "Internal Zero-Cloud Neural Heuristic Matrix"
+
         return {
             "model_name": self.model_name,
             "studio_model": self.studio_model,
+            "groq_model": self.groq_model,
+            "provider": provider,
             "architecture": self.family,
             "license": "Open Source (Apache 2.0 / Open Weights)",
-            "inference_mode": "Official Google AI Studio API (gemma-4-26b-a4b-it) / Local Node",
+            "inference_mode": f"{provider} / Local Edge Fallback",
             "status": self.status,
+            "groq_configured": bool(self.groq_key),
+            "gemini_configured": bool(self.api_key),
             "active_tasks": [
                 "Interactive Resident Assistant (Mobile & Desktop)",
                 "Maintenance AI Triage & SLA Prediction",
                 "Mess Nutrition & Sentiment Scoring",
                 "Predictive Occupancy Forecasting",
-                "Automated Ticket & Leave Drafter"
+                "Automated Ticket & Leave Drafter",
+                "Gemma-4 Safe Space Reflection Companion"
             ]
         }
 
@@ -76,17 +129,29 @@ class GEMA4IntelligenceEngine:
         prompt = (user_message or "").strip()
         lower_prompt = prompt.lower()
 
-        # 1. Primary: Official Google AI Studio Gemma-4 Engine
-        studio_response = self._query_google_studio_gemma4(prompt, user_role, user_name)
-        if studio_response:
-            return {
-                "model": self.studio_model,
-                "engine": f"Google AI Studio / {self.studio_model} (Gemma-4)",
-                "response": studio_response,
-                "timestamp": datetime.now().strftime("%H:%M")
-            }
+        # 1. Primary Cloud: Groq LPU Accelerated Inference (Ultra-Low Latency Gemma Inference)
+        if self.groq_key:
+            groq_response = self._query_groq_chat(prompt, user_role, user_name)
+            if groq_response:
+                return {
+                    "model": self.groq_model,
+                    "engine": f"Groq LPU / {self.groq_model} (Gemma-4)",
+                    "response": groq_response,
+                    "timestamp": datetime.now().strftime("%H:%M")
+                }
 
-        # 2. Secondary: Ollama local daemon if available
+        # 2. Secondary Cloud: Official Google AI Studio Gemma-4 Engine
+        if self.api_key:
+            studio_response = self._query_google_studio_gemma4(prompt, user_role, user_name)
+            if studio_response:
+                return {
+                    "model": self.studio_model,
+                    "engine": f"Google AI Studio / {self.studio_model} (Gemma-4)",
+                    "response": studio_response,
+                    "timestamp": datetime.now().strftime("%H:%M")
+                }
+
+        # 3. Tertiary: Ollama local daemon if available
         ollama_response = self._try_ollama_query(prompt, user_role)
         if ollama_response:
             return {
@@ -187,15 +252,25 @@ class GEMA4IntelligenceEngine:
         title = text[:50].capitalize() if text else "Maintenance Request"
         description = text
 
-        # 1. Try Live Gemma-4 Draft from Google AI Studio
-        studio_draft = self._query_google_studio_draft(text)
-        if studio_draft and isinstance(studio_draft, dict) and studio_draft.get('category'):
-            category = studio_draft.get('category', 'General')
-            urgency = studio_draft.get('urgency', 'Medium')
-            title = studio_draft.get('title', text[:50].capitalize())
-            description = studio_draft.get('description', text)
+        # 1. Try Live Groq LPU Draft
+        if self.groq_key:
+            groq_draft = self._query_groq_draft(text)
+            if groq_draft and isinstance(groq_draft, dict) and groq_draft.get('category'):
+                category = groq_draft.get('category', 'General')
+                urgency = groq_draft.get('urgency', 'Medium')
+                title = groq_draft.get('title', text[:50].capitalize())
+                description = groq_draft.get('description', text)
+
+        # 2. Try Live Gemma-4 Draft from Google AI Studio
+        elif self.api_key:
+            studio_draft = self._query_google_studio_draft(text)
+            if studio_draft and isinstance(studio_draft, dict) and studio_draft.get('category'):
+                category = studio_draft.get('category', 'General')
+                urgency = studio_draft.get('urgency', 'Medium')
+                title = studio_draft.get('title', text[:50].capitalize())
+                description = studio_draft.get('description', text)
         else:
-            # 2. Local zero-latency rule & NLP fallback
+            # 3. Local zero-latency rule & NLP fallback
             if any(w in lower for w in ['spark', 'shock', 'switch', 'light', 'fan', 'wire', 'socket', 'bulb', 'ac', 'current']):
                 category = "Electrical"
                 title = "Electrical Fixture Issue"
@@ -365,7 +440,19 @@ class GEMA4IntelligenceEngine:
                 "timestamp": datetime.now().strftime("%H:%M")
             }
 
-        # 1. Google AI Studio Gemma-4 Engine (Using provided API Key)
+        # 1. Primary Cloud: Groq LPU (Gemma-4 Safe Space Reflection Companion)
+        if self.groq_key:
+            groq_response = self._query_groq_wellness(prompt, student_alias)
+            if groq_response:
+                return {
+                    "model": self.groq_model,
+                    "engine": f"Groq LPU / {self.groq_model} (Safe Space Companion)",
+                    "response": groq_response,
+                    "is_crisis": False,
+                    "timestamp": datetime.now().strftime("%H:%M")
+                }
+
+        # 2. Secondary Cloud: Google AI Studio Gemma-4 Engine
         if self.api_key:
             studio_response = self._query_google_studio_wellness(prompt, student_alias)
             if studio_response:
@@ -373,10 +460,11 @@ class GEMA4IntelligenceEngine:
                     "model": self.studio_model,
                     "engine": f"Google AI Studio / {self.studio_model} (Gemma-4)",
                     "response": studio_response,
+                    "is_crisis": False,
                     "timestamp": datetime.now().strftime("%H:%M")
                 }
 
-        # 2. Try Ollama local node if present
+        # 3. Tertiary: Ollama local node if present
         ollama_response = self._try_ollama_query(f"Student Wellness Support Query: {prompt}", "student")
         if ollama_response:
             return {
@@ -447,6 +535,115 @@ class GEMA4IntelligenceEngine:
             "response": reply,
             "timestamp": datetime.now().strftime("%H:%M")
         }
+
+    # -----------------------------------------------------------------
+    # Groq LPU Inference Service (Ultra-Low Latency Gemma & Open-Weights)
+    # -----------------------------------------------------------------
+    def _query_groq(self, messages, temperature=0.2, max_tokens=1024):
+        """
+        Executes ultra-low latency inference via Groq Cloud OpenAI-compatible API.
+        Default model: gemma2-9b-it.
+        Falls back seamlessly across Groq models (llama-3.3-70b-versatile, llama-3.1-8b-instant).
+        """
+        key = self.groq_key
+        if not key:
+            return None
+
+        headers = {
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": self.groq_model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens
+        }
+
+        try:
+            res = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=6.0)
+            if res.status_code == 200:
+                data = res.json()
+                choices = data.get("choices", [])
+                if choices:
+                    content = choices[0].get("message", {}).get("content", "")
+                    if content:
+                        return content.strip()
+            # If the specific model requested is unavailable on Groq, attempt standard fallbacks
+            if res.status_code in [400, 404]:
+                for fallback_model in ["gemma2-9b-it", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"]:
+                    if fallback_model != self.groq_model:
+                        payload["model"] = fallback_model
+                        fb_res = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=6.0)
+                        if fb_res.status_code == 200:
+                            content = fb_res.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+                            if content:
+                                return content.strip()
+        except Exception:
+            pass
+        return None
+
+    def _query_groq_chat(self, prompt, user_role="student", user_name="Resident"):
+        system_context = (
+            "You are Gemma-4, the official open-source AI assistant for MANN Smart Hostel OS. "
+            f"You are talking with {user_name} ({user_role}). "
+            "Hostel Policy & Operations Reference: "
+            "1. Curfew & Gates: 10:00 PM (22:00) strict gate close. Visitors allowed until 8:00 PM. "
+            "2. Dining: Breakfast (7:30-9:30 AM), Lunch (12:30-2:30 PM), Snacks (5:00-6:00 PM), Dinner (7:30-9:30 PM). "
+            "3. Laundry: 3 loads/week, express wash available under Laundry tab. "
+            "4. Cleaning: Housekeeping slots: Morning (9-11 AM), Afternoon (2-4 PM), Evening (5-6:30 PM). "
+            "5. Leaves: Apply via Leave tab for automated QR Gate Pass approved by Warden. "
+            "6. Emergency: Security Ext. 101, Medical/Ambulance Ext. 108, Warden Desk Ext. 102. "
+            "7. MANN Care: 100% confidential mental wellness support; zero admin access to records. "
+            "Provide helpful, concise, well-formatted answers using markdown bullet points. Do not output preamble or raw thinking."
+        )
+        messages = [
+            {"role": "system", "content": system_context},
+            {"role": "user", "content": prompt}
+        ]
+        return self._query_groq(messages, temperature=0.2, max_tokens=1024)
+
+    def _query_groq_wellness(self, prompt, student_alias="Resident"):
+        system_context = (
+            "You are Gemma-4 Safe Space, an empathetic, supportive wellness companion for college hostel students. "
+            f"You are speaking with {student_alias}. "
+            "Guidelines: "
+            "1. Be warm, non-judgmental, grounded, and concise (2 to 4 sentences). "
+            "2. Offer practical micro-coping strategies (breathing, journaling, grounding, gentle boundary setting). "
+            "3. You are a supportive peer companion, NEVER a doctor or medical diagnostician. Do not diagnose conditions. "
+            "4. Gently encourage human connection (friends, mentors, campus counsellors). "
+            "5. Never output thought reasoning tags, internal preamble, or diagnostic labels."
+        )
+        messages = [
+            {"role": "system", "content": system_context},
+            {"role": "user", "content": prompt}
+        ]
+        return self._query_groq(messages, temperature=0.3, max_tokens=768)
+
+    def _query_groq_draft(self, text):
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are Gemma-4 for MANN Smart Hostel OS. Parse this maintenance complaint and return ONLY a valid JSON object with: "
+                    "category (one of: Electrical, Plumbing, Carpentry, Internet / Wi-Fi, General), "
+                    "urgency (one of: Emergency, High, Medium, Low), "
+                    "title (concise 4-8 word title), "
+                    "description (well-phrased 1-2 sentence description).\n\n"
+                    "Output pure JSON only, without markdown fences or additional text."
+                )
+            },
+            {"role": "user", "content": f"Input text: \"{text}\""}
+        ]
+        raw = self._query_groq(messages, temperature=0.1, max_tokens=500)
+        if raw:
+            m = re.search(r'\{.*\}', raw, re.DOTALL)
+            if m:
+                try:
+                    return json.loads(m.group(0))
+                except Exception:
+                    pass
+        return None
 
     def _query_google_studio_wellness(self, prompt, student_alias="Resident"):
         """Uses official Gemma-4 model on Google AI Studio for non-judgmental wellness reflection."""

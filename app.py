@@ -994,6 +994,33 @@ def get_gema4_info():
     """Returns official specification of the Gemma 4 open-source engine powering MANN 2.0"""
     return jsonify(gema4.get_model_specs())
 
+@app.route('/api/gemma4/configure-key', methods=['POST'])
+@app.route('/api/gema4/configure-key', methods=['POST'])
+def configure_gema4_key():
+    """Allows configuring Groq or Gemini API keys dynamically"""
+    data = request.get_json(silent=True) or {}
+    
+    if 'groq_api_key' in data or 'groq_key' in data:
+        groq_key = (data.get('groq_api_key') or data.get('groq_key') or '').strip()
+        os.environ['GROQ_API_KEY'] = groq_key
+        gema4.groq_key = groq_key
+
+    if 'groq_model' in data:
+        groq_model = (data.get('groq_model') or 'gemma2-9b-it').strip()
+        os.environ['GROQ_MODEL'] = groq_model
+        gema4.groq_model = groq_model
+
+    if 'gemini_api_key' in data or 'gemini_key' in data:
+        gemini_key = (data.get('gemini_api_key') or data.get('gemini_key') or '').strip()
+        os.environ['GEMINI_API_KEY'] = gemini_key
+        gema4.api_key = gemini_key
+
+    return jsonify({
+        'status': 'success',
+        'message': 'AI provider credentials updated successfully',
+        'specs': gema4.get_model_specs()
+    })
+
 @app.route('/api/gemma4/triage', methods=['POST'])
 @app.route('/api/gema4/triage', methods=['POST'])
 def run_gema4_triage():

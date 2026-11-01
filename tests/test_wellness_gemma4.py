@@ -116,5 +116,27 @@ class TestWellnessGemma4(unittest.TestCase):
         self.assertTrue(crisis_res.get('is_crisis'))
         self.assertIn("14416", crisis_res['response'])
 
+    def test_08_groq_lpu_configuration_and_resilience(self):
+        """Verify Groq API key configuration, spec generation, and fallback resilience."""
+        original_key = gema4.groq_key
+        try:
+            # Set a simulated Groq key
+            gema4.groq_key = "gsk_test_groq_key_12345"
+            self.assertEqual(gema4.groq_key, "gsk_test_groq_key_12345")
+            specs = gema4.get_model_specs()
+            self.assertTrue(specs.get('groq_configured'))
+            self.assertIn("Groq LPU", specs.get('provider'))
+
+            # Verify that even with mock/invalid key, the engine handles timeouts/errors gracefully and returns valid response
+            chat_res = gema4.chat("What is the curfew time?")
+            self.assertIn('response', chat_res)
+            self.assertIn('10:00 PM', chat_res['response'])
+
+            wellness_res = gema4.wellness_companion_chat("I feel anxious about tomorrow's exam")
+            self.assertIn('response', wellness_res)
+            self.assertFalse(wellness_res.get('is_crisis'))
+        finally:
+            gema4.groq_key = original_key
+
 if __name__ == '__main__':
     unittest.main()
