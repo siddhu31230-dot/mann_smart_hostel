@@ -69,45 +69,40 @@
                 </div>
 
                 <!-- Center Quick Switcher / Breadcrumbs (Demo & QA Friendly) -->
-                <div id="quickRoleBar" class="hidden lg:flex items-center gap-1 bg-[#143528]/80 p-1 rounded-xl border border-[#52b788]/20 text-xs shadow-inner">
-                    <span class="text-[10px] text-[#8fb89e] px-2 font-bold uppercase tracking-wider">Demo Quick-Role:</span>
-                    <button onclick="app.quickSwitch('student')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="student">Student</button>
-                    <button onclick="app.quickSwitch('warden')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="warden">Warden</button>
-                    <button onclick="app.quickSwitch('admin')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="admin">Admin</button>
-                    <button onclick="app.quickSwitch('maintenance')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="maintenance">Maint</button>
-                    <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="mess_manager">Mess</button>
-                    <button onclick="app.quickSwitch('counsellor')" class="role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f]" data-role="counsellor">Counsellor</button>
+                <div id="quickRoleBar" class="hidden lg:flex items-center gap-1 bg-[#0f281e]/90 p-1 rounded-2xl border border-[#52b788]/30 text-xs shadow-inner backdrop-blur-md">
+                    <span class="text-[10px] text-[#8fb89e] px-2.5 font-bold uppercase tracking-wider">Demo Quick-Role:</span>
+                    <button onclick="app.quickSwitch('student')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="student">Student</button>
+                    <button onclick="app.quickSwitch('warden')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="warden">Warden</button>
+                    <button onclick="app.quickSwitch('admin')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="admin">Admin</button>
+                    <button onclick="app.quickSwitch('maintenance')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="maintenance">Maint</button>
+                    <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="mess_manager">Mess</button>
+                    <button onclick="app.quickSwitch('counsellor')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="counsellor">Counsellor</button>
+                    <button onclick="app.openWellnessInApp()" class="px-3 py-1.5 text-xs rounded-xl font-bold btn-wellness flex items-center gap-1.5 transition ml-1" title="Private Wellness Sanctuary (Problem Statement #9)">
+                        <i class="fa-solid fa-spa text-xs"></i> <span>Wellness</span>
+                    </button>
                 </div>
 
                 <!-- Right Actions: Theme Toggle + Auth Buttons / Profile -->
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <!-- Direct Private Wellness Sanctuary Trigger (Unified Integration) -->
-                    <button onclick="app.openWellnessInApp()" class="hidden sm:flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#176B50] hover:bg-[#125740] text-white text-xs font-bold transition items-center gap-1.5 shadow-sm border border-[#A8D5BA]/40" title="Private Wellness Sanctuary (Problem Statement #9)">
-                        <i class="fa-solid fa-spa text-[#A8D5BA]"></i>
-                        <span class="hidden md:inline">Wellness</span>
-                    </button>
-
                     <!-- Mobile QR Code Modal Trigger -->
-                    <button id="mobileQrBtn" onclick="app.openModal('mobileQrModal')" class="w-9 h-9 rounded-xl bg-[#143528]/80 border border-[#52b788]/20 text-[#8fb89e] hover:text-[#52b788] flex items-center justify-center transition" title="Open on Mobile Phone (QR Code)">
+                    <button id="mobileQrBtn" onclick="app.openModal('mobileQrModal')" class="w-9 h-9 rounded-xl bg-[#143528]/90 border border-[#52b788]/30 text-[#8fb89e] hover:text-[#52b788] hover:border-[#52b788] flex items-center justify-center transition" title="Open on Mobile Phone (QR Code)">
                         <i class="fa-solid fa-mobile-screen text-sm"></i>
                     </button>
 
                     <!-- Light / Dark Theme Switcher -->
-                    <button id="themeToggleBtn" onclick="app.toggleTheme()" class="w-9 h-9 rounded-xl bg-[#143528]/80 border border-[#52b788]/20 text-[#8fb89e] hover:text-[#52b788] flex items-center justify-center transition" title="Toggle Light/Dark Theme">
+                    <button id="themeToggleBtn" onclick="app.toggleTheme()" class="w-9 h-9 rounded-xl bg-[#143528]/90 border border-[#52b788]/30 text-[#8fb89e] hover:text-[#52b788] hover:border-[#52b788] flex items-center justify-center transition" title="Toggle Light/Dark Theme">
                         <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
                     </button>
 
                     <!-- Unauthenticated Buttons (Landing Mode) -->
-                    <div id="unauthHeaderActions" class="flex items-center gap-1 sm:gap-2">
-                        <button onclick="app.openStudentLoginModal()" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-[#52b788]/30 bg-[#1b4332]/90 hover:bg-[#2d6a4f] text-xs font-semibold text-[#fefae0] transition flex items-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-graduation-cap text-[#52b788]"></i>
-                            <span class="hidden sm:inline">Student Login</span>
-                            <span class="sm:hidden">Student</span>
+                    <div id="unauthHeaderActions" class="flex items-center gap-2">
+                        <button onclick="app.openRoleLogin('student')" class="px-3.5 py-1.5 rounded-xl btn-forest-primary text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Student Login</span>
                         </button>
-                        <button onclick="app.openAdminLoginModal()" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#2d6a4f] to-[#52b788] hover:from-[#74c69d] hover:to-[#52b788] text-xs font-semibold text-white transition flex items-center gap-1 border border-[#52b788]/40 shadow-sm">
-                            <i class="fa-solid fa-user-shield text-white"></i>
-                            <span class="hidden sm:inline">Admin Portal</span>
-                            <span class="sm:hidden">Admin</span>
+                        <button onclick="app.openRoleLogin('warden')" class="px-3.5 py-1.5 rounded-xl btn-forest-secondary text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-shield-halved text-[#52b788]"></i>
+                            <span>Staff Portal</span>
                         </button>
                     </div>
 
@@ -171,22 +166,26 @@
                         Seamlessly connecting residents, wardens, dining services, facilities, and confidential mental wellness care with Gemma 4 open-source AI intelligence.
                     </p>
 
-                    <!-- Primary Action Buttons -->
-                    <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
-                        <button onclick="app.openStudentLoginModal()" class="px-6 py-3.5 rounded-xl btn-forest-primary font-semibold text-sm shadow-xl flex items-center gap-2">
+                    <!-- Primary Action Buttons (Cohesive Emerald Design System) -->
+                    <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+                        <button onclick="app.openRoleLogin('student')" class="px-6 py-3.5 rounded-xl btn-forest-primary font-bold text-sm shadow-xl flex items-center gap-2">
                             <i class="fa-solid fa-graduation-cap"></i>
                             <span>Student Resident Portal</span>
                         </button>
-                        <button onclick="app.openAdminLoginModal()" class="px-6 py-3.5 rounded-xl btn-cream-accent font-semibold text-sm shadow-xl flex items-center gap-2">
+                        <button onclick="app.openRoleLogin('warden')" class="px-6 py-3.5 rounded-xl btn-forest-primary font-bold text-sm shadow-xl flex items-center gap-2">
                             <i class="fa-solid fa-shield-halved"></i>
-                            <span>Admin & Staff Console</span>
+                            <span>Warden Command Hub</span>
                         </button>
-                        <button onclick="app.openWellnessInApp()" class="px-6 py-3.5 rounded-xl bg-[#176B50] hover:bg-[#125740] text-white font-semibold text-sm shadow-xl flex items-center gap-2 border border-[#A8D5BA]/40 transition">
-                            <i class="fa-solid fa-heart-pulse text-[#A8D5BA]"></i>
+                        <button onclick="app.openRoleLogin('admin')" class="px-6 py-3.5 rounded-xl btn-forest-primary font-bold text-sm shadow-xl flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield"></i>
+                            <span>Admin Console</span>
+                        </button>
+                        <button onclick="app.openWellnessInApp()" class="px-6 py-3.5 rounded-xl btn-wellness font-bold text-sm shadow-xl flex items-center gap-2">
+                            <i class="fa-solid fa-spa"></i>
                             <span>Private Wellness Sanctuary</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#A8D5BA]/20 text-[#D5EBDD] font-bold">PS#9</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-bold">PS#9</span>
                         </button>
-                        <button onclick="app.openModal('registerModal')" class="px-5 py-3.5 rounded-xl border border-[#52b788]/30 bg-[#143528]/80 hover:bg-[#52b788] text-xs font-semibold text-white transition flex items-center gap-2">
+                        <button onclick="app.openModal('registerModal')" class="px-5 py-3.5 rounded-xl btn-forest-secondary text-xs font-bold transition flex items-center gap-2">
                             <i class="fa-solid fa-user-plus text-[#52b788]"></i>
                             <span>New Student Registration</span>
                         </button>
@@ -303,38 +302,118 @@
                         </span>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
                         <!-- Student Card -->
-                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
-                                    <i class="fa-solid fa-graduation-cap"></i> Demo Student Resident
-                                </span>
-                                <span class="text-[10px] bg-emerald-500/10 text-sky-600 px-2 py-0.5 rounded border border-sky-300">Approved</span>
+                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
+                                        <i class="fa-solid fa-graduation-cap"></i> Student Resident
+                                    </span>
+                                    <span class="text-[10px] bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">Aarav Sharma</span>
+                                </div>
+                                <div class="text-xs font-mono text-[#fefae0] space-y-0.5">
+                                    <div><span class="text-[#8fb89e]">ID:</span> <span class="font-bold">NST2026-042</span></div>
+                                    <div><span class="text-[#8fb89e]">Pass:</span> <span class="font-bold">Student@123</span></div>
+                                </div>
                             </div>
-                            <div class="text-xs font-mono text-[#fefae0] space-y-1">
-                                <div><span class="text-[#8fb89e]">College ID:</span> <span class="font-bold">NST2026-042</span> (or <span class="text-[#52b788]">student1</span>)</div>
-                                <div><span class="text-[#8fb89e]">Password:</span> <span class="font-bold">Student@123</span></div>
-                            </div>
-                            <button onclick="app.fillAndLoginStudent('NST2026-042', 'Student@123')" class="w-full mt-2 py-2 rounded-lg bg-[#52b788] hover:bg-[#2d6a4f] text-xs font-semibold text-white transition border border-[#52b788]/30">
-                                Log In as Demo Student
+                            <button onclick="app.quickFillAndLogin('student', 'NST2026-042', 'Student@123')" class="w-full mt-2 py-2 rounded-lg btn-forest-primary text-xs font-bold">
+                                1-Click Login (Student)
                             </button>
                         </div>
 
-                        <!-- Admin Card -->
-                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
-                                    <i class="fa-solid fa-user-shield"></i> Demo Administrator
-                                </span>
-                                <span class="text-[10px] bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded border border-amber-500/20">Executive</span>
+                        <!-- Warden Card -->
+                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
+                                        <i class="fa-solid fa-shield-halved"></i> Hostel Warden
+                                    </span>
+                                    <span class="text-[10px] bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">Col. Rajesh Verma</span>
+                                </div>
+                                <div class="text-xs font-mono text-[#fefae0] space-y-0.5">
+                                    <div><span class="text-[#8fb89e]">ID:</span> <span class="font-bold">WARDEN-001</span></div>
+                                    <div><span class="text-[#8fb89e]">Pass:</span> <span class="font-bold">Warden@123</span></div>
+                                </div>
                             </div>
-                            <div class="text-xs font-mono text-[#fefae0] space-y-1">
-                                <div><span class="text-[#8fb89e]">Admin ID:</span> <span class="font-bold">ADMIN-001</span> (or <span class="text-[#52b788]">admin1</span>)</div>
-                                <div><span class="text-[#8fb89e]">Password:</span> <span class="font-bold">Admin@123</span></div>
+                            <button onclick="app.quickFillAndLogin('warden', 'WARDEN-001', 'Warden@123')" class="w-full mt-2 py-2 rounded-lg btn-forest-primary text-xs font-bold">
+                                1-Click Login (Warden)
+                            </button>
+                        </div>
+
+                        <!-- Super Admin Card -->
+                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
+                                        <i class="fa-solid fa-user-shield"></i> Campus Admin
+                                    </span>
+                                    <span class="text-[10px] bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">Dr. Vikram Malhotra</span>
+                                </div>
+                                <div class="text-xs font-mono text-[#fefae0] space-y-0.5">
+                                    <div><span class="text-[#8fb89e]">ID:</span> <span class="font-bold">ADMIN-001</span></div>
+                                    <div><span class="text-[#8fb89e]">Pass:</span> <span class="font-bold">Admin@123</span></div>
+                                </div>
                             </div>
-                            <button onclick="app.fillAndLoginAdmin('ADMIN-001', 'Admin@123')" class="w-full mt-2 py-2 rounded-lg bg-[#2d6a4f] hover:bg-[#74c69d] text-xs font-semibold text-white transition border border-[#52b788]/40">
-                                Log In as Demo Admin
+                            <button onclick="app.quickFillAndLogin('admin', 'ADMIN-001', 'Admin@123')" class="w-full mt-2 py-2 rounded-lg btn-forest-primary text-xs font-bold">
+                                1-Click Login (Admin)
+                            </button>
+                        </div>
+
+                        <!-- Maintenance Card -->
+                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
+                                        <i class="fa-solid fa-screwdriver-wrench"></i> Maintenance
+                                    </span>
+                                    <span class="text-[10px] bg-blue-500/10 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30">Ramesh Kumar</span>
+                                </div>
+                                <div class="text-xs font-mono text-[#fefae0] space-y-0.5">
+                                    <div><span class="text-[#8fb89e]">ID:</span> <span class="font-bold">MAINT-001</span></div>
+                                    <div><span class="text-[#8fb89e]">Pass:</span> <span class="font-bold">Maint@123</span></div>
+                                </div>
+                            </div>
+                            <button onclick="app.quickFillAndLogin('maintenance', 'MAINT-001', 'Maint@123')" class="w-full mt-2 py-2 rounded-lg btn-forest-primary text-xs font-bold">
+                                1-Click Login (Maint)
+                            </button>
+                        </div>
+
+                        <!-- Mess Manager Card -->
+                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
+                                        <i class="fa-solid fa-utensils"></i> Mess Director
+                                    </span>
+                                    <span class="text-[10px] bg-orange-500/10 text-orange-300 px-2 py-0.5 rounded border border-orange-500/30">Chef Anand Joshi</span>
+                                </div>
+                                <div class="text-xs font-mono text-[#fefae0] space-y-0.5">
+                                    <div><span class="text-[#8fb89e]">ID:</span> <span class="font-bold">MESS-001</span></div>
+                                    <div><span class="text-[#8fb89e]">Pass:</span> <span class="font-bold">Mess@123</span></div>
+                                </div>
+                            </div>
+                            <button onclick="app.quickFillAndLogin('mess_manager', 'MESS-001', 'Mess@123')" class="w-full mt-2 py-2 rounded-lg btn-forest-primary text-xs font-bold">
+                                1-Click Login (Mess)
+                            </button>
+                        </div>
+
+                        <!-- Counsellor Card -->
+                        <div class="p-4 rounded-xl bg-[#0f281e]/90 border border-[#52b788]/25 space-y-2 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-bold text-[#52b788] flex items-center gap-1.5">
+                                        <i class="fa-solid fa-user-doctor"></i> Counsellor
+                                    </span>
+                                    <span class="text-[10px] bg-teal-500/10 text-teal-300 px-2 py-0.5 rounded border border-teal-500/30">Dr. Priya Nair</span>
+                                </div>
+                                <div class="text-xs font-mono text-[#fefae0] space-y-0.5">
+                                    <div><span class="text-[#8fb89e]">ID:</span> <span class="font-bold">COUNSEL-001</span></div>
+                                    <div><span class="text-[#8fb89e]">Pass:</span> <span class="font-bold">Counsel@123</span></div>
+                                </div>
+                            </div>
+                            <button onclick="app.quickFillAndLogin('counsellor', 'COUNSEL-001', 'Counsel@123')" class="w-full mt-2 py-2 rounded-lg btn-forest-primary text-xs font-bold">
+                                1-Click Login (Counsellor)
                             </button>
                         </div>
                     </div>
@@ -355,6 +434,129 @@
                     </div>
                 </div>
             </footer>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW: UNIVERSAL ROLE-AWARE LOGIN PORTAL    -->
+        <!-- ========================================== -->
+        <section id="view-login" class="view-panel hidden flex-1 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-xl w-full forest-card p-6 sm:p-10 rounded-3xl border border-[#52b788]/40 shadow-2xl relative space-y-6">
+                <!-- Close / Back button -->
+                <button onclick="app.navigateTo('landing')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] flex items-center justify-center transition" title="Back to Home">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+
+                <!-- Title & Brand Header -->
+                <div class="text-center space-y-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#52b788]/15 border border-[#52b788]/30 text-xs text-[#52b788] font-bold">
+                        <i class="fa-solid fa-shield-halved"></i> Role-Based Authentication Gateway
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-[#fefae0] font-serif-title">MANN Campus Login</h2>
+                    <p class="text-xs text-[#8fb89e]">Select your category below to access your dedicated role portal</p>
+                </div>
+
+                <!-- Role Selection Tabs (Horizontal Grid) -->
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 p-1.5 rounded-2xl bg-[#0a1711]/80 border border-[#52b788]/25 text-xs">
+                    <button type="button" onclick="app.switchLoginRole('student')" id="loginTab-student" class="login-role-tab py-2 px-1 rounded-xl text-center font-bold transition">
+                        <i class="fa-solid fa-graduation-cap block text-sm mb-0.5"></i>
+                        <span class="text-[11px]">Student</span>
+                    </button>
+                    <button type="button" onclick="app.switchLoginRole('warden')" id="loginTab-warden" class="login-role-tab py-2 px-1 rounded-xl text-center font-bold transition">
+                        <i class="fa-solid fa-shield-halved block text-sm mb-0.5"></i>
+                        <span class="text-[11px]">Warden</span>
+                    </button>
+                    <button type="button" onclick="app.switchLoginRole('admin')" id="loginTab-admin" class="login-role-tab py-2 px-1 rounded-xl text-center font-bold transition">
+                        <i class="fa-solid fa-user-shield block text-sm mb-0.5"></i>
+                        <span class="text-[11px]">Admin</span>
+                    </button>
+                    <button type="button" onclick="app.switchLoginRole('maintenance')" id="loginTab-maintenance" class="login-role-tab py-2 px-1 rounded-xl text-center font-bold transition">
+                        <i class="fa-solid fa-screwdriver-wrench block text-sm mb-0.5"></i>
+                        <span class="text-[11px]">Maint</span>
+                    </button>
+                    <button type="button" onclick="app.switchLoginRole('mess_manager')" id="loginTab-mess_manager" class="login-role-tab py-2 px-1 rounded-xl text-center font-bold transition">
+                        <i class="fa-solid fa-utensils block text-sm mb-0.5"></i>
+                        <span class="text-[11px]">Mess</span>
+                    </button>
+                    <button type="button" onclick="app.switchLoginRole('counsellor')" id="loginTab-counsellor" class="login-role-tab py-2 px-1 rounded-xl text-center font-bold transition">
+                        <i class="fa-solid fa-user-doctor block text-sm mb-0.5"></i>
+                        <span class="text-[11px]">Counsel</span>
+                    </button>
+                </div>
+
+                <!-- Role Info Banner -->
+                <div id="loginRoleBanner" class="p-3.5 rounded-2xl bg-[#143528]/80 border border-[#52b788]/25 text-xs flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span id="loginRoleBadge" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="loginRoleTitle" class="font-bold text-[#fefae0]">Student Resident Portal</span>
+                    </div>
+                    <span id="loginRoleScope" class="text-[11px] text-[#8fb89e] hidden sm:inline">Room, Leaves, Mess & Care</span>
+                </div>
+
+                <!-- 1-Click Demo Fill & Test Box -->
+                <div class="p-3 rounded-2xl bg-[#0f281e] border border-[#52b788]/20 flex items-center justify-between text-xs">
+                    <div>
+                        <span class="text-[10px] text-[#8fb89e] uppercase font-bold tracking-wider block">Demo Account:</span>
+                        <span id="loginDemoCredsText" class="font-mono font-bold text-[#52b788]">NST2026-042 / Student@123</span>
+                    </div>
+                    <button type="button" onclick="app.autoFillActiveLogin()" class="px-3 py-1.5 rounded-xl btn-forest-secondary text-xs font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles text-[#52b788]"></i> <span>Auto-Fill</span>
+                    </button>
+                </div>
+
+                <!-- Live Login Form -->
+                <form id="universalLoginForm" onsubmit="app.handleUniversalLoginForm(event)" class="space-y-4">
+                    <!-- Error Alert Banner -->
+                    <div id="loginErrorMessage" class="hidden p-3 rounded-xl bg-red-500/15 border border-red-500/30 text-xs text-red-300 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-red-400"></i>
+                        <span id="loginErrorText">Invalid credentials.</span>
+                    </div>
+
+                    <div>
+                        <label id="loginIdentifierLabel" class="block text-xs font-semibold text-[#8fb89e] mb-1">College ID / Username</label>
+                        <div class="relative">
+                            <i id="loginIdentifierIcon" class="fa-solid fa-id-card absolute left-3.5 top-3 text-[#8fb89e]"></i>
+                            <input type="text" id="universalLoginInput" required placeholder="Enter College ID or username" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl pl-10 pr-3 py-2.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-xs font-semibold text-[#8fb89e]">Password</label>
+                            <button type="button" onclick="app.openModal('forgotPasswordModal')" class="text-[11px] text-[#52b788] hover:underline">
+                                Forgot password?
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <i class="fa-solid fa-lock absolute left-3.5 top-3 text-[#8fb89e]"></i>
+                            <input type="password" id="universalPasswordInput" required placeholder="Enter password" class="w-full bg-[#143528] border border-[#52b788]/30 rounded-xl pl-10 pr-10 py-2.5 text-xs text-[#fefae0] focus:outline-none focus:border-[#52b788]">
+                            <button type="button" onclick="app.togglePasswordVisibility('universalPasswordInput', 'universalPasswordToggleIcon')" class="absolute right-3.5 top-3 text-[#8fb89e] hover:text-[#fefae0]">
+                                <i id="universalPasswordToggleIcon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer text-[#8fb89e]">
+                            <input type="checkbox" id="universalRememberMe" class="rounded bg-[#143528] border-[#52b788]/30 text-[#52b788] focus:ring-0" checked>
+                            <span>Remember active session</span>
+                        </label>
+                        <span class="text-[10px] text-[#8fb89e]/80">SHA-256 Secured</span>
+                    </div>
+
+                    <button type="submit" id="universalLoginSubmitBtn" class="w-full py-3 rounded-xl btn-forest-primary font-bold text-xs shadow-lg flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                        <span id="universalLoginBtnText">Sign In to Student Portal</span>
+                    </button>
+                </form>
+
+                <div class="pt-2 text-center text-xs text-[#8fb89e]">
+                    <span>Need to register as a student?</span>
+                    <button onclick="app.openModal('registerModal')" class="font-bold text-[#52b788] hover:underline ml-1">
+                        Create Account
+                    </button>
+                </div>
+            </div>
         </section>
 
 
@@ -1245,6 +1447,62 @@
                         </button>
                     </div>
                     <div id="facilitiesListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+
+                <!-- VIEW: COUNSELLOR CONFIDENTIAL WELLNESS SESSIONS -->
+                <div id="view-counselor-sessions" class="subview-panel hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#52b788]/20">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-xl font-bold text-[#fefae0] font-serif-title flex items-center gap-2">
+                                    <i class="fa-solid fa-user-doctor text-emerald-400"></i>
+                                    <span>Confidential Student Wellness Sessions</span>
+                                </h2>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                    <i class="fa-solid fa-lock text-[9px]"></i> Strict Medical Privacy
+                                </span>
+                            </div>
+                            <p class="text-xs text-[#8fb89e] mt-0.5">Protected student counselling records. Strictly isolated from warden and admin access.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="app.loadCounsellorAppointments()" class="px-3 py-1.5 rounded-xl btn-forest-secondary text-xs font-semibold flex items-center gap-1.5">
+                                <i class="fa-solid fa-rotate text-xs"></i> Refresh
+                            </button>
+                            <a href="/wellness" target="_blank" class="px-3.5 py-1.5 rounded-xl btn-wellness text-xs font-bold flex items-center gap-1.5 shadow-md">
+                                <i class="fa-solid fa-spa"></i> Open MANN Care
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Counsellor Summary Stats Strip -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 text-center">
+                            <div id="counsellorActiveCount" class="text-2xl font-bold text-emerald-400">0</div>
+                            <div class="text-xs text-[#8fb89e] mt-0.5">Active / Scheduled Sessions</div>
+                        </div>
+                        <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 text-center">
+                            <div id="counsellorCompletedCount" class="text-2xl font-bold text-[#fefae0]">0</div>
+                            <div class="text-xs text-[#8fb89e] mt-0.5">Completed Consultations</div>
+                        </div>
+                        <div class="forest-card p-4 rounded-2xl border border-[#52b788]/20 text-center">
+                            <div class="text-2xl font-bold text-[#52b788]"><i class="fa-solid fa-shield-heart"></i> 100%</div>
+                            <div class="text-xs text-[#8fb89e] mt-0.5">Strict Privacy Seal</div>
+                        </div>
+                    </div>
+
+                    <!-- Appointments Container -->
+                    <div class="forest-card p-5 sm:p-6 rounded-2xl space-y-4">
+                        <div class="flex items-center justify-between pb-2 border-b border-[#52b788]/15">
+                            <h3 class="font-bold text-sm text-[#fefae0] flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-check text-[#52b788]"></i>
+                                Confidential Appointments List
+                            </h3>
+                            <span id="counsellorAptStatusText" class="text-xs text-[#8fb89e] font-mono">Loading...</span>
+                        </div>
+                        <div id="counsellorAppointmentsList" class="space-y-3">
+                            <div class="skeleton-shimmer h-24 rounded-2xl"></div>
+                        </div>
+                    </div>
                 </div>
 
             </main>

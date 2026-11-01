@@ -442,6 +442,22 @@ def seed_demo_data(conn):
         VALUES (?, ?, ?, ?, 4)
         """, post)
 
+    # Seed initial Confidential Wellness Appointments
+    cursor.execute("SELECT id FROM users WHERE username = 'counsel1'")
+    counsel_row = cursor.fetchone()
+    counsel_id = counsel_row[0] if counsel_row else None
+
+    wellness_seeds = [
+        (s1_id, counsel_id, '2026-11-03', '10:00 AM - 11:00 AM', 'In-Person', 'Academic Stress', 'Struggling with continuous exam preparation fatigue and racing thoughts at night.', 'Confirmed', 'Scheduled in Counselling Cabin C-102. Please review 4-4-4-4 breathing technique.'),
+        (s2_id, counsel_id, '2026-11-04', '03:00 PM - 04:00 PM', 'Online', 'Interpersonal Conflict', 'Need advice regarding establishing healthy study boundaries with roommates.', 'Confirmed', 'Confidential video meeting link generated in student portal.'),
+        (s1_id, counsel_id, '2026-10-28', '11:30 AM - 12:30 PM', 'In-Person', 'General Well-being', 'First-semester orientation stress and adjusting to hostel routine away from home.', 'Completed', 'Student responded well to sleep hygiene recommendations and grounding routines.')
+    ]
+    for w in wellness_seeds:
+        cursor.execute("""
+        INSERT INTO wellness_appointments (student_id, counsellor_id, preferred_date, preferred_time, session_mode, issue_category, confidential_notes, status, counsellor_remarks)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, w)
+
     # Seed Hostel Settings
     settings_seeds = [
         ('gate_curfew_weekday', '10:00 PM'),

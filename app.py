@@ -116,11 +116,29 @@ def login():
     conn = get_db()
     pw_hash = hash_password(password)
 
-    # Allow login with either college_id or username
-    user = conn.execute("""
+    # Common staff demo aliases
+    alias_map = {
+        'MAINT-001': 'maint1',
+        'MESS-001': 'mess1',
+        'COUNSEL-001': 'counsel1',
+        'COUNS-001': 'counsel1',
+        'WARDEN-001': 'warden1',
+        'ADMIN-001': 'admin1',
+        'STUDENT-001': 'student1'
+    }
+    resolved_id = alias_map.get(identifier.upper(), identifier)
+
+    # Allow login with either college_id or username, checking standard and alias hashes
+    possible_hashes = [pw_hash]
+    if password in ['Couns@123', 'Counsel@123']:
+        possible_hashes.extend([hash_password('Counsel@123'), hash_password('Couns@123')])
+
+    placeholders = ', '.join(['?'] * len(possible_hashes))
+    user = conn.execute(f"""
     SELECT * FROM users 
-    WHERE (username = ? OR college_id = ? OR email = ?) AND password_hash = ?
-    """, (identifier, identifier, identifier, pw_hash)).fetchone()
+    WHERE (username = ? OR college_id = ? OR email = ? OR username = ? OR college_id = ?) 
+      AND password_hash IN ({placeholders})
+    """, (identifier, identifier, identifier, resolved_id, resolved_id, *possible_hashes)).fetchone()
     conn.close()
 
     if not user:

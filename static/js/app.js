@@ -17,7 +17,12 @@ const app = {
         this.initTheme();
         this.setupEventListeners();
         this.loadPublicMetrics();
+        const initialHash = window.location.hash;
         await this.checkAuth();
+
+        if (!this.currentUser && (window.location.pathname === '/login' || initialHash === '#login')) {
+            this.openRoleLogin('student');
+        }
     },
 
     async loadPublicMetrics() {
@@ -40,10 +45,10 @@ const app = {
     // ==========================================
     initTheme() {
         const savedTheme = localStorage.getItem('mann_theme');
-        if (savedTheme === 'dark') {
-            this.applyTheme(true);
-        } else {
+        if (savedTheme === 'light') {
             this.applyTheme(false);
+        } else {
+            this.applyTheme(true);
         }
     },
 
@@ -77,13 +82,22 @@ const app = {
     navigateTo(view) {
         const landing = document.getElementById('view-landing');
         const workspace = document.getElementById('view-workspace');
+        const login = document.getElementById('view-login');
 
         if (view === 'landing') {
             if (landing) landing.classList.remove('hidden');
             if (workspace) workspace.classList.add('hidden');
+            if (login) login.classList.add('hidden');
+            window.location.hash = '';
         } else if (view === 'workspace') {
             if (landing) landing.classList.add('hidden');
             if (workspace) workspace.classList.remove('hidden');
+            if (login) login.classList.add('hidden');
+        } else if (view === 'login') {
+            if (landing) landing.classList.add('hidden');
+            if (workspace) workspace.classList.add('hidden');
+            if (login) login.classList.remove('hidden');
+            window.location.hash = '#login';
         }
     },
 
@@ -94,66 +108,108 @@ const app = {
         const role = this.currentUser.role;
         navList.innerHTML = '';
 
+        let items = [];
+        let portalTitle = 'Student Portal';
+        let portalSubtext = '';
+
         if (role === 'student') {
-            const studentItems = [
-                { id: 'my-room', icon: 'fa-door-open', label: 'My Room' },
-                { id: 'complaints', icon: 'fa-wrench', label: 'My Complaints' },
-                { id: 'mess', icon: 'fa-utensils', label: 'Mess Menu' },
-                { id: 'leaves', icon: 'fa-calendar-check', label: 'Leave Requests' },
-                { id: 'fees', icon: 'fa-credit-card', label: 'Fees & Payments' },
-                { id: 'laundry', icon: 'fa-shirt', label: 'Laundry' },
-                { id: 'cleaning', icon: 'fa-broom', label: 'Cleaning Requests' },
-                { id: 'visitors', icon: 'fa-id-badge', label: 'Visitor Requests' },
-                { id: 'community', icon: 'fa-users', label: 'Community Hub' },
-                { id: 'announcements', icon: 'fa-bullhorn', label: 'Announcements' },
-                { id: 'mann-care', icon: 'fa-shield-heart', label: 'MANN Care (Confidential)', special: 'text-purple-400' },
-                { id: 'profile', icon: 'fa-id-card', label: 'Resident Profile' }
+            portalTitle = 'Student Resident Portal';
+            portalSubtext = `${this.currentUser.college_id || 'ID Pending'} • Room ${this.currentUser.room_number || 'A-204'} (${this.currentUser.bed_number || 'Bed A'})`;
+            items = [
+                { id: 'my-room', icon: 'fa-door-open', label: 'My Room & NFC Pass', type: 'student' },
+                { id: 'complaints', icon: 'fa-wrench', label: 'My Complaints', type: 'student' },
+                { id: 'mess', icon: 'fa-utensils', label: 'Mess Menu & Ratings', type: 'student' },
+                { id: 'leaves', icon: 'fa-calendar-check', label: 'Leave Requests & Gate Pass', type: 'student' },
+                { id: 'fees', icon: 'fa-credit-card', label: 'Fees & Payment Receipts', type: 'student' },
+                { id: 'laundry', icon: 'fa-shirt', label: 'Laundry Service', type: 'student' },
+                { id: 'cleaning', icon: 'fa-broom', label: 'Housekeeping Request', type: 'student' },
+                { id: 'visitors', icon: 'fa-id-badge', label: 'Visitor Out-Pass', type: 'student' },
+                { id: 'community', icon: 'fa-users', label: 'Community Hub', type: 'student' },
+                { id: 'announcements', icon: 'fa-bullhorn', label: 'Campus Announcements', type: 'student' },
+                { id: 'mann-care', icon: 'fa-shield-heart', label: 'MANN Care (Confidential)', type: 'student', special: 'text-emerald-400' },
+                { id: 'profile', icon: 'fa-id-card', label: 'Resident Profile', type: 'student' }
             ];
-
-            studentItems.forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]`;
-                btn.dataset.tab = item.id;
-                btn.onclick = () => this.navigateToStudentSubTab(item.id);
-                btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center ${item.special || 'text-[#52b788]'}"></i> <span>${item.label}</span>`;
-                navList.appendChild(btn);
-            });
-
-            const privNotice = document.getElementById('wellnessPrivacyNotice');
-            if (privNotice) privNotice.classList.remove('hidden');
-
+        } else if (role === 'warden') {
+            portalTitle = 'Hostel Warden Command';
+            portalSubtext = `Chief Warden: ${this.currentUser.full_name || 'Col. Rajesh Verma'}`;
+            items = [
+                { id: 'admin-overview', icon: 'fa-shield-halved', label: 'Warden Command Hub', type: 'admin' },
+                { id: 'admin-leaves', icon: 'fa-envelope-open-text', label: 'Leave Approvals & Out-Pass', type: 'admin' },
+                { id: 'admin-complaints', icon: 'fa-triangle-exclamation', label: 'Complaint Queue & Hazard Triage', type: 'admin' },
+                { id: 'admin-students', icon: 'fa-user-graduate', label: 'Student Resident Directory', type: 'admin' },
+                { id: 'admin-visitors', icon: 'fa-id-badge', label: 'Visitor Gate Log', type: 'admin' },
+                { id: 'admin-announcements', icon: 'fa-bullhorn', label: 'Broadcast Urgent Notice', type: 'admin' }
+            ];
+        } else if (role === 'maintenance') {
+            portalTitle = 'Facilities & Maintenance Hub';
+            portalSubtext = `Technician Lead: ${this.currentUser.full_name || 'Ramesh Kumar'}`;
+            items = [
+                { id: 'admin-maintenance', icon: 'fa-screwdriver-wrench', label: 'Work Orders & Dispatch', type: 'admin' },
+                { id: 'admin-complaints', icon: 'fa-list-check', label: 'Repair Tickets & Gemma-4 SLAs', type: 'admin' },
+                { id: 'facilities', icon: 'fa-volleyball', label: 'Facilities & Room Checks', type: 'admin' },
+                { id: 'admin-announcements', icon: 'fa-bullhorn', label: 'Maintenance Service Bulletins', type: 'admin' }
+            ];
+        } else if (role === 'mess_manager') {
+            portalTitle = 'Dining & Mess Operations';
+            portalSubtext = `Executive Chef: ${this.currentUser.full_name || 'Chef Anand Joshi'}`;
+            items = [
+                { id: 'admin-mess', icon: 'fa-utensils', label: 'Weekly Dining Menu Editor', type: 'admin' },
+                { id: 'admin-analytics', icon: 'fa-chart-pie', label: 'Food Sentiment & Ratings', type: 'admin' },
+                { id: 'admin-announcements', icon: 'fa-bullhorn', label: 'Dining Broadcasts & Menus', type: 'admin' }
+            ];
+        } else if (role === 'counsellor') {
+            portalTitle = 'Student Wellness & Counselling';
+            portalSubtext = `Psychological Counsellor: ${this.currentUser.full_name || 'Dr. Priya Nair'}`;
+            items = [
+                { id: 'counselor-sessions', icon: 'fa-user-doctor', label: 'Confidential Appointments', type: 'admin' },
+                { id: 'counselor-sanctuary', icon: 'fa-spa', label: 'Launch MANN Care Sanctuary', type: 'action', action: () => window.open('/wellness', '_blank') },
+                { id: 'admin-announcements', icon: 'fa-bullhorn', label: 'Mental Wellness Bulletins', type: 'admin' }
+            ];
         } else {
-            // Staff / Admin Roles
-            const adminItems = [
-                { id: 'admin-overview', icon: 'fa-chart-line', label: 'Command Overview' },
-                { id: 'admin-students', icon: 'fa-user-graduate', label: 'Student Management' },
-                { id: 'admin-rooms', icon: 'fa-hotel', label: 'Room Management' },
-                { id: 'admin-complaints', icon: 'fa-list-check', label: 'Complaint Queue' },
-                { id: 'admin-leaves', icon: 'fa-envelope-open-text', label: 'Leave Approvals' },
-                { id: 'admin-mess', icon: 'fa-utensils', label: 'Mess Operations' },
-                { id: 'admin-visitors', icon: 'fa-id-badge', label: 'Visitor Gate Log' },
-                { id: 'admin-staff', icon: 'fa-user-shield', label: 'Staff Directory' },
-                { id: 'admin-maintenance', icon: 'fa-screwdriver-wrench', label: 'Maintenance Hub' },
-                { id: 'admin-finance', icon: 'fa-coins', label: 'Finance & Ledger' },
-                { id: 'admin-announcements', icon: 'fa-bullhorn', label: 'Announcements' },
-                { id: 'admin-analytics', icon: 'fa-chart-pie', label: 'Hostel Analytics' },
-                { id: 'admin-settings', icon: 'fa-sliders', label: 'System Settings' }
+            // Super Admin
+            portalTitle = 'Super Admin Console';
+            portalSubtext = `Housing Director: ${this.currentUser.full_name || 'Dr. Vikram Malhotra'}`;
+            items = [
+                { id: 'admin-overview', icon: 'fa-chart-line', label: 'Executive Overview', type: 'admin' },
+                { id: 'admin-students', icon: 'fa-user-graduate', label: 'Student Management & Approvals', type: 'admin' },
+                { id: 'admin-rooms', icon: 'fa-hotel', label: 'Room & Bed Allocations', type: 'admin' },
+                { id: 'admin-complaints', icon: 'fa-list-check', label: 'Complaints Master Queue', type: 'admin' },
+                { id: 'admin-leaves', icon: 'fa-envelope-open-text', label: 'Leave Approvals Log', type: 'admin' },
+                { id: 'admin-mess', icon: 'fa-utensils', label: 'Mess Operations & Menus', type: 'admin' },
+                { id: 'admin-visitors', icon: 'fa-id-badge', label: 'Visitor Gate Log', type: 'admin' },
+                { id: 'admin-staff', icon: 'fa-user-shield', label: 'Staff Directory & Roles', type: 'admin' },
+                { id: 'admin-maintenance', icon: 'fa-screwdriver-wrench', label: 'Maintenance Hub', type: 'admin' },
+                { id: 'admin-finance', icon: 'fa-coins', label: 'Finance & Student Ledger', type: 'admin' },
+                { id: 'admin-announcements', icon: 'fa-bullhorn', label: 'Announcements Publisher', type: 'admin' },
+                { id: 'admin-analytics', icon: 'fa-chart-pie', label: 'Gemma-4 AI Intelligence', type: 'admin' },
+                { id: 'admin-settings', icon: 'fa-sliders', label: 'System Configurations', type: 'admin' }
             ];
+        }
 
-            adminItems.forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]`;
-                btn.dataset.tab = item.id;
+        const portalNameEl = document.getElementById('sidebarPortalName');
+        const subtextEl = document.getElementById('sidebarUserSubtext');
+        if (portalNameEl) portalNameEl.textContent = portalTitle;
+        if (subtextEl) subtextEl.textContent = portalSubtext;
+
+        items.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = `w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0]`;
+            btn.dataset.tab = item.id;
+            if (item.action) {
+                btn.onclick = item.action;
+            } else if (item.type === 'student') {
+                btn.onclick = () => this.navigateToStudentSubTab(item.id);
+            } else {
                 btn.onclick = () => this.navigateToAdminSubTab(item.id);
-                btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center text-[#52b788]"></i> <span>${item.label}</span>`;
-                navList.appendChild(btn);
-            });
-
-            const privNotice = document.getElementById('wellnessPrivacyNotice');
-            if (privNotice) {
-                if (role === 'counsellor') privNotice.classList.remove('hidden');
-                else privNotice.classList.add('hidden');
             }
+            btn.innerHTML = `<i class="fa-solid ${item.icon} w-5 text-center ${item.special || 'text-[#52b788]'}"></i> <span>${item.label}</span>`;
+            navList.appendChild(btn);
+        });
+
+        const privNotice = document.getElementById('wellnessPrivacyNotice');
+        if (privNotice) {
+            if (role === 'counsellor' || role === 'student') privNotice.classList.remove('hidden');
+            else privNotice.classList.add('hidden');
         }
     },
 
@@ -236,6 +292,8 @@ const app = {
         else if (tabId === 'admin-announcements') this.loadAnnouncements();
         else if (tabId === 'admin-analytics') this.loadAdminAnalytics();
         else if (tabId === 'admin-settings') this.loadAdminSettings();
+        else if (tabId === 'counselor-sessions') this.loadCounsellorAppointments();
+        else if (tabId === 'facilities') this.loadFacilities();
     },
 
     // ==========================================
@@ -262,8 +320,6 @@ const app = {
         const nameEl = document.getElementById('userFullName');
         const roleEl = document.getElementById('userRoleBadge');
         const avatarEl = document.getElementById('userAvatarText');
-        const portalNameEl = document.getElementById('sidebarPortalName');
-        const subtextEl = document.getElementById('sidebarUserSubtext');
 
         if (user) {
             if (unauth) unauth.classList.add('hidden');
@@ -276,36 +332,252 @@ const app = {
                 avatarEl.textContent = initials;
             }
 
-            if (user.role === 'student') {
-                if (portalNameEl) portalNameEl.textContent = 'Student Resident Portal';
-                if (subtextEl) subtextEl.textContent = `${user.college_id || 'ID Pending'} • Room ${user.room_number || 'Unallocated'}`;
-            } else {
-                if (portalNameEl) portalNameEl.textContent = 'Staff Management Console';
-                if (subtextEl) subtextEl.textContent = `Staff Role: ${user.role.toUpperCase()}`;
-            }
-
             // Highlight quick-role buttons in header
             document.querySelectorAll('.role-btn').forEach(btn => {
                 if (btn.dataset.role === user.role) {
-                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-bold bg-[#52b788] text-[#08140e] shadow-sm';
+                    btn.className = 'role-btn px-3 py-1.5 text-xs rounded-xl font-bold bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-md shadow-emerald-950/40 border border-emerald-400/40';
                 } else {
-                    btn.className = 'role-btn px-2.5 py-1 text-xs rounded-lg font-medium transition hover:bg-[#2d6a4f] text-[#8fb89e] hover:text-[#fefae0]';
+                    btn.className = 'role-btn px-3 py-1.5 text-xs rounded-xl font-medium text-[#8fb89e] hover:text-[#fefae0] hover:bg-[#1b4332] transition';
                 }
             });
 
             this.navigateTo('workspace');
             this.renderSidebar();
 
-            // Set initial tab
+            // Set initial tab based strictly on the user's role
             if (user.role === 'student') {
-                this.navigateToStudentSubTab(this.activeSubTab || 'my-room');
+                const valid = ['my-room', 'complaints', 'mess', 'leaves', 'fees', 'laundry', 'cleaning', 'visitors', 'community', 'announcements', 'mann-care', 'profile'];
+                this.navigateToStudentSubTab(valid.includes(this.activeSubTab) ? this.activeSubTab : 'my-room');
+            } else if (user.role === 'warden') {
+                const valid = ['admin-overview', 'admin-leaves', 'admin-complaints', 'admin-students', 'admin-visitors', 'admin-announcements'];
+                this.navigateToAdminSubTab(valid.includes(this.activeSubTab) ? this.activeSubTab : 'admin-leaves');
+            } else if (user.role === 'maintenance') {
+                const valid = ['admin-maintenance', 'admin-complaints', 'facilities', 'admin-announcements'];
+                this.navigateToAdminSubTab(valid.includes(this.activeSubTab) ? this.activeSubTab : 'admin-maintenance');
+            } else if (user.role === 'mess_manager') {
+                const valid = ['admin-mess', 'admin-analytics', 'admin-announcements'];
+                this.navigateToAdminSubTab(valid.includes(this.activeSubTab) ? this.activeSubTab : 'admin-mess');
+            } else if (user.role === 'counsellor') {
+                const valid = ['counselor-sessions', 'counselor-sanctuary', 'admin-announcements'];
+                this.navigateToAdminSubTab(valid.includes(this.activeSubTab) ? this.activeSubTab : 'counselor-sessions');
             } else {
-                this.navigateToAdminSubTab(this.activeSubTab || 'admin-overview');
+                this.navigateToAdminSubTab(this.activeSubTab && this.activeSubTab.startsWith('admin-') ? this.activeSubTab : 'admin-overview');
             }
         } else {
             if (unauth) unauth.classList.remove('hidden');
             if (auth) auth.classList.add('hidden');
-            this.navigateTo('landing');
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.className = 'role-btn px-3 py-1.5 text-xs rounded-xl font-medium text-[#8fb89e] hover:text-[#fefae0] hover:bg-[#1b4332] transition';
+            });
+            if (window.location.hash !== '#login') {
+                this.navigateTo('landing');
+            }
+        }
+    },
+
+    activeLoginRole: 'student',
+
+    loginRoleConfigs: {
+        'student': {
+            title: 'Student Resident Portal',
+            scope: 'My Room, Leave Out-Pass, Mess & Care',
+            idLabel: 'College ID / Username',
+            idPlaceholder: 'e.g. NST2026-042 or student1',
+            icon: 'fa-id-card',
+            btnText: 'Sign In to Student Portal',
+            demoUser: 'NST2026-042',
+            demoPass: 'Student@123',
+            demoLabel: 'Aarav Sharma (NST2026-042) / Student@123',
+            portalParam: 'student'
+        },
+        'warden': {
+            title: 'Hostel Warden Command',
+            scope: 'Leave Approvals, Curfews & Disciplinary Queue',
+            idLabel: 'Warden ID / Username',
+            idPlaceholder: 'e.g. WARDEN-001 or warden1',
+            icon: 'fa-shield-halved',
+            btnText: 'Sign In to Warden Command',
+            demoUser: 'WARDEN-001',
+            demoPass: 'Warden@123',
+            demoLabel: 'Col. Rajesh Verma (WARDEN-001) / Warden@123',
+            portalParam: 'admin'
+        },
+        'admin': {
+            title: 'Super Administrator Console',
+            scope: 'Executive Campus Control, Rooms & Ledgers',
+            idLabel: 'Admin ID / Username',
+            idPlaceholder: 'e.g. ADMIN-001 or admin1',
+            icon: 'fa-user-shield',
+            btnText: 'Sign In to Admin Console',
+            demoUser: 'ADMIN-001',
+            demoPass: 'Admin@123',
+            demoLabel: 'Dr. Vikram Malhotra (ADMIN-001) / Admin@123',
+            portalParam: 'admin'
+        },
+        'maintenance': {
+            title: 'Facilities & Maintenance Hub',
+            scope: 'Repair Work Orders, SLAs & Housekeeping',
+            idLabel: 'Staff ID / Username',
+            idPlaceholder: 'e.g. MAINT-001 or maint1',
+            icon: 'fa-screwdriver-wrench',
+            btnText: 'Sign In to Maintenance Hub',
+            demoUser: 'MAINT-001',
+            demoPass: 'Maint@123',
+            demoLabel: 'Ramesh Kumar (MAINT-001) / Maint@123',
+            portalParam: 'admin'
+        },
+        'mess_manager': {
+            title: 'Dining & Mess Operations',
+            scope: 'Daily Menus, Grocery & Food Ratings',
+            idLabel: 'Mess ID / Username',
+            idPlaceholder: 'e.g. MESS-001 or mess1',
+            icon: 'fa-utensils',
+            btnText: 'Sign In to Mess Operations',
+            demoUser: 'MESS-001',
+            demoPass: 'Mess@123',
+            demoLabel: 'Chef Anand Joshi (MESS-001) / Mess@123',
+            portalParam: 'admin'
+        },
+        'counsellor': {
+            title: 'Confidential Wellness Sanctuary',
+            scope: 'Student Sessions • 100% Medical Privacy',
+            idLabel: 'Counsellor ID / Username',
+            idPlaceholder: 'e.g. COUNSEL-001 or counsel1',
+            icon: 'fa-user-doctor',
+            btnText: 'Sign In to Counsellor Desk',
+            demoUser: 'COUNSEL-001',
+            demoPass: 'Counsel@123',
+            demoLabel: 'Dr. Priya Nair (COUNSEL-001) / Counsel@123',
+            portalParam: 'admin'
+        }
+    },
+
+    openRoleLogin(role = 'student') {
+        this.navigateTo('login');
+        this.switchLoginRole(role);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    switchLoginRole(role) {
+        this.activeLoginRole = role;
+        const cfg = this.loginRoleConfigs[role] || this.loginRoleConfigs['student'];
+
+        document.querySelectorAll('.login-role-tab').forEach(tab => {
+            const tabRole = tab.id.replace('loginTab-', '');
+            if (tabRole === role) {
+                tab.className = 'login-role-tab py-2 px-1 rounded-xl text-center font-bold bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-md shadow-emerald-950/40 border border-emerald-400/40';
+            } else {
+                tab.className = 'login-role-tab py-2 px-1 rounded-xl text-center font-medium text-[#8fb89e] hover:text-[#fefae0] hover:bg-[#143528] transition';
+            }
+        });
+
+        const titleEl = document.getElementById('loginRoleTitle');
+        const scopeEl = document.getElementById('loginRoleScope');
+        const labelEl = document.getElementById('loginIdentifierLabel');
+        const iconEl = document.getElementById('loginIdentifierIcon');
+        const btnTextEl = document.getElementById('universalLoginBtnText');
+        const demoCredsEl = document.getElementById('loginDemoCredsText');
+        const errEl = document.getElementById('loginErrorMessage');
+
+        if (titleEl) titleEl.textContent = cfg.title;
+        if (scopeEl) scopeEl.textContent = cfg.scope;
+        if (labelEl) labelEl.textContent = cfg.idLabel;
+        if (iconEl) iconEl.className = `fa-solid ${cfg.icon} absolute left-3.5 top-3 text-[#8fb89e]`;
+        if (btnTextEl) btnTextEl.textContent = cfg.btnText;
+        if (demoCredsEl) demoCredsEl.textContent = cfg.demoLabel;
+        if (errEl) errEl.classList.add('hidden');
+
+        const inp = document.getElementById('universalLoginInput');
+        const pass = document.getElementById('universalPasswordInput');
+        if (inp) {
+            inp.placeholder = cfg.idPlaceholder;
+            inp.value = cfg.demoUser;
+        }
+        if (pass) pass.value = cfg.demoPass;
+    },
+
+    autoFillActiveLogin() {
+        const cfg = this.loginRoleConfigs[this.activeLoginRole] || this.loginRoleConfigs['student'];
+        const inp = document.getElementById('universalLoginInput');
+        const pass = document.getElementById('universalPasswordInput');
+        if (inp) inp.value = cfg.demoUser;
+        if (pass) pass.value = cfg.demoPass;
+        this.showToast(`Auto-filled ${cfg.title} credentials`, 'info');
+    },
+
+    async quickFillAndLogin(role, id, pass) {
+        this.activeLoginRole = role;
+        const cfg = this.loginRoleConfigs[role] || this.loginRoleConfigs['student'];
+        
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    login: id, 
+                    password: pass, 
+                    portal: cfg.portalParam 
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                this.setUser(data.user);
+                this.showToast(`Welcome back, ${data.user.full_name}! (${data.user.role.toUpperCase()})`, 'success');
+            } else {
+                this.showToast(data.error || 'Authentication rejected', 'error');
+            }
+        } catch (err) {
+            this.showToast('Network error during authentication', 'error');
+        }
+    },
+
+    async handleUniversalLoginForm(e) {
+        if (e) e.preventDefault();
+        const cfg = this.loginRoleConfigs[this.activeLoginRole] || this.loginRoleConfigs['student'];
+        const login = document.getElementById('universalLoginInput').value.trim();
+        const password = document.getElementById('universalPasswordInput').value;
+        const errEl = document.getElementById('loginErrorMessage');
+        const errText = document.getElementById('loginErrorText');
+        const submitBtn = document.getElementById('universalLoginSubmitBtn');
+
+        if (errEl) errEl.classList.add('hidden');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Verifying credentials...</span>';
+        }
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    login, 
+                    password, 
+                    portal: cfg.portalParam 
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                this.setUser(data.user);
+                this.showToast(`Welcome back, ${data.user.full_name}! (${data.user.role.toUpperCase()})`, 'success');
+            } else {
+                if (errEl && errText) {
+                    errText.textContent = data.error || 'Login failed. Please verify credentials.';
+                    errEl.classList.remove('hidden');
+                }
+                this.showToast(data.error || 'Authentication rejected', 'error');
+            }
+        } catch (err) {
+            if (errEl && errText) {
+                errText.textContent = 'Network communication error. Please try again.';
+                errEl.classList.remove('hidden');
+            }
+            this.showToast('Network connection failure', 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-arrow-right-to-bracket"></i> <span>${cfg.btnText}</span>`;
+            }
         }
     },
 
@@ -1676,6 +1948,118 @@ const app = {
     },
 
     // ==========================================
+    // COUNSELLOR APPOINTMENTS MODULE
+    // ==========================================
+    async loadCounsellorAppointments() {
+        const container = document.getElementById('counsellorAppointmentsList');
+        const activeCountEl = document.getElementById('counsellorActiveCount');
+        const completedCountEl = document.getElementById('counsellorCompletedCount');
+        const statusText = document.getElementById('counsellorAptStatusText');
+        if (!container) return;
+
+        try {
+            const res = await fetch('/api/wellness/appointments');
+            if (!res.ok) throw new Error('Failed to load appointments');
+            const data = await res.json();
+            const apts = data.appointments || [];
+
+            const activeApts = apts.filter(a => a.status === 'Confirmed' || a.status === 'Pending');
+            const completedApts = apts.filter(a => a.status === 'Completed');
+            if (activeCountEl) activeCountEl.textContent = activeApts.length;
+            if (completedCountEl) completedCountEl.textContent = completedApts.length;
+            if (statusText) statusText.textContent = `${apts.length} Total Sessions`;
+
+            if (apts.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center text-xs text-[#8fb89e] space-y-2">
+                        <i class="fa-solid fa-heart-pulse text-2xl text-emerald-400"></i>
+                        <p>No confidential appointments booked yet.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = apts.map(a => {
+                const isPendingOrConfirmed = a.status === 'Pending' || a.status === 'Confirmed';
+                const statusBadge = a.status === 'Confirmed' 
+                    ? '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Confirmed</span>'
+                    : a.status === 'Completed'
+                    ? '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">Completed</span>'
+                    : '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">Pending Review</span>';
+
+                return `
+                    <div class="p-4 rounded-2xl bg-[#0f281e]/90 border border-[#52b788]/20 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-sm text-[#fefae0]">${a.student_name || 'Resident'}</span>
+                                    <span class="text-xs text-[#8fb89e] font-mono">(${a.room_number ? 'Room ' + a.room_number : 'Resident'})</span>
+                                </div>
+                                <div class="text-xs text-emerald-300 font-semibold mt-0.5">
+                                    <i class="fa-solid fa-calendar-day mr-1"></i> ${a.preferred_date} • ${a.preferred_time} (${a.session_mode})
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">${a.issue_category}</span>
+                                ${statusBadge}
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-[#143528]/60 text-xs text-[#d8f3dc] border border-[#52b788]/15">
+                            <span class="text-[10px] uppercase font-bold text-[#8fb89e] block mb-0.5">Confidential Student Note:</span>
+                            "${a.confidential_notes || 'No extra notes provided'}"
+                        </div>
+
+                        ${a.counsellor_remarks ? `
+                            <div class="text-xs text-amber-300/90 italic pl-1">
+                                <span class="font-bold text-[#8fb89e] not-italic">Counsellor Remarks:</span> ${a.counsellor_remarks}
+                            </div>
+                        ` : ''}
+
+                        ${isPendingOrConfirmed ? `
+                            <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-[#52b788]/15">
+                                ${a.status === 'Pending' ? `
+                                    <button onclick="app.updateAppointmentStatus(${a.id}, 'Confirmed')" class="px-3 py-1.5 rounded-lg btn-forest-primary text-xs font-bold flex items-center gap-1">
+                                        <i class="fa-solid fa-check"></i> Confirm Slot
+                                    </button>
+                                ` : ''}
+                                <button onclick="app.updateAppointmentStatus(${a.id}, 'Completed')" class="px-3 py-1.5 rounded-lg btn-forest-secondary text-xs font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-circle-check text-emerald-400"></i> Mark Completed
+                                </button>
+                                <button onclick="app.updateAppointmentStatus(${a.id}, 'Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30 text-xs font-bold transition">
+                                    Cancel
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        } catch (e) {
+            container.innerHTML = `<div class="p-4 text-xs text-red-300">Error loading appointments: ${e.message}</div>`;
+        }
+    },
+
+    async updateAppointmentStatus(appointmentId, status) {
+        const remarks = prompt(`Enter clinical remarks or follow-up note for status "${status}":`) || '';
+        try {
+            const res = await fetch(`/api/wellness/appointments/${appointmentId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status, counsellor_remarks: remarks })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                this.showToast(`Appointment status updated to ${status}`, 'success');
+                this.loadCounsellorAppointments();
+            } else {
+                this.showToast(data.error || 'Failed to update status', 'error');
+            }
+        } catch (e) {
+            this.showToast('Network error updating appointment', 'error');
+        }
+    },
+
+    // ==========================================
     // RESIDENT PROFILE MODULE
     // ==========================================
     loadStudentProfile() {
@@ -2481,6 +2865,15 @@ const app = {
         // Room filters
         const rBlock = document.getElementById('roomBlockFilter');
         if (rBlock) rBlock.addEventListener('change', () => this.loadRooms());
+
+        // URL Hash change navigation
+        window.addEventListener('hashchange', () => {
+            if (window.location.hash === '#login') {
+                this.openRoleLogin(this.activeLoginRole || 'student');
+            } else if (!window.location.hash && !this.currentUser) {
+                this.navigateTo('landing');
+            }
+        });
 
         const rOcc = document.getElementById('roomOccupancyFilter');
         if (rOcc) rOcc.addEventListener('change', () => this.loadRooms());
