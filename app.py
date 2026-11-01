@@ -6,16 +6,19 @@ from datetime import datetime, date
 from functools import wraps
 from flask import Flask, request, jsonify, session, send_from_directory
 
-from database import get_db, hash_password, init_db
+from database import get_db, hash_password, init_db, get_db_path
 from gema4_engine import gema4, GEMA4_MODEL_IDENTIFIER
 
-app = Flask(__name__, static_folder='static', static_url_path='/static')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+
+app = Flask(__name__, static_folder=STATIC_DIR, static_url_path='/static')
 app.secret_key = os.environ.get('SECRET_KEY', 'mann_smart_hostel_super_secure_key_2026')
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Ensure database is initialized on startup
-if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hostel.db')):
+if not os.path.exists(get_db_path()):
     init_db()
 
 # --- RBAC & Authentication Helpers ---

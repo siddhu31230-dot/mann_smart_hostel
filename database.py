@@ -6,6 +6,17 @@ from datetime import datetime, date
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hostel.db')
 
 def get_db_path():
+    if os.environ.get('VERCEL') == '1' or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
+        tmp_db = '/tmp/hostel.db'
+        if not os.path.exists(tmp_db):
+            base_db = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hostel.db')
+            if os.path.exists(base_db):
+                import shutil
+                try:
+                    shutil.copy2(base_db, tmp_db)
+                except Exception:
+                    pass
+        return tmp_db
     return os.environ.get('HOSTEL_DB_PATH', DB_PATH)
 
 def hash_password(password: str) -> str:
