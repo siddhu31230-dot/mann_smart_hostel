@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mann-wellness-v5';
+const CACHE_NAME = 'mann-wellness-v8';
 const ASSETS_TO_CACHE = [
   '/wellness',
   '/static/css/wellness.css',

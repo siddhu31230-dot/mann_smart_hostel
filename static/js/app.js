@@ -517,6 +517,7 @@ const app = {
             const res = await fetch('/api/student/room-details');
             if (!res.ok) throw new Error();
             const data = await res.json();
+            this.currentRoomDetails = data;
             const room = data.room;
 
             if (!room) {
@@ -612,7 +613,41 @@ const app = {
     },
 
     downloadRoomKeyPass() {
-        this.showToast('Digital Key Pass loaded into device wallet.', 'success');
+        const roomBedEl = document.getElementById('walletPassRoomBed');
+        const locEl = document.getElementById('walletPassLocation');
+        const resEl = document.getElementById('walletPassResidentName');
+        const keyEl = document.getElementById('walletPassKeyId');
+
+        if (this.currentUser) {
+            if (resEl) resEl.textContent = this.currentUser.full_name || 'Resident Student';
+        }
+        if (this.currentRoomDetails && this.currentRoomDetails.room) {
+            const r = this.currentRoomDetails.room;
+            const b = this.currentRoomDetails.my_bed || 'Bed A';
+            const cleanBlock = (r.block || '').replace(/Block/i, '').trim();
+            if (roomBedEl) roomBedEl.textContent = `Room ${r.room_number} • ${b}`;
+            if (locEl) locEl.textContent = `Block ${cleanBlock}, ${r.floor}nd Floor`;
+            if (keyEl) keyEl.textContent = `KEYPASS-${r.room_number}-${b.replace(/\s+/g, '')}`;
+        }
+
+        this.openModal('digitalKeyPassModal');
+        this.showToast('📱 Digital Key Pass loaded into device wallet.', 'success');
+    },
+
+    simulateNfcUnlock() {
+        const btn = document.getElementById('walletSimulateNfcBtn');
+        if (btn) {
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Communicating with Door Reader...`;
+            btn.classList.add('opacity-75');
+            setTimeout(() => {
+                btn.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> Access Granted! Door Unlocked`;
+                this.showToast('🔓 Corridor Door Lock: Access Granted! Safe entry logged.', 'success');
+                setTimeout(() => {
+                    btn.innerHTML = `<i class="fa-solid fa-door-open"></i> Tap NFC Reader (Simulate Door Unlock)`;
+                    btn.classList.remove('opacity-75');
+                }, 2500);
+            }, 800);
+        }
     },
 
     // ==========================================

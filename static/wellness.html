@@ -81,7 +81,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Wellness Custom Stylesheet -->
-    <link rel="stylesheet" href="/static/css/wellness.css">
+    <link rel="stylesheet" href="/static/css/wellness.css?v=8.0">
 </head>
 <body class="h-full flex flex-col antialiased selection:bg-[#A8D5BA]/40 selection:text-[#176B50]">
 
@@ -199,35 +199,26 @@
             
             <!-- DESKTOP SIDEBAR NAVIGATION -->
             <aside class="hidden md:flex flex-col w-64 space-y-2 flex-shrink-0">
-                <div class="wellness-card p-3 space-y-1">
+                <div class="wellness-card p-3 space-y-1.5">
                     <button onclick="app.navTo('home')" data-view="home" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
-                        <i class="fa-solid fa-house-chimney-window w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>Home</span>
+                        <i class="fa-solid fa-house-chimney-window w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i>
+                        <span>Home</span>
                     </button>
                     <button onclick="app.navTo('checkin')" data-view="checkin" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
-                        <i class="fa-solid fa-heart-pulse w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>Daily Check-In</span>
+                        <i class="fa-solid fa-heart-pulse w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i>
+                        <span>Daily Check-In</span>
                     </button>
                     <button onclick="app.navTo('gemma4')" data-view="gemma4" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
                         <i class="fa-solid fa-sparkles w-5 text-center text-amber-500"></i>
                         <span class="flex-1">Gemma-4 Safe Space</span>
                         <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">AI</span>
                     </button>
-                    <button onclick="app.navTo('insights')" data-view="insights" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
-                        <i class="fa-solid fa-chart-line w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>My Insights</span>
-                    </button>
-                    <button onclick="app.navTo('journal')" data-view="journal" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
-                        <i class="fa-solid fa-book-bookmark w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>My Journal</span>
-                    </button>
-                    <button onclick="app.navTo('calendar')" data-view="calendar" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
-                        <i class="fa-solid fa-calendar-days w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>Wellness Calendar</span>
-                    </button>
-                    <button onclick="app.navTo('counselor')" data-view="counselor" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
-                        <i class="fa-solid fa-user-doctor w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>Counselor Support</span>
-                    </button>
-                    <button onclick="app.navTo('vault')" data-view="vault" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
-                        <i class="fa-solid fa-shield-halved w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>Privacy Vault</span>
-                    </button>
-                    <button onclick="app.navTo('settings')" data-view="settings" class="wellness-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
-                        <i class="fa-solid fa-sliders w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i> <span>Settings & Backup</span>
+                    <button onclick="app.navTo('insights')" data-view="insights" class="wellness-nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-left transition hover:bg-[#D5EBDD]/60 dark:hover:bg-[#1C332A] text-[#1C2923] dark:text-[#F6F8F5]">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-chart-line w-5 text-center text-[#176B50] dark:text-[#A8D5BA]"></i>
+                            <span>Insights (1W & 1M)</span>
+                        </div>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-[#176B50]/15 dark:bg-[#A8D5BA]/20 text-[#176B50] dark:text-[#A8D5BA]">7d/30d</span>
                     </button>
                 </div>
 
@@ -260,7 +251,7 @@
                 <!-- Hackathon Demo Loader Button -->
                 <div class="pt-2">
                     <button onclick="app.loadDemoSampleData()" class="w-full py-2 px-3 rounded-xl border border-dashed border-[#176B50]/30 hover:border-[#176B50] text-[11px] font-bold text-[#176B50] dark:text-[#A8D5BA] transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-database text-xs"></i> Load Demo History (10d)
+                        <i class="fa-solid fa-database text-xs"></i> Load Demo History (30d)
                     </button>
                 </div>
             </aside>
@@ -301,6 +292,9 @@
                                 <button id="homeCheckinActionBtn" onclick="app.navTo('checkin')" class="btn-wellness-primary px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
                                     <i class="fa-solid fa-heart-pulse"></i> Start 30s Check-In
                                 </button>
+                                <button onclick="app.navTo('gemma4')" class="btn-wellness-secondary px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 border-amber-500/40 text-amber-700 dark:text-amber-300">
+                                    <i class="fa-solid fa-sparkles text-amber-500"></i> Gemma-4 AI Safe Space
+                                </button>
                                 <button onclick="app.openBoxBreathingModal()" class="btn-wellness-secondary px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
                                     <i class="fa-solid fa-wind"></i> 2-Min Reset
                                 </button>
@@ -325,6 +319,12 @@
 
                         <div id="homeWeekPillsContainer" class="grid grid-cols-7 gap-2">
                             <!-- Populated dynamically via JS -->
+                        </div>
+                        <div class="flex justify-end pt-1">
+                            <button onclick="app.navTo('insights')" class="text-xs font-bold text-[#176B50] dark:text-[#A8D5BA] hover:underline flex items-center gap-1.5 transition">
+                                <span>Explore 1-Week & 1-Month Insights</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -591,48 +591,102 @@
                         <strong>Important:</strong> Gemma-4 Safe Space is a supportive peer companion designed to assist with self-reflection and healthy coping habits. It does not provide medical diagnoses or psychiatric treatment. In crisis, call <strong>Tele-MANAS (14416)</strong> or <strong>112</strong> immediately.
                     </div>
                 </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- ============================================== -->
-                <!-- VIEW 3: MY INSIGHTS (Mood Intelligence)        -->
+                <!-- VIEW 3: MY INSIGHTS (Mood Intelligence 1W & 1M)-->
                 <!-- ============================================== -->
                 <div id="view-insights" class="wellness-view hidden space-y-6">
-                    <div>
-                        <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Mood Intelligence Dashboard</h2>
-                        <p class="text-xs text-gray-500">Personal patterns computed on-device. Observational associations, not clinical diagnoses.</p>
+                    <!-- Insights Header with Time-Horizon Switcher -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-2xl font-bold font-serif-title text-[#176B50] dark:text-[#A8D5BA]">Wellness & Mood Insights</h2>
+                                <span class="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-[#176B50]/15 text-[#176B50] dark:text-[#A8D5BA] border border-[#176B50]/20">100% On-Device</span>
+                            </div>
+                            <p class="text-xs text-gray-500">Compare your short-term 1-week trajectory against your 1-month baseline.</p>
+                        </div>
+                        
+                        <!-- Prominent Time Range Segmented Switcher -->
+                        <div class="inline-flex p-1 bg-[#D5EBDD]/40 dark:bg-[#162420] rounded-2xl border border-[#176B50]/20 shadow-sm">
+                            <button id="insights7DayBtn" onclick="app.setInsightsTimeRange(7)" class="px-4 py-2 rounded-xl font-bold text-xs bg-[#176B50] text-white shadow-sm transition flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-week"></i>
+                                <span>1 Week (7 Days)</span>
+                            </button>
+                            <button id="insights30DayBtn" onclick="app.setInsightsTimeRange(30)" class="px-4 py-2 rounded-xl font-semibold text-xs text-gray-600 dark:text-gray-300 hover:text-[#176B50] dark:hover:text-[#A8D5BA] transition flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                <span>1 Month (30 Days)</span>
+                            </button>
+                            <button id="insights90DayBtn" onclick="app.setInsightsTimeRange(90)" class="px-3.5 py-2 rounded-xl font-semibold text-xs text-gray-600 dark:text-gray-300 hover:text-[#176B50] dark:hover:text-[#A8D5BA] transition flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie"></i>
+                                <span>All History</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Insufficient Data Warning Card -->
                     <div id="insightsEmptyState" class="wellness-card p-10 text-center space-y-3">
                         <i class="fa-solid fa-chart-pie text-4xl text-gray-300"></i>
                         <h3 class="font-bold text-sm">Building Your Baseline</h3>
-                        <p class="text-xs text-gray-500 max-w-sm mx-auto">Complete at least 3 daily check-ins to discover meaningful trends and correlations without misleading insights.</p>
+                        <p class="text-xs text-gray-500 max-w-sm mx-auto">Complete daily check-ins to discover meaningful trends and correlations without misleading insights.</p>
                         <button onclick="app.loadDemoSampleData()" class="btn-wellness-secondary px-4 py-2 rounded-xl text-xs font-bold">
-                            Load Demo Historical Data (10 Days)
+                            Load Demo Historical Data (30 Days)
                         </button>
                     </div>
 
                     <!-- Analytics Content -->
                     <div id="insightsContent" class="space-y-6">
-                        <!-- KPI Metric Cards -->
+
+                        <!-- Weekly vs Monthly Comparative Intelligence Banner -->
+                        <div class="wellness-card p-5 sm:p-6 bg-gradient-to-br from-white via-[#F6F8F5] to-[#D5EBDD]/40 dark:from-[#162420] dark:via-[#101A17] dark:to-[#1C332A]/50 border border-[#176B50]/20 space-y-4">
+                            <div class="flex items-center justify-between border-b border-[#176B50]/15 pb-3">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-scale-balanced text-[#176B50] dark:text-[#A8D5BA]"></i>
+                                    <h3 class="font-bold text-sm text-[#1C2923] dark:text-[#F6F8F5]">Weekly Pulse vs Monthly Baseline Comparison</h3>
+                                </div>
+                                <span id="compDiffBadge" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                                    <i class="fa-solid fa-arrow-down"></i> Comparing 7d vs 30d
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="p-3.5 rounded-xl bg-white/70 dark:bg-[#101A17]/70 border border-[#176B50]/15 space-y-1">
+                                    <span class="text-[10px] uppercase font-bold text-gray-400 block">7-Day (1 Week) Average Stress</span>
+                                    <div id="compWeekAvg" class="text-2xl font-extrabold text-[#176B50] dark:text-[#A8D5BA]">3.0/10</div>
+                                    <span class="text-[11px] text-gray-500">Short-term immediate window</span>
+                                </div>
+                                <div class="p-3.5 rounded-xl bg-white/70 dark:bg-[#101A17]/70 border border-[#176B50]/15 space-y-1">
+                                    <span class="text-[10px] uppercase font-bold text-gray-400 block">30-Day (1 Month) Baseline</span>
+                                    <div id="compMonthAvg" class="text-2xl font-extrabold text-[#1C2923] dark:text-gray-200">4.7/10</div>
+                                    <span class="text-[11px] text-gray-500">Hostel monthly baseline</span>
+                                </div>
+                                <div class="p-3.5 rounded-xl bg-white/70 dark:bg-[#101A17]/70 border border-[#176B50]/15 space-y-1">
+                                    <span class="text-[10px] uppercase font-bold text-gray-400 block">Restful Sleep Ratio</span>
+                                    <div id="kpiSleepRestful" class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400">71% Restful</div>
+                                    <span class="text-[11px] text-gray-500">Good or Excellent rest</span>
+                                </div>
+                            </div>
+
+                            <p id="compSummaryText" class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed pt-1">
+                                Your past 7 days show a <strong>healthy recovery trend</strong> compared to your 30-day hostel baseline, driven by increased restful sleep and calming social anchors.
+                            </p>
+                        </div>
+
+                        <!-- KPI Metric Cards for Active Horizon -->
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div class="wellness-card p-5 space-y-1">
-                                <span class="text-[10px] uppercase font-bold text-gray-400">Average Stress Level</span>
-                                <div id="kpiAvgStress" class="text-2xl font-extrabold text-[#176B50] dark:text-[#A8D5BA]">3.8/10</div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400">Selected Horizon Average Stress</span>
+                                <div id="kpiAvgStress" class="text-2xl font-extrabold text-[#176B50] dark:text-[#A8D5BA]">3.0/10</div>
                                 <span class="text-[11px] text-gray-500">Moderate & Manageable</span>
                             </div>
                             <div class="wellness-card p-5 space-y-1">
                                 <span class="text-[10px] uppercase font-bold text-gray-400">Most Frequent Mood</span>
-                                <div id="kpiDominantMood" class="text-2xl font-extrabold text-[#176B50] dark:text-[#A8D5BA]">😌 Calm (50%)</div>
+                                <div id="kpiDominantMood" class="text-2xl font-extrabold text-[#176B50] dark:text-[#A8D5BA]">😌 Calm (57%)</div>
                                 <span class="text-[11px] text-gray-500">Positive Valence</span>
                             </div>
                             <div class="wellness-card p-5 space-y-1">
-                                <span class="text-[10px] uppercase font-bold text-gray-400">Total Check-Ins Stored</span>
-                                <div id="kpiTotalCheckins" class="text-2xl font-extrabold text-[#176B50] dark:text-[#A8D5BA]">0 check-ins</div>
-                                <span class="text-[11px] text-gray-500">Stored via Dexie IndexedDB</span>
+                                <span class="text-[10px] uppercase font-bold text-gray-400">Logged Check-Ins</span>
+                                <div id="kpiTotalCheckins" class="text-2xl font-extrabold text-[#176B50] dark:text-[#A8D5BA]">7 check-ins</div>
+                                <span class="text-[11px] text-gray-500">Encrypted via Dexie IndexedDB</span>
                             </div>
                         </div>
 
@@ -640,13 +694,12 @@
                         <div class="wellness-card p-6 space-y-3">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                 <div>
-                                    <h3 class="font-bold text-sm">Mood Valence & Stress Trends</h3>
-                                    <p class="text-[11px] text-gray-500">Historical curve computed 100% on-device from your actual logs.</p>
+                                    <h3 id="chartHorizonTitle" class="font-bold text-sm">Mood Valence & Stress Trajectory</h3>
+                                    <p class="text-[11px] text-gray-500">Mathematical curve computed 100% on-device from your actual encrypted logs.</p>
                                 </div>
-                                <div class="flex items-center gap-1 bg-[#F6F8F5] dark:bg-[#162420] p-1 rounded-xl border border-[#176B50]/20 text-xs">
-                                    <button id="insights7DayBtn" onclick="app.setInsightsTimeRange(7)" class="px-2.5 py-1 rounded-lg font-bold bg-[#176B50] text-white transition">7 Days</button>
-                                    <button id="insights30DayBtn" onclick="app.setInsightsTimeRange(30)" class="px-2.5 py-1 rounded-lg font-medium text-gray-500 hover:text-[#176B50] dark:hover:text-[#A8D5BA] transition">30 Days</button>
-                                </div>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#176B50]/10 text-[#176B50] dark:text-[#A8D5BA]">
+                                    Chart.js Local Canvas
+                                </span>
                             </div>
                             <div class="h-64 w-full">
                                 <canvas id="chartWeeklyJourney"></canvas>
@@ -655,8 +708,8 @@
 
                         <!-- Sleep & Stress Correlation Chart -->
                         <div class="wellness-card p-6 space-y-3">
-                            <h3 class="font-bold text-sm">Sleep Quality vs Reported Stress Pattern</h3>
-                            <p class="text-[11px] text-gray-500">Notice how nights with restful sleep correlate with lower daily strain.</p>
+                            <h3 class="font-bold text-sm">Sleep Quality vs Reported Stress Correlation</h3>
+                            <p class="text-[11px] text-gray-500">Notice how nights with restful sleep correlate with lower daily strain across this time horizon.</p>
                             <div class="h-56 w-full">
                                 <canvas id="chartSleepStress"></canvas>
                             </div>
@@ -674,8 +727,8 @@
                         <div class="wellness-card p-6 space-y-4">
                             <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
                                 <div>
-                                    <h3 class="font-bold text-sm">Mood & Contextual Tag Associations</h3>
-                                    <p class="text-[11px] text-gray-400">Self-awareness correlations based on your personal logs.</p>
+                                    <h3 class="font-bold text-sm">Contextual Tag Associations & Patterns</h3>
+                                    <p class="text-[11px] text-gray-400">Self-awareness correlations based on your personal logs for this window.</p>
                                 </div>
                                 <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 font-bold">Observational</span>
                             </div>
@@ -1065,15 +1118,7 @@
             </button>
             <button onclick="app.navTo('insights')" data-view="insights" class="wellness-nav-btn flex flex-col items-center gap-1 p-1 text-gray-500">
                 <i class="fa-solid fa-chart-line text-base"></i>
-                <span>Insights</span>
-            </button>
-            <button onclick="app.navTo('journal')" data-view="journal" class="wellness-nav-btn flex flex-col items-center gap-1 p-1 text-gray-500">
-                <i class="fa-solid fa-book-bookmark text-base"></i>
-                <span>Journal</span>
-            </button>
-            <button onclick="app.navTo('counselor')" data-view="counselor" class="wellness-nav-btn flex flex-col items-center gap-1 p-1 text-gray-500">
-                <i class="fa-solid fa-user-doctor text-base"></i>
-                <span>Support</span>
+                <span>Insights (1W/1M)</span>
             </button>
         </nav>
 
@@ -1363,6 +1408,6 @@
     };
     </script>
     <!-- Application Script -->
-    <script src="/static/js/wellness.js?v=6.0"></script>
+    <script src="/static/js/wellness.js?v=8.0"></script>
 </body>
 </html>

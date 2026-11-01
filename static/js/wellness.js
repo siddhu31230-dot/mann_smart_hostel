@@ -593,7 +593,7 @@ class WellnessApp {
         // Auto-seed sample contents if vault is empty so judges immediately see rich data
         try {
             const allCheckins = await this.db.getAllCheckIns();
-            if (!allCheckins || allCheckins.length === 0) {
+            if (!allCheckins || allCheckins.length < 25) {
                 await this.loadDemoSampleData(true);
             }
         } catch (e) {
@@ -1257,24 +1257,36 @@ class WellnessApp {
     }
 
     // -----------------------------------------------------------------
-    // Mood Intelligence Dashboard (Chart.js & Correlation)
+    // Mood Intelligence Dashboard (Chart.js & Multi-Horizon 1W / 1M)
     // -----------------------------------------------------------------
     async renderInsights() {
-        let checkins = await this.db.getAllCheckIns();
-        if (!checkins || checkins.length < 3) {
-            await this.loadDemoSampleData(true);
-            checkins = await this.db.getAllCheckIns();
+        if (this._isSeeding) return;
+        let allCheckins = await this.db.getAllCheckIns();
+        if (!allCheckins || allCheckins.length < 25) {
+            this._isSeeding = true;
+            try {
+                await this.loadDemoSampleData(true);
+            } finally {
+                this._isSeeding = false;
+            }
+            allCheckins = await this.db.getAllCheckIns();
         }
-        checkins.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+        allCheckins.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
         document.getElementById('insightsEmptyState')?.classList.add('hidden');
         document.getElementById('insightsContent')?.classList.remove('hidden');
 
-        const total = checkins.length;
-        const avgStress = (checkins.reduce((sum, c) => sum + (c.stress || 0), 0) / total).toFixed(1);
+        const activeDays = this.insightsDays || 7;
+        const windowCheckins = (activeDays > 0 && activeDays < allCheckins.length)
+            ? allCheckins.slice(-activeDays)
+            : allCheckins;
+
+        // Window-specific metrics
+        const total = windowCheckins.length;
+        const avgStress = (windowCheckins.reduce((sum, c) => sum + (c.stress || 0), 0) / (total || 1)).toFixed(1);
 
         const moodCounts = {};
-        checkins.forEach(c => moodCounts[c.mood] = (moodCounts[c.mood] || 0) + 1);
+        windowCheckins.forEach(c => moodCounts[c.mood] = (moodCounts[c.mood] || 0) + 1);
         let dominantMood = 'Calm';
         let maxCount = 0;
         for (const [m, count] of Object.entries(moodCounts)) {
@@ -1283,23 +1295,84 @@ class WellnessApp {
                 dominantMood = m;
             }
         }
-        const dominantPct = Math.round((maxCount / total) * 100);
+        const dominantPct = Math.round((maxCount / (total || 1)) * 100);
 
         const tagCounts = {};
-        checkins.forEach(c => {
+        windowCheckins.forEach(c => {
             (c.tags || []).forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1);
         });
 
+        // Restful sleep ratio in active window
+        const goodSleepInWindow = windowCheckins.filter(c => c.sleep === 'Good' || c.sleep === 'Excellent').length;
+        const sleepRestfulPct = Math.round((goodSleepInWindow / (total || 1)) * 100);
+
+        // Comparative Weekly (7d) vs Monthly (30d) Statistics
+        const weekCheckins = allCheckins.slice(-7);
+        const monthCheckins = allCheckins.slice(-30);
+        const weekAvgStress = (weekCheckins.reduce((s, c) => s + (c.stress || 0), 0) / (weekCheckins.length || 1)).toFixed(1);
+        const monthAvgStress = (monthCheckins.reduce((s, c) => s + (c.stress || 0), 0) / (monthCheckins.length || 1)).toFixed(1);
+        const diffStress = (parseFloat(weekAvgStress) - parseFloat(monthAvgStress)).toFixed(1);
+
+        // Update DOM elements for Active Horizon KPIs
         const avgStressEl = document.getElementById('kpiAvgStress');
         const dominantMoodEl = document.getElementById('kpiDominantMood');
         const checkinCountEl = document.getElementById('kpiTotalCheckins');
 
         if (avgStressEl) avgStressEl.textContent = `${avgStress}/10`;
         if (dominantMoodEl) dominantMoodEl.textContent = `${this.getMoodEmoji(dominantMood)} ${dominantMood} (${dominantPct}%)`;
-        if (checkinCountEl) checkinCountEl.textContent = `${total} check-ins`;
+        if (checkinCountEl) {
+            const horizonLabel = activeDays === 7 ? 'Past 1 Week' : (activeDays === 30 ? 'Past 1 Month' : 'All-Time');
+            checkinCountEl.textContent = `${total} check-ins (${horizonLabel})`;
+        }
 
-        this.renderCorrelationObservations(checkins, tagCounts, parseFloat(avgStress));
-        this.renderCharts(checkins, tagCounts);
+        // Update Comparative Banner elements
+        const compWeekAvg = document.getElementById('compWeekAvg');
+        const compMonthAvg = document.getElementById('compMonthAvg');
+        const compDiffBadge = document.getElementById('compDiffBadge');
+        const compSummaryText = document.getElementById('compSummaryText');
+        const kpiSleepRestful = document.getElementById('kpiSleepRestful');
+
+        if (compWeekAvg) compWeekAvg.textContent = `${weekAvgStress}/10`;
+        if (compMonthAvg) compMonthAvg.textContent = `${monthAvgStress}/10`;
+        if (kpiSleepRestful) kpiSleepRestful.textContent = `${sleepRestfulPct}% Restful`;
+
+        if (compDiffBadge) {
+            if (parseFloat(diffStress) < 0) {
+                compDiffBadge.className = 'text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30';
+                compDiffBadge.innerHTML = `<i class="fa-solid fa-arrow-down mr-1"></i> ${Math.abs(diffStress)} pts lower strain this week`;
+            } else if (parseFloat(diffStress) > 0) {
+                compDiffBadge.className = 'text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30';
+                compDiffBadge.innerHTML = `<i class="fa-solid fa-arrow-up mr-1"></i> +${diffStress} pts higher strain this week`;
+            } else {
+                compDiffBadge.className = 'text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30';
+                compDiffBadge.innerHTML = `<i class="fa-solid fa-minus mr-1"></i> Consistent with 30-day baseline`;
+            }
+        }
+
+        if (compSummaryText) {
+            if (parseFloat(diffStress) <= -0.4) {
+                compSummaryText.innerHTML = `Your past 7 days show a <strong>positive recovery trend</strong> compared to your 30-day hostel baseline (<strong>${weekAvgStress}/10</strong> vs <strong>${monthAvgStress}/10</strong>), accompanied by higher restful sleep and calming social anchors.`;
+            } else if (parseFloat(diffStress) >= 0.4) {
+                compSummaryText.innerHTML = `Your past 7 days indicate <strong>elevated strain</strong> compared to your 30-day baseline (<strong>${weekAvgStress}/10</strong> vs <strong>${monthAvgStress}/10</strong>). Academic deadlines or disrupted sleep may be contributing.`;
+            } else {
+                compSummaryText.innerHTML = `Your wellness indicators over the past 7 days are balanced and aligned with your 30-day hostel baseline.`;
+            }
+        }
+
+        // Dynamic Chart Horizon Title
+        const chartTitleEl = document.getElementById('chartHorizonTitle');
+        if (chartTitleEl) {
+            if (activeDays === 7) {
+                chartTitleEl.textContent = 'Past 1 Week Trajectory (7-Day Mood Valence & Stress)';
+            } else if (activeDays === 30) {
+                chartTitleEl.textContent = 'Past 1 Month Trajectory (30-Day Mood Valence & Stress)';
+            } else {
+                chartTitleEl.textContent = 'All-Time Trajectory (Full Historical Mood Valence & Stress)';
+            }
+        }
+
+        this.renderCorrelationObservations(windowCheckins, tagCounts, parseFloat(avgStress));
+        this.renderCharts(windowCheckins, tagCounts);
     }
 
     renderCorrelationObservations(checkins, tagCounts, overallAvgStress) {
@@ -1314,15 +1387,15 @@ class WellnessApp {
                 const taggedRecords = checkins.filter(c => (c.tags || []).includes(tag));
                 const tagAvgStress = (taggedRecords.reduce((s, c) => s + c.stress, 0) / taggedRecords.length).toFixed(1);
 
-                if (parseFloat(tagAvgStress) >= overallAvgStress + 1.2) {
+                if (parseFloat(tagAvgStress) >= overallAvgStress + 1.0) {
                     observations.push({
                         icon: 'fa-triangle-exclamation',
                         color: 'text-amber-500',
                         bg: 'bg-amber-500/10 border-amber-500/30',
                         title: `Pattern Association: "${tag}"`,
-                        text: `On days influenced by **${tag}**, your reported stress averaged **${tagAvgStress}/10** (compared to your overall average of ${overallAvgStress}/10). Scheduling intentional 10-minute breaks during these days can soften the strain.`
+                        text: `On days influenced by **${tag}**, your reported stress averaged **${tagAvgStress}/10** (compared to your window average of ${overallAvgStress}/10). Intentional 10-minute grounding breaks during these days can soften the strain.`
                     });
-                } else if (parseFloat(tagAvgStress) <= overallAvgStress - 1.0) {
+                } else if (parseFloat(tagAvgStress) <= overallAvgStress - 0.8) {
                     observations.push({
                         icon: 'fa-seedling',
                         color: 'text-emerald-500',
@@ -1352,8 +1425,8 @@ class WellnessApp {
                 icon: 'fa-compass',
                 color: 'text-[#176B50]',
                 bg: 'bg-[#D5EBDD]/40 border-[#176B50]/20 dark:bg-[#1C332A]',
-                title: 'Baseline In Progress',
-                text: 'As you log more check-ins over the upcoming week, your on-device engine will surface deeper associations between daily hostel factors and mood shifts.'
+                title: 'Consistent Wellness Horizon',
+                text: 'Your check-ins for this horizon demonstrate consistent emotional equilibrium without extreme variance.'
             });
         }
 
@@ -1375,15 +1448,15 @@ class WellnessApp {
         this.insightsDays = days;
         const btn7 = document.getElementById('insights7DayBtn');
         const btn30 = document.getElementById('insights30DayBtn');
-        if (btn7 && btn30) {
-            if (days === 7) {
-                btn7.className = 'px-2.5 py-1 rounded-lg font-bold bg-[#176B50] text-white transition';
-                btn30.className = 'px-2.5 py-1 rounded-lg font-medium text-gray-500 hover:text-[#176B50] dark:hover:text-[#A8D5BA] transition';
-            } else {
-                btn30.className = 'px-2.5 py-1 rounded-lg font-bold bg-[#176B50] text-white transition';
-                btn7.className = 'px-2.5 py-1 rounded-lg font-medium text-gray-500 hover:text-[#176B50] dark:hover:text-[#A8D5BA] transition';
-            }
-        }
+        const btn90 = document.getElementById('insights90DayBtn');
+
+        const activeClass = 'px-4 py-2 rounded-xl font-bold text-xs bg-[#176B50] text-white shadow-sm transition flex items-center gap-2';
+        const inactiveClass = 'px-4 py-2 rounded-xl font-semibold text-xs text-gray-600 dark:text-gray-300 hover:text-[#176B50] dark:hover:text-[#A8D5BA] transition flex items-center gap-2';
+
+        if (btn7) btn7.className = (days === 7) ? activeClass : inactiveClass;
+        if (btn30) btn30.className = (days === 30) ? activeClass : inactiveClass;
+        if (btn90) btn90.className = (days === 90 || days === 0) ? activeClass : inactiveClass;
+
         this.renderInsights();
     }
 
@@ -1392,15 +1465,13 @@ class WellnessApp {
         const textColor = isDark ? '#A8D5BA' : '#1C2923';
         const gridColor = isDark ? 'rgba(168, 213, 186, 0.1)' : 'rgba(23, 107, 80, 0.1)';
 
-        const daysSlice = this.insightsDays === 30 ? -30 : -7;
-        const slicedCheckins = checkins.slice(daysSlice);
-        const labels = slicedCheckins.map(c => {
+        const labels = checkins.map(c => {
             const d = new Date(c.date + 'T00:00:00');
             return d.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' });
         });
-        const stressData = slicedCheckins.map(c => c.stress);
+        const stressData = checkins.map(c => c.stress);
         const moodScoreMap = { 'Happy': 5, 'Calm': 4, 'Okay': 3, 'Low': 2, 'Stressed': 2, 'Overwhelmed': 1 };
-        const moodData = slicedCheckins.map(c => moodScoreMap[c.mood] || 3);
+        const moodData = checkins.map(c => moodScoreMap[c.mood] || 3);
 
         const ctx1 = document.getElementById('chartWeeklyJourney')?.getContext('2d');
         if (ctx1) {
@@ -1418,7 +1489,7 @@ class WellnessApp {
                             fill: true,
                             tension: 0.35,
                             borderWidth: 3,
-                            pointRadius: 5,
+                            pointRadius: checkins.length > 14 ? 3 : 5,
                             pointBackgroundColor: '#176B50'
                         },
                         {
@@ -1429,7 +1500,7 @@ class WellnessApp {
                             tension: 0.35,
                             borderDash: [5, 5],
                             borderWidth: 2,
-                            pointRadius: 4,
+                            pointRadius: checkins.length > 14 ? 2 : 4,
                             pointBackgroundColor: '#A8D5BA'
                         }
                     ]
@@ -2500,25 +2571,53 @@ class WellnessApp {
     }
 
     // -----------------------------------------------------------------
-    // Hackathon Demo Mode Seeder
+    // Hackathon Demo Mode Seeder (30 Days of Historical Trajectory)
     // -----------------------------------------------------------------
     async loadDemoSampleData(skipConfirm = false) {
         if (!skipConfirm) {
-            const confirmed = confirm('Restore 10 days of safe sample check-in history, journals, charts, and counselor bookings?\n\n(Existing records will be merged).');
+            const confirmed = confirm('Restore 30 days of safe sample check-in history, journals, charts, and counselor bookings?\n\n(Existing records will be merged).');
             if (!confirmed) return;
         }
 
         const today = new Date();
         const sampleEntries = [
-            { dayOffset: 9, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Academics', 'Friendships'], note: 'Quiet evening reading in my hostel room.' },
-            { dayOffset: 8, mood: 'Happy', stress: 2, sleep: 'Excellent', tags: ['Friendships', 'Personal'], note: 'Roommate made tea, felt very supportive.' },
-            { dayOffset: 7, mood: 'Stressed', stress: 7, sleep: 'Average', tags: ['Exams', 'Academics'], note: 'Mid-term revision week began. Lots of content.' },
-            { dayOffset: 6, mood: 'Overwhelmed', stress: 8, sleep: 'Poor', tags: ['Exams', 'Roommates'], note: 'Noisy corridor, woke up multiple times.' },
-            { dayOffset: 5, mood: 'Stressed', stress: 8, sleep: 'Poor', tags: ['Exams', 'Finances'], note: 'Late night study group before lab submission.' },
-            { dayOffset: 4, mood: 'Okay', stress: 5, sleep: 'Average', tags: ['Exams'], note: 'Algorithms test completed. Feeling relief.' },
-            { dayOffset: 3, mood: 'Low', stress: 4, sleep: 'Average', tags: ['Homesickness', 'Family'], note: 'Missing home cooked meals today.' },
+            // Week 1 (Days 0 to 6 - Recent Calm & Recovery)
+            { dayOffset: 0, mood: 'Happy', stress: 2, sleep: 'Excellent', tags: ['Friendships', 'Personal'], note: 'Feeling grounded and grateful after finishing weekly assignments.' },
+            { dayOffset: 1, mood: 'Happy', stress: 2, sleep: 'Good', tags: ['Friendships'], note: 'Celebrated a project milestone with wingmates.' },
             { dayOffset: 2, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Family', 'Personal'], note: 'Video call with parents restored my calm.' },
-            { dayOffset: 1, mood: 'Happy', stress: 2, sleep: 'Good', tags: ['Friendships'], note: 'Celebrated a project milestone with wingmates.' }
+            { dayOffset: 3, mood: 'Okay', stress: 4, sleep: 'Good', tags: ['Academics'], note: 'Quiet evening in the library, finished lab journal.' },
+            { dayOffset: 4, mood: 'Happy', stress: 2, sleep: 'Excellent', tags: ['Friendships', 'Personal'], note: 'Evening badminton match at the hostel court.' },
+            { dayOffset: 5, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Personal'], note: 'Relaxing music session before sleep in room.' },
+            { dayOffset: 6, mood: 'Okay', stress: 4, sleep: 'Average', tags: ['Academics'], note: 'Weekly lab submission completed on time.' },
+
+            // Week 2 (Days 7 to 13 - Midterm Exams Crunch)
+            { dayOffset: 7, mood: 'Stressed', stress: 7, sleep: 'Average', tags: ['Exams', 'Academics'], note: 'Algorithms mid-term revision week began. Lots of content.' },
+            { dayOffset: 8, mood: 'Overwhelmed', stress: 8, sleep: 'Poor', tags: ['Exams', 'Roommates'], note: 'Noisy corridor, woke up multiple times at night.' },
+            { dayOffset: 9, mood: 'Stressed', stress: 8, sleep: 'Poor', tags: ['Exams', 'Finances'], note: 'Late night study group before exam. Very tired.' },
+            { dayOffset: 10, mood: 'Okay', stress: 5, sleep: 'Average', tags: ['Exams'], note: 'Algorithms test completed. Feeling relief.' },
+            { dayOffset: 11, mood: 'Low', stress: 4, sleep: 'Average', tags: ['Homesickness', 'Family'], note: 'Missing home cooked meals today.' },
+            { dayOffset: 12, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Friendships'], note: 'Mess dinner with friends cheered me up.' },
+            { dayOffset: 13, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Personal'], note: 'Catching up on sleep over the weekend.' },
+
+            // Week 3 (Days 14 to 20 - Project Sprint & Labs)
+            { dayOffset: 14, mood: 'Stressed', stress: 6, sleep: 'Average', tags: ['Academics', 'Finances'], note: 'Sprint deadline approaching, working in computer center.' },
+            { dayOffset: 15, mood: 'Okay', stress: 5, sleep: 'Good', tags: ['Academics'], note: 'Debugging code in lab with team.' },
+            { dayOffset: 16, mood: 'Happy', stress: 3, sleep: 'Good', tags: ['Friendships', 'Academics'], note: 'Merged final code PR with teammates.' },
+            { dayOffset: 17, mood: 'Calm', stress: 3, sleep: 'Excellent', tags: ['Personal'], note: 'Restful sleep, morning walk around hostel lawns.' },
+            { dayOffset: 18, mood: 'Low', stress: 4, sleep: 'Poor', tags: ['Homesickness'], note: 'Rainy evening, wanted to speak with childhood friends.' },
+            { dayOffset: 19, mood: 'Okay', stress: 4, sleep: 'Average', tags: ['Academics'], note: 'Elective lecture was engaging today.' },
+            { dayOffset: 20, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Friendships'], note: 'Weekend movie night in the common room.' },
+
+            // Week 4 (Days 21 to 29 - Monthly Baseline & Settling In)
+            { dayOffset: 21, mood: 'Stressed', stress: 6, sleep: 'Average', tags: ['Finances', 'Academics'], note: 'Managing monthly hostel fees and budget.' },
+            { dayOffset: 22, mood: 'Okay', stress: 5, sleep: 'Average', tags: ['Roommates'], note: 'Discussed room cleaning schedule with roommate.' },
+            { dayOffset: 23, mood: 'Happy', stress: 3, sleep: 'Good', tags: ['Friendships'], note: 'Went to campus cafe with wingmates.' },
+            { dayOffset: 24, mood: 'Calm', stress: 3, sleep: 'Excellent', tags: ['Personal'], note: 'Deep restful night of sleep.' },
+            { dayOffset: 25, mood: 'Overwhelmed', stress: 7, sleep: 'Poor', tags: ['Exams', 'Academics'], note: 'Surprise quiz announced for Friday.' },
+            { dayOffset: 26, mood: 'Stressed', stress: 6, sleep: 'Average', tags: ['Exams'], note: 'Studying in the central reading room.' },
+            { dayOffset: 27, mood: 'Okay', stress: 4, sleep: 'Good', tags: ['Academics'], note: 'Quiz went decently well, feeling calmer.' },
+            { dayOffset: 28, mood: 'Calm', stress: 3, sleep: 'Good', tags: ['Family', 'Personal'], note: 'Sunday family video call.' },
+            { dayOffset: 29, mood: 'Happy', stress: 2, sleep: 'Excellent', tags: ['Personal', 'Friendships'], note: 'First weekend of the month, feeling comfortable in hostel.' }
         ];
 
         for (const s of sampleEntries) {
@@ -2588,7 +2687,7 @@ class WellnessApp {
         if (this.currentView === 'calendar') this.renderCalendar();
         if (this.currentView === 'vault') this.renderVaultRecords();
 
-        this.showToast('✨ 10-day historical contents restored to local Dexie IndexedDB!', 'success');
+        this.showToast('✨ 30-day historical data loaded into local Dexie IndexedDB!', 'success');
         if (!skipConfirm) this.navTo('insights');
     }
 

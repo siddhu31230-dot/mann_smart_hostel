@@ -59,8 +59,8 @@ body {
     box-shadow: var(--shadow-elevated);
 }
 
-/* Visibility Utility Fallback */
-.hidden {
+/* Visibility Utility Fallback: Only enforce on views, preserving responsive layout classes */
+.wellness-view.hidden {
     display: none !important;
 }
 

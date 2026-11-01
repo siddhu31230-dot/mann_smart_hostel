@@ -1961,6 +1961,86 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- DIGITAL NFC KEY PASS (WALLET PASS) MODAL   -->
+    <!-- ========================================== -->
+    <div id="digitalKeyPassModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="max-w-sm w-full space-y-4">
+            <!-- Simulated Apple / Google Wallet Pass Card -->
+            <div class="rounded-3xl bg-gradient-to-br from-[#1b4332] via-[#0f281e] to-[#081c14] border-2 border-[#52b788]/40 shadow-2xl overflow-hidden relative text-[#fefae0]">
+                <!-- Top Notch / Header -->
+                <div class="p-5 pb-4 bg-[#143528]/80 border-b border-[#52b788]/20 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#52b788] to-[#2d6a4f] flex items-center justify-center text-white text-sm shadow-md">
+                            <i class="fa-solid fa-hotel"></i>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-[#52b788] uppercase tracking-wider">Device Wallet Pass</div>
+                            <div class="text-xs font-extrabold text-[#fefae0]">MANN Smart Hostel</div>
+                        </div>
+                    </div>
+                    <button onclick="app.closeModal('digitalKeyPassModal')" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-[#8fb89e] hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- NFC Broadcast Wave Visualizer -->
+                <div class="p-5 text-center space-y-4">
+                    <div class="relative inline-flex items-center justify-center">
+                        <div class="w-16 h-16 rounded-full bg-[#52b788]/20 border border-[#52b788]/50 flex items-center justify-center text-2xl text-[#52b788] animate-pulse">
+                            <i class="fa-solid fa-wifi rotate-90"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold tracking-widest block" style="color: #52b788 !important;">NFC Access Ready</span>
+                        <h4 class="text-base font-extrabold" style="color: #ffffff !important;">Hold Near Corridor Electronic Reader</h4>
+                    </div>
+
+                    <!-- Room & Resident Credentials Strip -->
+                    <div class="p-3.5 rounded-2xl bg-[#0a1e16] border border-[#52b788]/40 grid grid-cols-2 gap-3 text-left">
+                        <div>
+                            <span class="text-[9px] uppercase font-bold block" style="color: #a8d5ba !important;">Room & Bed</span>
+                            <span id="walletPassRoomBed" class="text-sm font-extrabold" style="color: #52b788 !important;">Room A-204 • Bed A</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] uppercase font-bold block" style="color: #a8d5ba !important;">Location</span>
+                            <span id="walletPassLocation" class="text-xs font-bold" style="color: #ffffff !important;">Block A, 2nd Floor</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] uppercase font-bold block" style="color: #a8d5ba !important;">Resident Student</span>
+                            <span id="walletPassResidentName" class="text-xs font-bold" style="color: #ffffff !important;">Aarav Sharma</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] uppercase font-bold block" style="color: #a8d5ba !important;">Access Clearance</span>
+                            <span class="text-xs font-bold text-emerald-400" style="color: #34d399 !important;">24/7 Corridor Valid</span>
+                        </div>
+                    </div>
+
+                    <!-- QR Barcode for Optical Scanners -->
+                    <div class="p-3 bg-white rounded-2xl inline-block shadow-lg mx-auto">
+                        <i class="fa-solid fa-qrcode text-7xl text-slate-900 block mx-auto"></i>
+                        <span id="walletPassKeyId" class="text-[10px] font-mono text-slate-800 font-bold block mt-1">KEYPASS-B204-BedA</span>
+                    </div>
+
+                    <!-- Interactive Door Unlock Test Simulator -->
+                    <div class="pt-1">
+                        <button id="walletSimulateNfcBtn" onclick="app.simulateNfcUnlock()" class="w-full py-2.5 px-4 rounded-xl btn-forest-primary font-bold text-xs flex items-center justify-center gap-2 shadow-lg">
+                            <i class="fa-solid fa-door-open"></i>
+                            <span>Tap NFC Reader (Simulate Door Unlock)</span>
+                        </button>
+                    </div>
+
+                    <!-- Device Wallet Badges -->
+                    <div class="flex items-center justify-center gap-3 pt-2 text-[11px] text-[#8fb89e]">
+                        <span class="flex items-center gap-1.5"><i class="fa-brands fa-apple text-sm"></i> Apple Wallet</span>
+                        <span>•</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-brands fa-google text-xs"></i> Google Wallet</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
     <!-- MOBILE QR CODE ACCESS MODAL                -->
     <!-- ========================================== -->
     <div id="mobileQrModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -2093,6 +2173,6 @@
     </div>
 
     <!-- Application Controller JS -->
-    <script src="/static/js/app.js"></script>
+    <script src="/static/js/app.js?v=2.0"></script>
 </body>
 </html>
