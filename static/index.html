@@ -54,7 +54,7 @@
                     <button id="mobileSidebarToggle" onclick="app.toggleMobileSidebar()" class="md:hidden p-2 text-[#8fb89e] hover:text-[#fefae0] focus:outline-none">
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
-                    <a href="javascript:void(0)" onclick="app.navigateTo('landing')" class="flex items-center gap-3 group">
+                    <a href="javascript:void(0)" onclick="app.onBrandClick()" class="flex items-center gap-3 group">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#52b788] via-[#2d6a4f] to-[#74c69d] flex items-center justify-center shadow-lg shadow-[#2d6a4f]/20 border border-[#52b788]/30 group-hover:scale-105 transition">
                             <i class="fa-solid fa-building-shield text-white text-lg"></i>
                         </div>
@@ -68,21 +68,7 @@
                     </a>
                 </div>
 
-                <!-- Center Quick Switcher / Breadcrumbs (Demo & QA Friendly) -->
-                <div id="quickRoleBar" class="hidden lg:flex items-center gap-1 bg-[#0f281e]/90 p-1 rounded-2xl border border-[#52b788]/30 text-xs shadow-inner backdrop-blur-md">
-                    <span class="text-[10px] text-[#8fb89e] px-2.5 font-bold uppercase tracking-wider">Demo Quick-Role:</span>
-                    <button onclick="app.quickSwitch('student')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="student">Student</button>
-                    <button onclick="app.quickSwitch('warden')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="warden">Warden</button>
-                    <button onclick="app.quickSwitch('admin')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="admin">Admin</button>
-                    <button onclick="app.quickSwitch('maintenance')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="maintenance">Maint</button>
-                    <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="mess_manager">Mess</button>
-                    <button onclick="app.quickSwitch('counsellor')" class="role-btn px-3 py-1.5 text-xs rounded-xl font-medium transition" data-role="counsellor">Counsellor</button>
-                    <button onclick="app.openWellnessInApp()" class="px-3 py-1.5 text-xs rounded-xl font-bold btn-wellness flex items-center gap-1.5 transition ml-1" title="Private Wellness Sanctuary (Problem Statement #9)">
-                        <i class="fa-solid fa-spa text-xs"></i> <span>Wellness</span>
-                    </button>
-                </div>
-
-                <!-- Right Actions: Theme Toggle + Auth Buttons / Profile -->
+                <!-- Right Actions: Theme Toggle + Auth Badges / Logout -->
                 <div class="flex items-center gap-2 sm:gap-3">
                     <!-- Mobile QR Code Modal Trigger -->
                     <button id="mobileQrBtn" onclick="app.openModal('mobileQrModal')" class="w-9 h-9 rounded-xl bg-[#143528]/90 border border-[#52b788]/30 text-[#8fb89e] hover:text-[#52b788] hover:border-[#52b788] flex items-center justify-center transition" title="Open on Mobile Phone (QR Code)">
@@ -94,16 +80,12 @@
                         <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
                     </button>
 
-                    <!-- Unauthenticated Buttons (Landing Mode) -->
+                    <!-- Unauthenticated Mode Badge -->
                     <div id="unauthHeaderActions" class="flex items-center gap-2">
-                        <button onclick="app.openRoleLogin('student')" class="px-3.5 py-1.5 rounded-xl btn-forest-primary text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                            <span>Student Login</span>
-                        </button>
-                        <button onclick="app.openRoleLogin('warden')" class="px-3.5 py-1.5 rounded-xl btn-forest-secondary text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-                            <i class="fa-solid fa-shield-halved text-[#52b788]"></i>
-                            <span>Staff Portal</span>
-                        </button>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#143528]/80 border border-[#52b788]/30 text-xs text-[#52b788] font-bold">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span class="hidden sm:inline">Secure Gateway</span>
+                        </span>
                     </div>
 
                     <!-- Authenticated Profile Dropdown & Logout -->
@@ -115,23 +97,12 @@
                                 <div id="userRoleBadge" class="text-[10px] font-mono text-[#52b788] uppercase mt-0.5">STUDENT</div>
                             </div>
                         </div>
-                        <button onclick="app.logout()" class="px-3 py-1.5 rounded-xl border border-[#52b788]/20 bg-[#143528]/80 hover:bg-[#1b4332] text-xs font-semibold text-[#fefae0] transition flex items-center gap-1.5">
+                        <button onclick="app.logout()" class="px-3.5 py-1.5 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-xs font-semibold text-red-200 transition flex items-center gap-1.5">
                             <i class="fa-solid fa-arrow-right-from-bracket text-red-400"></i>
-                            <span class="hidden sm:inline">Logout</span>
+                            <span>Logout</span>
                         </button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Mobile Quick Role Switcher Strip -->
-            <div id="mobileRoleBar" class="lg:hidden flex overflow-x-auto py-2 gap-1.5 border-t border-[#52b788]/20 text-xs scrollbar-none">
-                <span class="text-[10px] text-[#8fb89e] self-center px-1 font-bold uppercase">QA:</span>
-                <button onclick="app.quickSwitch('student')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="student">Student</button>
-                <button onclick="app.quickSwitch('warden')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="warden">Warden</button>
-                <button onclick="app.quickSwitch('admin')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="admin">Admin</button>
-                <button onclick="app.quickSwitch('maintenance')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="maintenance">Maint</button>
-                <button onclick="app.quickSwitch('mess_manager')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="mess_manager">Mess</button>
-                <button onclick="app.quickSwitch('counsellor')" class="role-btn px-2.5 py-0.5 rounded-lg text-xs whitespace-nowrap bg-[#143528]" data-role="counsellor">Counsellor</button>
             </div>
         </div>
     </header>
@@ -145,7 +116,7 @@
         <!-- ========================================== -->
         <!-- VIEW 1: PROFESSIONAL LANDING & PORTAL PAGE -->
         <!-- ========================================== -->
-        <section id="view-landing" class="view-panel flex-1 flex flex-col">
+        <section id="view-landing" class="view-panel hidden flex-1 flex flex-col">
             <!-- Hero Section -->
             <div class="relative overflow-hidden border-b border-[#52b788]/20 forest-gradient-hero py-16 lg:py-24">
                 <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#52b788_1px,transparent_1px)] [background-size:16px_16px]"></div>
@@ -440,12 +411,8 @@
         <!-- ========================================== -->
         <!-- VIEW: UNIVERSAL ROLE-AWARE LOGIN PORTAL    -->
         <!-- ========================================== -->
-        <section id="view-login" class="view-panel hidden flex-1 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
+        <section id="view-login" class="view-panel flex-1 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
             <div class="max-w-xl w-full forest-card p-6 sm:p-10 rounded-3xl border border-[#52b788]/40 shadow-2xl relative space-y-6">
-                <!-- Close / Back button -->
-                <button onclick="app.navigateTo('landing')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#143528] hover:bg-[#1b4332] text-[#8fb89e] hover:text-[#fefae0] flex items-center justify-center transition" title="Back to Home">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
 
                 <!-- Title & Brand Header -->
                 <div class="text-center space-y-2">
@@ -494,14 +461,19 @@
                 </div>
 
                 <!-- 1-Click Demo Fill & Test Box -->
-                <div class="p-3 rounded-2xl bg-[#0f281e] border border-[#52b788]/20 flex items-center justify-between text-xs">
+                <div class="p-3.5 rounded-2xl bg-[#0f281e] border border-[#52b788]/20 flex items-center justify-between text-xs gap-2">
                     <div>
                         <span class="text-[10px] text-[#8fb89e] uppercase font-bold tracking-wider block">Demo Account:</span>
                         <span id="loginDemoCredsText" class="font-mono font-bold text-[#52b788]">NST2026-042 / Student@123</span>
                     </div>
-                    <button type="button" onclick="app.autoFillActiveLogin()" class="px-3 py-1.5 rounded-xl btn-forest-secondary text-xs font-bold flex items-center gap-1.5">
-                        <i class="fa-solid fa-wand-magic-sparkles text-[#52b788]"></i> <span>Auto-Fill</span>
-                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="app.autoFillActiveLogin()" class="px-2.5 py-1.5 rounded-xl btn-forest-secondary text-xs font-semibold flex items-center gap-1" title="Fill form with demo credentials">
+                            <i class="fa-solid fa-wand-magic-sparkles text-[#52b788]"></i> <span class="hidden sm:inline">Auto-Fill</span>
+                        </button>
+                        <button type="button" onclick="app.autoFillAndSubmitActiveLogin()" class="px-3 py-1.5 rounded-xl btn-forest-primary text-xs font-bold flex items-center gap-1.5 shadow-md" title="Login immediately with demo account">
+                            <i class="fa-solid fa-bolt"></i> <span>1-Click Login</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Live Login Form -->

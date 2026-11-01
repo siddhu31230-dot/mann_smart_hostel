@@ -17,10 +17,9 @@ const app = {
         this.initTheme();
         this.setupEventListeners();
         this.loadPublicMetrics();
-        const initialHash = window.location.hash;
         await this.checkAuth();
 
-        if (!this.currentUser && (window.location.pathname === '/login' || initialHash === '#login')) {
+        if (!this.currentUser) {
             this.openRoleLogin('student');
         }
     },
@@ -84,20 +83,24 @@ const app = {
         const workspace = document.getElementById('view-workspace');
         const login = document.getElementById('view-login');
 
-        if (view === 'landing') {
-            if (landing) landing.classList.remove('hidden');
-            if (workspace) workspace.classList.add('hidden');
-            if (login) login.classList.add('hidden');
-            window.location.hash = '';
-        } else if (view === 'workspace') {
+        if (view === 'workspace') {
             if (landing) landing.classList.add('hidden');
-            if (workspace) workspace.classList.remove('hidden');
             if (login) login.classList.add('hidden');
+            if (workspace) workspace.classList.remove('hidden');
         } else if (view === 'login') {
             if (landing) landing.classList.add('hidden');
             if (workspace) workspace.classList.add('hidden');
             if (login) login.classList.remove('hidden');
             window.location.hash = '#login';
+        } else if (view === 'landing') {
+            if (!this.currentUser) {
+                this.navigateTo('login');
+                return;
+            }
+            if (landing) landing.classList.remove('hidden');
+            if (workspace) workspace.classList.add('hidden');
+            if (login) login.classList.add('hidden');
+            window.location.hash = '';
         }
     },
 
@@ -366,12 +369,7 @@ const app = {
         } else {
             if (unauth) unauth.classList.remove('hidden');
             if (auth) auth.classList.add('hidden');
-            document.querySelectorAll('.role-btn').forEach(btn => {
-                btn.className = 'role-btn px-3 py-1.5 text-xs rounded-xl font-medium text-[#8fb89e] hover:text-[#fefae0] hover:bg-[#1b4332] transition';
-            });
-            if (window.location.hash !== '#login') {
-                this.navigateTo('landing');
-            }
+            this.openRoleLogin(this.activeLoginRole || 'student');
         }
     },
 
@@ -503,6 +501,42 @@ const app = {
         if (inp) inp.value = cfg.demoUser;
         if (pass) pass.value = cfg.demoPass;
         this.showToast(`Auto-filled ${cfg.title} credentials`, 'info');
+    },
+
+    autoFillAndSubmitActiveLogin() {
+        this.autoFillActiveLogin();
+        const form = document.getElementById('universalLoginForm');
+        if (form) {
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
+        }
+    },
+
+    onBrandClick() {
+        if (!this.currentUser) {
+            this.openRoleLogin(this.activeLoginRole || 'student');
+        } else if (this.currentUser.role === 'student') {
+            this.navigateTo('workspace');
+            this.navigateToStudentSubTab('my-room');
+        } else if (this.currentUser.role === 'warden') {
+            this.navigateTo('workspace');
+            this.navigateToAdminSubTab('admin-leaves');
+        } else if (this.currentUser.role === 'maintenance') {
+            this.navigateTo('workspace');
+            this.navigateToAdminSubTab('admin-maintenance');
+        } else if (this.currentUser.role === 'mess_manager') {
+            this.navigateTo('workspace');
+            this.navigateToAdminSubTab('admin-mess');
+        } else if (this.currentUser.role === 'counsellor') {
+            this.navigateTo('workspace');
+            this.navigateToAdminSubTab('counselor-sessions');
+        } else {
+            this.navigateTo('workspace');
+            this.navigateToAdminSubTab('admin-overview');
+        }
     },
 
     async quickFillAndLogin(role, id, pass) {
