@@ -463,9 +463,9 @@ const app = {
         document.querySelectorAll('.login-role-tab').forEach(tab => {
             const tabRole = tab.id.replace('loginTab-', '');
             if (tabRole === role) {
-                tab.className = 'login-role-tab py-2 px-1 rounded-xl text-center font-bold bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-md shadow-emerald-950/40 border border-emerald-400/40';
+                tab.className = 'login-role-tab active py-2.5 px-1.5 rounded-xl text-center font-bold transition flex flex-col items-center justify-center';
             } else {
-                tab.className = 'login-role-tab py-2 px-1 rounded-xl text-center font-medium text-[#8fb89e] hover:text-[#fefae0] hover:bg-[#143528] transition';
+                tab.className = 'login-role-tab py-2.5 px-1.5 rounded-xl text-center font-bold transition flex flex-col items-center justify-center';
             }
         });
 
@@ -480,7 +480,7 @@ const app = {
         if (titleEl) titleEl.textContent = cfg.title;
         if (scopeEl) scopeEl.textContent = cfg.scope;
         if (labelEl) labelEl.textContent = cfg.idLabel;
-        if (iconEl) iconEl.className = `fa-solid ${cfg.icon} absolute left-3.5 top-3 text-[#8fb89e]`;
+        if (iconEl) iconEl.className = `fa-solid ${cfg.icon} absolute left-3.5 top-3.5 text-[#52b788]`;
         if (btnTextEl) btnTextEl.textContent = cfg.btnText;
         if (demoCredsEl) demoCredsEl.textContent = cfg.demoLabel;
         if (errEl) errEl.classList.add('hidden');

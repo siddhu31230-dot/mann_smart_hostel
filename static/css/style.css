@@ -398,7 +398,7 @@ body.light-theme .text-\[\#52b788\] {
 }
 
 body.light-theme .bg-\[\#0a1711\] {
-    background-color: #f7f4ea !important;
+    background-color: #f0fdf4 !important;
 }
 
 body.light-theme .bg-\[\#0f281e\],
@@ -410,13 +410,13 @@ body.light-theme .bg-\[\#0f281e\]\/95 {
 
 body.light-theme .bg-\[\#143528\],
 body.light-theme .bg-\[\#143528\]\/80 {
-    background-color: #f2efe4 !important;
+    background-color: #ecfdf5 !important;
 }
 
 body.light-theme .forest-card {
     background: #ffffff !important;
-    border-color: rgba(45, 106, 79, 0.2) !important;
-    box-shadow: 0 4px 20px -2px rgba(27, 67, 50, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.08) !important;
 }
 
 body.light-theme #navItemsList button {
@@ -445,4 +445,159 @@ body.light-theme textarea {
     background-color: #ffffff !important;
     color: #0f281e !important;
     border-color: rgba(45, 106, 79, 0.3) !important;
+}
+
+/* =====================================================================
+   UNIVERSAL ROLE-AWARE LOGIN PORTAL - HIGH CONTRAST COHESIVE PALETTE
+   ===================================================================== */
+.login-portal-card {
+    background: #0d2319 !important;
+    border: 1.5px solid rgba(82, 183, 136, 0.45) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 30px rgba(16, 185, 129, 0.15) !important;
+}
+
+.login-tabs-container {
+    background: #07150f !important;
+    border: 1.5px solid rgba(82, 183, 136, 0.3) !important;
+}
+
+.login-role-tab {
+    color: #bbf7d0 !important;
+    background: transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.login-role-tab i {
+    color: #34d399 !important;
+    transition: all 0.2s ease;
+}
+
+.login-role-tab:hover {
+    color: #ffffff !important;
+    background: #143528 !important;
+}
+
+.login-role-tab:hover i {
+    color: #6ee7b7 !important;
+    transform: scale(1.1);
+}
+
+.login-role-tab.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(167, 243, 208, 0.6) !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45) !important;
+}
+
+.login-role-tab.active i,
+.login-role-tab.active span {
+    color: #ffffff !important;
+}
+
+.login-role-banner {
+    background: linear-gradient(135deg, #143828 0%, #0e271c 100%) !important;
+    border: 1.5px solid rgba(82, 183, 136, 0.45) !important;
+    color: #fefae0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.login-role-banner #loginRoleTitle {
+    color: #ffffff !important;
+}
+
+.login-role-banner #loginRoleScope {
+    color: #a7f3d0 !important;
+}
+
+.login-demo-box {
+    background: #091a12 !important;
+    border: 1.5px solid rgba(82, 183, 136, 0.3) !important;
+}
+
+.login-input {
+    background: #143828 !important;
+    border: 1.5px solid rgba(82, 183, 136, 0.45) !important;
+    color: #fefae0 !important;
+}
+
+.login-input:focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35) !important;
+    outline: none !important;
+}
+
+/* Light Theme Overrides for Login Portal (High-End Crisp Emerald & White) */
+body.light-theme .login-portal-card {
+    background: #ffffff !important;
+    border: 2px solid #10b981 !important;
+    box-shadow: 0 20px 45px -10px rgba(16, 185, 129, 0.18), 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.light-theme .login-tabs-container {
+    background: #f0fdf4 !important;
+    border: 2px solid #a7f3d0 !important;
+}
+
+body.light-theme .login-role-tab {
+    color: #065f46 !important;
+    background: transparent;
+}
+
+body.light-theme .login-role-tab i {
+    color: #059669 !important;
+}
+
+body.light-theme .login-role-tab:hover {
+    color: #047857 !important;
+    background: #dcfce7 !important;
+}
+
+body.light-theme .login-role-tab.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid #059669 !important;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35) !important;
+}
+
+body.light-theme .login-role-tab.active i,
+body.light-theme .login-role-tab.active span {
+    color: #ffffff !important;
+}
+
+body.light-theme .login-role-banner {
+    background: #ecfdf5 !important;
+    border: 1.5px solid #10b981 !important;
+}
+
+body.light-theme .login-role-banner #loginRoleTitle {
+    color: #065f46 !important;
+}
+
+body.light-theme .login-role-banner #loginRoleScope {
+    color: #047857 !important;
+}
+
+body.light-theme .login-demo-box {
+    background: #f0fdf4 !important;
+    border: 1.5px solid #a7f3d0 !important;
+}
+
+body.light-theme .login-demo-box span {
+    color: #065f46 !important;
+}
+
+body.light-theme .login-demo-box #loginDemoCredsText {
+    color: #059669 !important;
+}
+
+body.light-theme .login-input {
+    background: #ffffff !important;
+    border: 1.5px solid #10b981 !important;
+    color: #0f281e !important;
+}
+
+body.light-theme .login-input:focus {
+    border-color: #059669 !important;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.25) !important;
 }
